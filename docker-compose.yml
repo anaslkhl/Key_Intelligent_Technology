@@ -48,8 +48,8 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: key_intelligent
-      POSTGRES_USER: laravel
-      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: kit_user
+      POSTGRES_PASSWORD: kit_admin
     ports:
       - "5433:5432"
     volumes:
