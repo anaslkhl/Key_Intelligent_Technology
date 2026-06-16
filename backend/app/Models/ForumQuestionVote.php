@@ -6,29 +6,16 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class ForumAnswer extends Model
+class ForumQuestionVote extends Model
 {
     use HasFactory, HasUuids;
 
     protected $fillable = [
         'question_id',
         'user_id',
-        'content',
-        'upvotes',
-        'downvotes',
-        'is_accepted',
+        'vote',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'upvotes' => 'integer',
-            'downvotes' => 'integer',
-            'is_accepted' => 'boolean',
-        ];
-    }
 
     public function question(): BelongsTo
     {
@@ -38,10 +25,5 @@ class ForumAnswer extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function votes(): HasMany
-    {
-        return $this->hasMany(ForumAnswerVote::class, 'answer_id');
     }
 }

@@ -20,12 +20,12 @@ class KbArticleController extends Controller
         ]);
 
         $articles = $this->publishedArticleQuery()
-            ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query->where('family_id', $familyId))
-            ->when($validated['q'] ?? null, fn (Builder $query, string $term) => $this->applySearch($query, $term))
+            ->when($validated['family_id'] ?? null, fn(Builder $query, string $familyId) => $query->where('family_id', $familyId))
+            ->when($validated['q'] ?? null, fn(Builder $query, string $term) => $this->applySearch($query, $term))
             ->latest()
             ->paginate($request->integer('per_page', 15));
 
-        $articles->getCollection()->transform(fn (KbArticle $article) => $this->articleListPayload($article));
+        $articles->getCollection()->transform(fn(KbArticle $article) => $this->articleListPayload($article));
 
         return response()->json($articles);
     }
@@ -38,12 +38,12 @@ class KbArticleController extends Controller
         ]);
 
         $articles = $this->publishedArticleQuery()
-            ->when($validated['q'] ?? null, fn (Builder $query, string $term) => $this->applySearch($query, $term))
-            ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query->where('family_id', $familyId))
+            ->when($validated['q'] ?? null, fn(Builder $query, string $term) => $this->applySearch($query, $term))
+            ->when($validated['family_id'] ?? null, fn(Builder $query, string $familyId) => $query->where('family_id', $familyId))
             ->latest()
             ->paginate($request->integer('per_page', 15));
 
-        $articles->getCollection()->transform(fn (KbArticle $article) => $this->articleListPayload($article));
+        $articles->getCollection()->transform(fn(KbArticle $article) => $this->articleListPayload($article));
 
         return response()->json($articles);
     }
@@ -193,8 +193,9 @@ class KbArticleController extends Controller
 
         while (KbArticle::query()
             ->where('slug', $slug)
-            ->when($ignoreId, fn (Builder $query) => $query->where('id', '!=', $ignoreId))
-            ->exists()) {
+            ->when($ignoreId, fn(Builder $query) => $query->where('id', '!=', $ignoreId))
+            ->exists()
+        ) {
             $slug = "{$baseSlug}-{$suffix}";
             $suffix++;
         }

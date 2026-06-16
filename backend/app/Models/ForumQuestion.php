@@ -18,6 +18,7 @@ class ForumQuestion extends Model
         'content',
         'tags',
         'upvotes',
+        'downvotes',
         'is_solved',
     ];
 
@@ -26,6 +27,7 @@ class ForumQuestion extends Model
         return [
             'tags' => 'array',
             'upvotes' => 'integer',
+            'downvotes' => 'integer',
             'is_solved' => 'boolean',
         ];
     }
@@ -38,5 +40,10 @@ class ForumQuestion extends Model
     public function answers(): HasMany
     {
         return $this->hasMany(ForumAnswer::class, 'question_id');
+    }
+
+    public function votes(): HasMany
+    {
+        return $this->hasMany(ForumQuestionVote::class, 'question_id');
     }
 }
