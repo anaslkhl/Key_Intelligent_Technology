@@ -42,8 +42,8 @@ class ForumQuestion extends Model
         return $this->hasMany(ForumAnswer::class, 'question_id');
     }
 
-    public function votes(): HasMany
+    public function votes()
     {
-        return $this->hasMany(ForumQuestionVote::class, 'question_id');
+        return $this->morphMany(ForumQuestionVote::class, 'votable');
     }
 }

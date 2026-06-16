@@ -102,4 +102,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(FeatureVote::class);
     }
+    public function forumQuestionVotes(): HasMany
+    {
+        return $this->hasMany(ForumQuestionVote::class);
+    }
+
+    public function forumAnswerVotes(): HasMany
+    {
+        return $this->hasMany(ForumAnswerVote::class);
+    }
 }
