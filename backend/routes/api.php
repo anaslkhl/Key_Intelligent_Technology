@@ -8,3 +8,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tickets', [TicketController::class, 'index']);
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
 });
+
+
