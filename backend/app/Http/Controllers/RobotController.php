@@ -55,3 +55,6 @@ class RobotController extends Controller
         return response()->json($robot);
     }
 }
+
+
+
