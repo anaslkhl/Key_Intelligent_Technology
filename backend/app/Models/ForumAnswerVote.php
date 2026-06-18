@@ -14,7 +14,7 @@ class ForumAnswerVote extends Model
     protected $fillable = [
         'answer_id',
         'user_id',
-        'vote',
+        'vote_type',
     ];
 
     public function answer(): BelongsTo

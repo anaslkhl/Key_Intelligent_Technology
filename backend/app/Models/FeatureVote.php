@@ -12,13 +12,13 @@ class FeatureVote extends Model
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'feature_request_id',
+        'feature_id',
         'user_id',
     ];
 
     public function featureRequest(): BelongsTo
     {
-        return $this->belongsTo(FeatureRequest::class);
+        return $this->belongsTo(FeatureRequest::class, 'feature_id');
     }
 
     public function user(): BelongsTo

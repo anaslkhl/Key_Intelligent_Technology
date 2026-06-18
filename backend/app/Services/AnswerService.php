@@ -32,7 +32,7 @@ class AnswerService
             DB::transaction(function () use ($answer, $user, $vote): void {
                 $answer->votes()->create([
                     'user_id' => $user->id,
-                    'vote' => $vote,
+                    'vote_type' => $vote,
                 ]);
 
                 $answer->increment($vote === 'up' ? 'upvotes' : 'downvotes');

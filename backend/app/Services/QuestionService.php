@@ -33,7 +33,7 @@ class QuestionService
             DB::transaction(function () use ($question, $user, $vote): void {
                 $question->votes()->create([
                     'user_id' => $user->id,
-                    'vote' => $vote,
+                    'vote_type' => $vote,
                 ]);
 
                 $question->increment($vote === 'up' ? 'upvotes' : 'downvotes');

@@ -120,15 +120,14 @@ class KbArticleController extends Controller
 
         $article = KbArticle::query()->where('is_published', true)->findOrFail($id);
 
-        if ($validated['helpful']) {
-            $article->increment('helpful_count');
-            $article->refresh();
-        }
+        $article->increment($validated['helpful'] ? 'helpful_count' : 'not_helpful_count');
+        $article->refresh();
 
         return response()->json([
             'id' => $article->id,
             'helpful' => $validated['helpful'],
             'helpful_count' => $article->helpful_count,
+            'not_helpful_count' => $article->not_helpful_count,
         ]);
     }
 
@@ -213,6 +212,7 @@ class KbArticleController extends Controller
             'family' => $article->family,
             'tags' => $article->tags ?? [],
             'helpful_count' => $article->helpful_count,
+            'not_helpful_count' => $article->not_helpful_count,
             'views' => $article->views,
         ];
     }
@@ -231,6 +231,7 @@ class KbArticleController extends Controller
             'author' => $article->author,
             'views' => $article->views,
             'helpful_count' => $article->helpful_count,
+            'not_helpful_count' => $article->not_helpful_count,
             'is_published' => $article->is_published,
             'created_at' => $article->created_at,
             'updated_at' => $article->updated_at,

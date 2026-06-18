@@ -12,7 +12,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('answer_id')->constrained('forum_answers')->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
-            $table->string('vote');
+            $table->string('vote_type');
             $table->timestamps();
 
             $table->unique(['answer_id', 'user_id']);

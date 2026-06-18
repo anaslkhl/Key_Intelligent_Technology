@@ -21,6 +21,7 @@ class KbArticle extends Model
         'author_id',
         'views',
         'helpful_count',
+        'not_helpful_count',
         'is_published',
     ];
 
@@ -30,6 +31,7 @@ class KbArticle extends Model
             'tags' => 'array',
             'views' => 'integer',
             'helpful_count' => 'integer',
+            'not_helpful_count' => 'integer',
             'is_published' => 'boolean',
         ];
     }

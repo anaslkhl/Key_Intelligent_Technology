@@ -57,7 +57,7 @@ class FeatureRequestController extends Controller
         $featureRequest = FeatureRequest::query()->findOrFail($id);
 
         if (FeatureVote::query()
-            ->where('feature_request_id', $featureRequest->id)
+            ->where('feature_id', $featureRequest->id)
             ->where('user_id', $request->user()->id)
             ->exists()) {
             return $this->errorResponse('You have already voted for this feature request.', [
@@ -67,7 +67,7 @@ class FeatureRequestController extends Controller
 
         DB::transaction(function () use ($featureRequest, $request): void {
             FeatureVote::query()->create([
-                'feature_request_id' => $featureRequest->id,
+                'feature_id' => $featureRequest->id,
                 'user_id' => $request->user()->id,
             ]);
 

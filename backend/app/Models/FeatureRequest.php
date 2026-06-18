@@ -35,6 +35,6 @@ class FeatureRequest extends Model
 
     public function votes(): HasMany
     {
-        return $this->hasMany(FeatureVote::class);
+        return $this->hasMany(FeatureVote::class, 'feature_id');
     }
 }

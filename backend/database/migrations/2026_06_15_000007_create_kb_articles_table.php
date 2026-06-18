@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignUuid('author_id')->nullable()->constrained('users')->nullOnDelete();
             $table->unsignedBigInteger('views')->default(0);
             $table->unsignedBigInteger('helpful_count')->default(0);
+            $table->unsignedBigInteger('not_helpful_count')->default(0);
             $table->boolean('is_published')->default(false)->index();
             $table->timestamps();
 
