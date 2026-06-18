@@ -33,7 +33,7 @@ abstract class Controller
     protected function paginated(LengthAwarePaginator $paginator, string $resourceClass, string $message = 'OK'): JsonResponse
     {
         return response()->json([
-            'data' => $resourceClass::collection($paginator->getCollection()),
+            'data' => $resourceClass::collection($paginator->items()),
             'links' => [
                 'first' => $paginator->url(1),
                 'last' => $paginator->url($paginator->lastPage()),
@@ -54,6 +54,3 @@ abstract class Controller
         ]);
     }
 }
-
-
-
