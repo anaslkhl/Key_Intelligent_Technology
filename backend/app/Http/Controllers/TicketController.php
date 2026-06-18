@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Events\TicketCreated;
 use App\Models\Robot;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
@@ -91,6 +93,8 @@ class TicketController extends Controller
             'messages.user:id,name,email,role',
         ]);
 
+        TicketCreated::dispatch($ticket);
+
         return response()->json($ticket, 201);
     }
 
@@ -121,4 +125,3 @@ class TicketController extends Controller
         abort_unless($request->user()?->role === 'client', 403, 'Only authenticated clients can access tickets.');
     }
 }
-

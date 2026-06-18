@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email_verified_at',
         'last_login_at',
         'last_login_ip',
+        'notification_preferences',
     ];
 
     protected $hidden = [
@@ -38,6 +39,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
             'last_login_at' => 'datetime',
+            'notification_preferences' => 'array',
         ];
     }
 

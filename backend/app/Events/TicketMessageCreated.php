@@ -1,0 +1,16 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\TicketMessage;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class TicketMessageCreated
+{
+    use Dispatchable, SerializesModels;
+
+    public function __construct(public TicketMessage $message)
+    {
+    }
+}

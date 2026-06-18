@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Events\TicketAssigned;
+use App\Events\TicketStatusChanged;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -54,5 +56,18 @@ class Ticket extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(TicketMessage::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::updated(function (Ticket $ticket): void {
+            if ($ticket->wasChanged('assigned_to') && $ticket->assigned_to) {
+                TicketAssigned::dispatch($ticket);
+            }
+
+            if ($ticket->wasChanged('status')) {
+                TicketStatusChanged::dispatch($ticket, $ticket->getOriginal('status'));
+            }
+        });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TicketMessageCreated;
 use App\Http\Requests\StoreTicketMessageRequest;
 use App\Http\Requests\UpdateTicketMessageRequest;
 use App\Http\Resources\TicketMessageResource;
@@ -63,6 +64,8 @@ class TicketMessageController extends Controller
         });
 
         $message->load('user:id,name,role');
+
+        TicketMessageCreated::dispatch($message);
 
         return $this->success(new TicketMessageResource($message), 'Ticket message created successfully.', 201);
     }

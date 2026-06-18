@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\KbArticleController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RobotController;
 use App\Http\Controllers\TicketController;
@@ -37,6 +38,11 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->whereUuid('id');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->whereUuid('id');
 
     Route::post('/upload', [UploadController::class, 'upload']);
     Route::post('/uploads', [UploadController::class, 'uploadMultiple']);
