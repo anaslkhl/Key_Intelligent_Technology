@@ -6,31 +6,28 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-class TicketMessage extends Model
+class Upload extends Model
 {
     use HasFactory, HasUuids;
 
     protected $fillable = [
-        'ticket_id',
         'user_id',
-        'content',
-        'is_internal',
-        'attachments',
+        'original_name',
+        'file_path',
+        'file_size',
+        'mime_type',
+        'disk',
+        'attachable_type',
+        'attachable_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_internal' => 'boolean',
-            'attachments' => 'array',
+            'file_size' => 'integer',
         ];
-    }
-
-    public function ticket(): BelongsTo
-    {
-        return $this->belongsTo(Ticket::class);
     }
 
     public function user(): BelongsTo
@@ -38,8 +35,8 @@ class TicketMessage extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function attachUploads(): MorphMany
+    public function attachable(): MorphTo
     {
-        return $this->morphMany(Upload::class, 'attachable');
+        return $this->morphTo();
     }
 }

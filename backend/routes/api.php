@@ -9,6 +9,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RobotController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketMessageController;
+use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:5,1')->group(function () {
@@ -36,6 +37,11 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+    Route::post('/upload', [UploadController::class, 'upload']);
+    Route::post('/uploads', [UploadController::class, 'uploadMultiple']);
+    Route::get('/uploads/{id}', [UploadController::class, 'show'])->whereUuid('id');
+    Route::delete('/uploads/{id}', [UploadController::class, 'destroy'])->whereUuid('id');
 
     Route::get('/robots', [RobotController::class, 'index']);
     Route::post('/robots', [RobotController::class, 'store']);

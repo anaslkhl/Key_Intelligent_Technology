@@ -20,7 +20,7 @@ class UpdateTicketMessageRequest extends FormRequest
             'content' => ['sometimes', 'required', 'string', 'max:5000'],
             'is_internal' => ['sometimes', 'boolean'],
             'attachments' => ['sometimes', 'array'],
-            'attachments.*' => ['string', 'max:2048'],
+            'attachments.*' => ['string', 'max:2048', 'exists:uploads,file_path'],
         ];
     }
 

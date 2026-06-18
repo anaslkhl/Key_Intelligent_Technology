@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\Robot;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
+use App\Models\TicketMessage;
+use App\Models\Upload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -38,6 +40,8 @@ class TicketController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'priority' => ['required', 'string', Rule::in(['low', 'medium', 'high', 'urgent'])],
+            'attachments' => ['sometimes', 'array'],
+            'attachments.*' => ['string', 'max:2048', 'exists:uploads,file_path'],
         ]);
 
         $robot = Robot::query()
@@ -63,6 +67,23 @@ class TicketController extends Controller
             'priority' => $validated['priority'],
             'status' => 'new',
         ]);
+
+        if (! empty($validated['attachments'])) {
+            $message = $ticket->messages()->create([
+                'user_id' => $request->user()->id,
+                'content' => $validated['description'],
+                'attachments' => $validated['attachments'],
+                'is_internal' => false,
+            ]);
+
+            Upload::query()
+                ->where('user_id', $request->user()->id)
+                ->whereIn('file_path', $validated['attachments'])
+                ->update([
+                    'attachable_type' => TicketMessage::class,
+                    'attachable_id' => $message->id,
+                ]);
+        }
 
         $ticket->load([
             'robot.product.family',
@@ -100,6 +121,4 @@ class TicketController extends Controller
         abort_unless($request->user()?->role === 'client', 403, 'Only authenticated clients can access tickets.');
     }
 }
-
-
 
