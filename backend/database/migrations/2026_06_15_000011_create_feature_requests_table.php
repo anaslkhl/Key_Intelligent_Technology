@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('title');
             $table->longText('description');
             $table->string('category')->index();
-            $table->string('status')->default('submitted')->index();
+            $table->string('status')->default('pending')->index();
             $table->unsignedBigInteger('upvotes_count')->default(0);
             $table->timestamps();
 

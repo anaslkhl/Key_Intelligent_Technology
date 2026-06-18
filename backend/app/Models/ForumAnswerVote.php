@@ -15,8 +15,6 @@ class ForumAnswerVote extends Model
         'answer_id',
         'user_id',
         'vote',
-        'votable_id',
-        'votable_type',
     ];
 
     public function answer(): BelongsTo
@@ -29,8 +27,4 @@ class ForumAnswerVote extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function votable()
-    {
-        return $this->morphTo();
-    }
 }

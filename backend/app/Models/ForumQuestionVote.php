@@ -15,18 +15,11 @@ class ForumQuestionVote extends Model
         'question_id',
         'user_id',
         'vote',
-        'votable_id',
-        'votable_type',
     ];
 
     public function question(): BelongsTo
     {
         return $this->belongsTo(ForumQuestion::class, 'question_id');
-    }
-
-    public function votable()
-    {
-        return $this->morphTo();
     }
 
     public function user(): BelongsTo

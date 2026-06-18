@@ -2,196 +2,171 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ForumQuestion;
+use App\Http\Requests\StoreAnswerRequest;
+use App\Http\Requests\StoreQuestionRequest;
+use App\Http\Requests\UpdateAnswerRequest;
+use App\Http\Requests\UpdateQuestionRequest;
+use App\Http\Requests\VoteRequest;
+use App\Http\Resources\AnswerResource;
+use App\Http\Resources\QuestionResource;
 use App\Models\ForumAnswer;
+use App\Models\ForumQuestion;
+use App\Services\AnswerService;
+use App\Services\QuestionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use RuntimeException;
 
 class ForumController extends Controller
 {
-    // === QUESTIONS ===
-
-    public function questions(Request $request)
-    {
-        $query = ForumQuestion::with('user')->withCount('answers');
-
-        if ($request->tag) {
-            $query->whereJsonContains('tags', $request->tag);
-        }
-
-        if ($request->solved !== null) {
-            $query->where('is_solved', $request->solved);
-        }
-
-        return response()->json($query->latest()->paginate(15));
+    public function __construct(
+        private readonly QuestionService $questions,
+        private readonly AnswerService $answers,
+    ) {
     }
 
-    public function storeQuestion(Request $request)
+    public function questions(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'tags' => 'nullable|array|max:5',
+        $validated = $request->validate([
+            'tag' => ['nullable', 'string', 'max:50'],
+            'solved' => ['nullable', 'boolean'],
         ]);
 
-        $question = ForumQuestion::create([
-            'user_id' => auth()->id(),
-            'title' => $data['title'],
-            'content' => $data['content'],
-            'tags' => $data['tags'] ?? [],
-        ]);
+        $query = ForumQuestion::query()
+            ->with('user:id,name')
+            ->withCount('answers')
+            ->when($validated['tag'] ?? null, fn ($query, string $tag) => $query->whereJsonContains('tags', $tag))
+            ->when(array_key_exists('solved', $validated), fn ($query) => $query->where('is_solved', $validated['solved']))
+            ->latest();
 
-        return response()->json($question->load('user'), 201);
+        return $this->paginated(
+            $query->paginate($request->integer('per_page', 15)),
+            QuestionResource::class,
+            'Questions retrieved successfully.',
+        );
     }
 
-    public function showQuestion($id)
+    public function storeQuestion(StoreQuestionRequest $request): JsonResponse
     {
-        $question = ForumQuestion::with('user', 'answers.user')->findOrFail($id);
-        $question->loadCount('answers');
-        return response()->json($question);
+        $question = $this->questions->create($request->user(), $request->validated())
+            ->load('user:id,name')
+            ->loadCount('answers');
+
+        return $this->success(new QuestionResource($question), 'Question created successfully.', 201);
     }
 
-    public function updateQuestion(Request $request, $id)
+    public function showQuestion(string $id): JsonResponse
     {
-        $question = ForumQuestion::findOrFail($id);
+        $question = ForumQuestion::query()
+            ->with(['user:id,name', 'answers.user:id,name'])
+            ->withCount('answers')
+            ->findOrFail($id);
 
-        if ($question->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        return $this->success(new QuestionResource($question), 'Question retrieved successfully.');
+    }
+
+    public function updateQuestion(UpdateQuestionRequest $request, string $id): JsonResponse
+    {
+        $question = ForumQuestion::query()->findOrFail($id);
+
+        if (Gate::denies('update', $question)) {
+            return $this->error('Only the question author can update this question.', [], 403);
         }
 
-        $data = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'content' => 'sometimes|string',
-            'tags' => 'nullable|array|max:5',
-        ]);
+        $question = $this->questions->update($question, $request->validated())
+            ->load('user:id,name')
+            ->loadCount('answers');
 
-        $question->update($data);
-        return response()->json($question);
+        return $this->success(new QuestionResource($question), 'Question updated successfully.');
     }
 
-    public function deleteQuestion($id)
+    public function deleteQuestion(string $id): JsonResponse
     {
-        $question = ForumQuestion::findOrFail($id);
+        $question = ForumQuestion::query()->findOrFail($id);
 
-        if ($question->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (Gate::denies('delete', $question)) {
+            return $this->error('Only the question author or an admin can delete this question.', [], 403);
         }
 
         $question->delete();
-        return response()->json(['message' => 'Question deleted']);
+
+        return $this->success(null, 'Question deleted successfully.');
     }
 
-    // === ANSWERS ===
-
-    public function storeAnswer(Request $request, $questionId)
+    public function voteQuestion(VoteRequest $request, string $id): JsonResponse
     {
-        $data = $request->validate([
-            'content' => 'required|string',
-        ]);
+        $question = ForumQuestion::query()->findOrFail($id);
 
-        $question = ForumQuestion::findOrFail($questionId);
-
-        $answer = $question->answers()->create([
-            'user_id' => auth()->id(),
-            'content' => $data['content'],
-        ]);
-
-        return response()->json($answer->load('user'), 201);
-    }
-
-    public function updateAnswer(Request $request, $id)
-    {
-        $answer = ForumAnswer::findOrFail($id);
-
-        if ($answer->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        try {
+            $question = $this->questions->toggleVote($question, $request->user(), $request->validated()['vote'])
+                ->load('user:id,name')
+                ->loadCount('answers');
+        } catch (RuntimeException $exception) {
+            return $this->error($exception->getMessage(), ['vote' => [$exception->getMessage()]]);
         }
 
-        $data = $request->validate([
-            'content' => 'sometimes|string',
-        ]);
-
-        $answer->update($data);
-        return response()->json($answer);
+        return $this->success(new QuestionResource($question), 'Vote recorded successfully.');
     }
 
-    public function deleteAnswer($id)
+    public function storeAnswer(StoreAnswerRequest $request, string $questionId): JsonResponse
     {
-        $answer = ForumAnswer::findOrFail($id);
+        $question = ForumQuestion::query()->findOrFail($questionId);
+        $answer = $this->answers->create($question, $request->user(), $request->validated())->load('user:id,name');
 
-        if ($answer->user_id !== auth()->id() && auth()->user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        return $this->success(new AnswerResource($answer), 'Answer created successfully.', 201);
+    }
+
+    public function updateAnswer(UpdateAnswerRequest $request, string $id): JsonResponse
+    {
+        $answer = ForumAnswer::query()->with('question')->findOrFail($id);
+
+        if (Gate::denies('update', $answer)) {
+            return $this->error('Only the answer author can update this answer.', [], 403);
+        }
+
+        $answer = $this->answers->update($answer, $request->validated())->load('user:id,name');
+
+        return $this->success(new AnswerResource($answer), 'Answer updated successfully.');
+    }
+
+    public function deleteAnswer(string $id): JsonResponse
+    {
+        $answer = ForumAnswer::query()->with('question')->findOrFail($id);
+
+        if (Gate::denies('delete', $answer)) {
+            return $this->error('Only the answer author or an admin can delete this answer.', [], 403);
         }
 
         $answer->delete();
-        return response()->json(['message' => 'Answer deleted']);
+
+        return $this->success(null, 'Answer deleted successfully.');
     }
 
-    public function acceptAnswer($id)
+    public function voteAnswer(VoteRequest $request, string $id): JsonResponse
     {
-        $answer = ForumAnswer::findOrFail($id);
-        $question = $answer->question;
+        $answer = ForumAnswer::query()->findOrFail($id);
 
-        // Only question author can accept
-        if ($question->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Only the question author can accept answers'], 403);
+        try {
+            $answer = $this->answers->toggleVote($answer, $request->user(), $request->validated()['vote'])
+                ->load('user:id,name');
+        } catch (RuntimeException $exception) {
+            return $this->error($exception->getMessage(), ['vote' => [$exception->getMessage()]]);
         }
 
-        // Remove previous accepted
-        $question->answers()->where('is_accepted', true)->update(['is_accepted' => false]);
-
-        // Accept this answer
-        $answer->update(['is_accepted' => true]);
-        $question->update(['is_solved' => true]);
-
-        return response()->json(['message' => 'Answer accepted']);
+        return $this->success(new AnswerResource($answer), 'Vote recorded successfully.');
     }
 
-    // === VOTES ===
-
-    public function voteQuestion(Request $request, $id)
+    public function acceptAnswer(string $id): JsonResponse
     {
-        $data = $request->validate(['vote' => 'required|in:up,down']);
-        $question = ForumQuestion::findOrFail($id);
+        $answer = ForumAnswer::query()->with(['question', 'user:id,name'])->findOrFail($id);
 
-        return $this->toggleVote($question, $data['vote']);
-    }
-
-    public function voteAnswer(Request $request, $id)
-    {
-        $data = $request->validate(['vote' => 'required|in:up,down']);
-        $answer = ForumAnswer::findOrFail($id);
-
-        return $this->toggleVote($answer, $data['vote']);
-    }
-
-    private function toggleVote($model, $voteType)
-    {
-        $user = auth()->user();
-        $existing = $model->votes()->where('user_id', $user->id)->first();
-
-        if ($existing) {
-            if ($existing->vote_type === $voteType) {
-                $existing->delete();
-                $message = 'Vote removed';
-            } else {
-                $existing->update(['vote_type' => $voteType]);
-                $message = 'Vote updated';
-            }
-        } else {
-            $model->votes()->create([
-                'user_id' => $user->id,
-                'vote_type' => $voteType,
-            ]);
-            $message = 'Vote added';
+        if (Gate::denies('accept', $answer)) {
+            return $this->error('Only the question author can accept an answer.', [], 403);
         }
 
-        $upvotes = $model->votes()->where('vote_type', 'up')->count();
-        $downvotes = $model->votes()->where('vote_type', 'down')->count();
+        $answer = $this->answers->acceptAnswer($answer)->load('user:id,name');
 
-        return response()->json([
-            'message' => $message,
-            'upvotes' => $upvotes,
-            'downvotes' => $downvotes,
-        ]);
+        return $this->success(new AnswerResource($answer), 'Answer accepted successfully.');
     }
 }

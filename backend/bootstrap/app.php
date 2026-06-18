@@ -13,9 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->appendToGroup('api', [
-            \App\Http\Middleware\EnsureUserIsActive::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ]);
 
@@ -24,9 +22,20 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
     })
-    ->withMiddleware(function (Middleware $middleware) {
-        //
-    })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Illuminate\Validation\ValidationException $exception) {
+            return response()->json([
+                'message' => 'Validation failed.',
+                'errors' => $exception->errors(),
+                'status' => 422,
+            ], 422);
+        });
+
+        $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $exception) {
+            return response()->json([
+                'message' => $exception->getMessage() ?: 'This action is unauthorized.',
+                'errors' => (object) [],
+                'status' => 403,
+            ], 403);
+        });
     })->create();

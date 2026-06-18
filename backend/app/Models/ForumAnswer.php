@@ -40,8 +40,8 @@ class ForumAnswer extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function votes()
+    public function votes(): HasMany
     {
-        return $this->morphMany(ForumAnswerVote::class, 'votable');
+        return $this->hasMany(ForumAnswerVote::class, 'answer_id');
     }
 }

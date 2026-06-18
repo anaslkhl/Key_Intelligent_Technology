@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('robot_id')->constrained()->cascadeOnDelete();
             $table->unsignedTinyInteger('rating');
-            $table->string('title');
-            $table->longText('comment');
+            $table->string('title')->nullable();
+            $table->longText('comment')->nullable();
             $table->text('pros')->nullable();
             $table->text('cons')->nullable();
             $table->boolean('is_approved')->default(false)->index();

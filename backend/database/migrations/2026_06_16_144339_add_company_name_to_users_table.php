@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('users', 'company_name')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
             $table->string('company_name')->nullable()->after('email');
         });
@@ -21,6 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (! Schema::hasColumn('users', 'company_name')) {
+            return;
+        }
+
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('company_name');
         });
