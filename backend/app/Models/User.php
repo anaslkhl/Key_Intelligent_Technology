@@ -2,24 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasUuids, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -27,32 +20,28 @@ class User extends Authenticatable
         'role',
         'password',
         'is_active',
+        'email_verified_at',
+        'last_login_at',
+        'last_login_ip',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'last_login_at' => 'datetime',
         ];
     }
 
+    // Relationships
     public function robots(): HasMany
     {
         return $this->hasMany(Robot::class);
@@ -102,6 +91,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(FeatureVote::class);
     }
+
     public function forumQuestionVotes(): HasMany
     {
         return $this->hasMany(ForumQuestionVote::class);
@@ -110,5 +100,31 @@ class User extends Authenticatable
     public function forumAnswerVotes(): HasMany
     {
         return $this->hasMany(ForumAnswerVote::class);
+    }
+
+    // Security methods
+    public function isActive(): bool
+    {
+        return $this->is_active && !is_null($this->email_verified_at);
+    }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isAgent(): bool
+    {
+        return $this->role === 'agent';
+    }
+
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
     }
 }
