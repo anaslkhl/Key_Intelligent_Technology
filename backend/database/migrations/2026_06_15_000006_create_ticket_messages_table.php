@@ -12,11 +12,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('ticket_id')->constrained()->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained()->cascadeOnDelete();
-            $table->text('message');
+            $table->text('content');
             $table->boolean('is_internal')->default(false)->index();
             $table->jsonb('attachments')->nullable();
             $table->timestamps();
 
+            $table->index('ticket_id');
+            $table->index('user_id');
+            $table->index('created_at');
             $table->index(['ticket_id', 'created_at']);
             $table->index(['user_id', 'created_at']);
         });

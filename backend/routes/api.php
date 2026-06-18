@@ -8,6 +8,7 @@ use App\Http\Controllers\KbArticleController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RobotController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\TicketMessageController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:5,1')->group(function () {
@@ -43,6 +44,10 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::get('/tickets', [TicketController::class, 'index']);
     Route::post('/tickets', [TicketController::class, 'store']);
     Route::get('/tickets/{id}', [TicketController::class, 'show'])->whereUuid('id');
+    Route::get('/tickets/{ticket}/messages', [TicketMessageController::class, 'index'])->whereUuid('ticket');
+    Route::post('/tickets/{ticket}/messages', [TicketMessageController::class, 'store'])->whereUuid('ticket');
+    Route::put('/messages/{message}', [TicketMessageController::class, 'update'])->whereUuid('message');
+    Route::delete('/messages/{message}', [TicketMessageController::class, 'destroy'])->whereUuid('message');
 
     Route::post('/knowledge-base', [KbArticleController::class, 'store']);
     Route::put('/knowledge-base/{id}', [KbArticleController::class, 'update'])->whereUuid('id');
