@@ -7,6 +7,7 @@ use App\Models\ForumAnswer;
 use App\Models\ForumQuestion;
 use App\Models\Review;
 use App\Policies\AnswerPolicy;
+use App\Policies\AdminPolicy;
 use App\Policies\FeatureRequestPolicy;
 use App\Policies\QuestionPolicy;
 use App\Policies\ReviewPolicy;
@@ -32,5 +33,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(FeatureRequest::class, FeatureRequestPolicy::class);
         Gate::policy(ForumQuestion::class, QuestionPolicy::class);
         Gate::policy(ForumAnswer::class, AnswerPolicy::class);
+        Gate::define('viewAdminDashboard', [AdminPolicy::class, 'viewAdminDashboard']);
     }
 }

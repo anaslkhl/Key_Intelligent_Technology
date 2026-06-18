@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\KbArticleController;
@@ -66,3 +67,17 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
     Route::post('/forum/answers/{id}/vote', [ForumController::class, 'voteAnswer'])->whereUuid('id');
     Route::post('/forum/answers/{id}/accept', [ForumController::class, 'acceptAnswer'])->whereUuid('id');
 });
+
+Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
+    ->prefix('admin')
+    ->group(function () {
+        Route::get('/stats', [AdminController::class, 'getStats']);
+        Route::get('/users', [AdminController::class, 'getUsers']);
+        Route::patch('/users/{id}/role', [AdminController::class, 'updateUserRole'])->whereUuid('id');
+        Route::patch('/users/{id}/status', [AdminController::class, 'toggleUserStatus'])->whereUuid('id');
+        Route::get('/tickets', [AdminController::class, 'getTickets']);
+        Route::get('/tickets/{id}', [AdminController::class, 'getTicketDetail'])->whereUuid('id');
+        Route::get('/analytics', [AdminController::class, 'getAnalytics']);
+        Route::get('/export/users', [AdminController::class, 'exportUsers']);
+        Route::get('/export/tickets', [AdminController::class, 'exportTickets']);
+    });
