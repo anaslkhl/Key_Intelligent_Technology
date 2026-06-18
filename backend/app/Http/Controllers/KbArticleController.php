@@ -23,11 +23,11 @@ class KbArticleController extends Controller
             ->when($validated['family_id'] ?? null, fn(Builder $query, string $familyId) => $query->where('family_id', $familyId))
             ->when($validated['q'] ?? null, fn(Builder $query, string $term) => $this->applySearch($query, $term))
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         $articles->getCollection()->transform(fn(KbArticle $article) => $this->articleListPayload($article));
 
-        return response()->json($articles);
+        return $this->success($this->paginatorPayload($articles), 'Knowledge base articles retrieved successfully.');
     }
 
     public function search(Request $request): JsonResponse
@@ -41,11 +41,11 @@ class KbArticleController extends Controller
             ->when($validated['q'] ?? null, fn(Builder $query, string $term) => $this->applySearch($query, $term))
             ->when($validated['family_id'] ?? null, fn(Builder $query, string $familyId) => $query->where('family_id', $familyId))
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         $articles->getCollection()->transform(fn(KbArticle $article) => $this->articleListPayload($article));
 
-        return response()->json($articles);
+        return $this->success($this->paginatorPayload($articles), 'Knowledge base search results retrieved successfully.');
     }
 
     public function show(string $slug): JsonResponse
@@ -57,7 +57,7 @@ class KbArticleController extends Controller
         $article->increment('views');
         $article->refresh();
 
-        return response()->json($this->articleDetailPayload($article));
+        return $this->success($this->articleDetailPayload($article), 'Knowledge base article retrieved successfully.');
     }
 
     public function store(Request $request): JsonResponse
@@ -77,7 +77,7 @@ class KbArticleController extends Controller
 
         $article->load(['family', 'product', 'author:id,name,email,role']);
 
-        return response()->json($this->articleDetailPayload($article), 201);
+        return $this->success($this->articleDetailPayload($article), 'Knowledge base article created successfully.', 201);
     }
 
     public function update(Request $request, string $id): JsonResponse
@@ -100,7 +100,7 @@ class KbArticleController extends Controller
         $article->update($validated);
         $article->load(['family', 'product', 'author:id,name,email,role']);
 
-        return response()->json($this->articleDetailPayload($article));
+        return $this->success($this->articleDetailPayload($article), 'Knowledge base article updated successfully.');
     }
 
     public function destroy(Request $request, string $id): JsonResponse
@@ -109,7 +109,7 @@ class KbArticleController extends Controller
 
         KbArticle::query()->findOrFail($id)->delete();
 
-        return response()->noContent();
+        return $this->success(null, 'Knowledge base article deleted successfully.');
     }
 
     public function feedback(Request $request, string $id): JsonResponse
@@ -123,12 +123,12 @@ class KbArticleController extends Controller
         $article->increment($validated['helpful'] ? 'helpful_count' : 'not_helpful_count');
         $article->refresh();
 
-        return response()->json([
+        return $this->success([
             'id' => $article->id,
             'helpful' => $validated['helpful'],
             'helpful_count' => $article->helpful_count,
             'not_helpful_count' => $article->not_helpful_count,
-        ]);
+        ], 'Feedback recorded successfully.');
     }
 
     private function publishedArticleQuery(): Builder
@@ -208,7 +208,7 @@ class KbArticleController extends Controller
             'id' => $article->id,
             'title' => $article->title,
             'slug' => $article->slug,
-            'excerpt' => Str::limit(strip_tags((string) Str::markdown($article->content)), 180),
+            'excerpt' => Str::limit(strip_tags($this->renderMarkdown($article->content)), 180),
             'family' => $article->family,
             'tags' => $article->tags ?? [],
             'helpful_count' => $article->helpful_count,
@@ -224,7 +224,7 @@ class KbArticleController extends Controller
             'title' => $article->title,
             'slug' => $article->slug,
             'content' => $article->content,
-            'content_html' => (string) Str::markdown($article->content),
+            'content_html' => $this->renderMarkdown($article->content),
             'family' => $article->family,
             'product' => $article->product,
             'tags' => $article->tags ?? [],
@@ -235,6 +235,33 @@ class KbArticleController extends Controller
             'is_published' => $article->is_published,
             'created_at' => $article->created_at,
             'updated_at' => $article->updated_at,
+        ];
+    }
+
+    private function renderMarkdown(string $content): string
+    {
+        return (string) Str::markdown(strip_tags($content));
+    }
+
+    private function paginatorPayload($paginator): array
+    {
+        return [
+            'data' => $paginator->getCollection(),
+            'links' => [
+                'first' => $paginator->url(1),
+                'last' => $paginator->url($paginator->lastPage()),
+                'prev' => $paginator->previousPageUrl(),
+                'next' => $paginator->nextPageUrl(),
+            ],
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'from' => $paginator->firstItem(),
+                'last_page' => $paginator->lastPage(),
+                'path' => $paginator->path(),
+                'per_page' => $paginator->perPage(),
+                'to' => $paginator->lastItem(),
+                'total' => $paginator->total(),
+            ],
         ];
     }
 }

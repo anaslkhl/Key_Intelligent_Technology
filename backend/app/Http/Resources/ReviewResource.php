@@ -28,7 +28,6 @@ class ReviewResource extends JsonResource
             'robot' => $this->whenLoaded('robot', fn () => [
                 'id' => $this->robot->id,
                 'name' => $this->robot->name,
-                'serial_number' => $this->robot->serial_number,
                 'product' => $this->robot->relationLoaded('product') && $this->robot->product ? [
                     'id' => $this->robot->product->id,
                     'model' => $this->robot->product->model,

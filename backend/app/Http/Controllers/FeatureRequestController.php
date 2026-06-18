@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateFeatureStatusRequest;
 use App\Http\Resources\FeatureRequestResource;
 use App\Models\FeatureRequest;
 use App\Models\FeatureVote;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@ class FeatureRequestController extends Controller
             ->with('user:id,name')
             ->orderByDesc('upvotes_count')
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         return $this->paginatedResponse($featureRequests, FeatureRequestResource::class, 'Feature requests retrieved successfully.');
     }
@@ -65,14 +66,20 @@ class FeatureRequestController extends Controller
             ]);
         }
 
-        DB::transaction(function () use ($featureRequest, $request): void {
-            FeatureVote::query()->create([
-                'feature_id' => $featureRequest->id,
-                'user_id' => $request->user()->id,
-            ]);
+        try {
+            DB::transaction(function () use ($featureRequest, $request): void {
+                FeatureVote::query()->create([
+                    'feature_id' => $featureRequest->id,
+                    'user_id' => $request->user()->id,
+                ]);
 
-            $featureRequest->increment('upvotes_count');
-        });
+                $featureRequest->increment('upvotes_count');
+            });
+        } catch (QueryException) {
+            return $this->errorResponse('You have already voted for this feature request.', [
+                'feature_request_id' => ['Each user can vote once per feature request.'],
+            ]);
+        }
 
         return $this->successResponse(
             new FeatureRequestResource($featureRequest->refresh()->load('user:id,name')),

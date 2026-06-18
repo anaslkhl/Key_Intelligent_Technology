@@ -41,7 +41,7 @@ class ForumController extends Controller
             ->latest();
 
         return $this->paginated(
-            $query->paginate($request->integer('per_page', 15)),
+            $query->paginate($this->perPage()),
             QuestionResource::class,
             'Questions retrieved successfully.',
         );

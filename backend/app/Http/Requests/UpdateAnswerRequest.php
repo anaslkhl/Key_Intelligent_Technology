@@ -14,7 +14,7 @@ class UpdateAnswerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'content' => ['sometimes', 'string'],
+            'content' => ['sometimes', 'string', 'max:10000'],
         ];
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Upload;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StoreTicketMessageRequest extends FormRequest
 {
@@ -21,6 +23,28 @@ class StoreTicketMessageRequest extends FormRequest
             'is_internal' => ['sometimes', 'boolean'],
             'attachments' => ['sometimes', 'array'],
             'attachments.*' => ['string', 'max:2048', 'exists:uploads,file_path'],
+        ];
+    }
+
+    public function after(): array
+    {
+        return [
+            function (Validator $validator): void {
+                $paths = array_unique($this->input('attachments', []));
+
+                if ($paths === []) {
+                    return;
+                }
+
+                $ownedUploads = Upload::query()
+                    ->where('user_id', $this->user()?->id)
+                    ->whereIn('file_path', $paths)
+                    ->count();
+
+                if ($ownedUploads !== count($paths)) {
+                    $validator->errors()->add('attachments', 'All attachments must belong to the authenticated user.');
+                }
+            },
         ];
     }
 

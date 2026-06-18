@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\TicketCreated;
+use App\Http\Resources\TicketResource;
 use App\Models\Robot;
 use App\Models\Ticket;
 use App\Models\TicketCategory;
@@ -10,6 +11,7 @@ use App\Models\TicketMessage;
 use App\Models\Upload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
@@ -27,9 +29,9 @@ class TicketController extends Controller
             ])
             ->withCount('messages')
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
-        return response()->json($tickets);
+        return $this->paginated($tickets, TicketResource::class, 'Tickets retrieved successfully.');
     }
 
     public function store(Request $request): JsonResponse
@@ -46,6 +48,8 @@ class TicketController extends Controller
             'attachments.*' => ['string', 'max:2048', 'exists:uploads,file_path'],
         ]);
 
+        $this->ensureAttachmentsBelongToUser($validated['attachments'] ?? [], $request->user()->id);
+
         $robot = Robot::query()
             ->with('product')
             ->where('id', $validated['robot_id'])
@@ -60,32 +64,36 @@ class TicketController extends Controller
             ], 422);
         }
 
-        $ticket = Ticket::query()->create([
-            'user_id' => $request->user()->id,
-            'robot_id' => $robot->id,
-            'category_id' => $category->id,
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'priority' => $validated['priority'],
-            'status' => 'new',
-        ]);
-
-        if (! empty($validated['attachments'])) {
-            $message = $ticket->messages()->create([
+        $ticket = DB::transaction(function () use ($request, $robot, $category, $validated): Ticket {
+            $ticket = Ticket::query()->create([
                 'user_id' => $request->user()->id,
-                'content' => $validated['description'],
-                'attachments' => $validated['attachments'],
-                'is_internal' => false,
+                'robot_id' => $robot->id,
+                'category_id' => $category->id,
+                'title' => $validated['title'],
+                'description' => $validated['description'],
+                'priority' => $validated['priority'],
+                'status' => 'new',
             ]);
 
-            Upload::query()
-                ->where('user_id', $request->user()->id)
-                ->whereIn('file_path', $validated['attachments'])
-                ->update([
-                    'attachable_type' => TicketMessage::class,
-                    'attachable_id' => $message->id,
+            if (! empty($validated['attachments'])) {
+                $message = $ticket->messages()->create([
+                    'user_id' => $request->user()->id,
+                    'content' => $validated['description'],
+                    'attachments' => $validated['attachments'],
+                    'is_internal' => false,
                 ]);
-        }
+
+                Upload::query()
+                    ->where('user_id', $request->user()->id)
+                    ->whereIn('file_path', $validated['attachments'])
+                    ->update([
+                        'attachable_type' => TicketMessage::class,
+                        'attachable_id' => $message->id,
+                    ]);
+            }
+
+            return $ticket;
+        });
 
         $ticket->load([
             'robot.product.family',
@@ -95,7 +103,7 @@ class TicketController extends Controller
 
         TicketCreated::dispatch($ticket);
 
-        return response()->json($ticket, 201);
+        return $this->success(new TicketResource($ticket), 'Ticket created successfully.', 201);
     }
 
     public function show(Request $request, string $id): JsonResponse
@@ -116,12 +124,31 @@ class TicketController extends Controller
             ])
             ->firstOrFail();
 
-        return response()->json($ticket);
+        return $this->success(new TicketResource($ticket), 'Ticket retrieved successfully.');
     }
 
     private function authorizeClient(Request $request): void
     {
         abort_unless($request->user()?->is_active, 403, 'Your account is inactive.');
         abort_unless($request->user()?->role === 'client', 403, 'Only authenticated clients can access tickets.');
+    }
+
+    /**
+     * @param array<int, string> $paths
+     */
+    private function ensureAttachmentsBelongToUser(array $paths, string $userId): void
+    {
+        $paths = array_unique($paths);
+
+        if ($paths === []) {
+            return;
+        }
+
+        $ownedUploads = Upload::query()
+            ->where('user_id', $userId)
+            ->whereIn('file_path', $paths)
+            ->count();
+
+        abort_unless($ownedUploads === count($paths), 403, 'All attachments must belong to the authenticated user.');
     }
 }

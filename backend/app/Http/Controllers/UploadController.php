@@ -77,11 +77,19 @@ class UploadController extends Controller
 
         return Upload::query()->create([
             'user_id' => $userId,
-            'original_name' => basename($file->getClientOriginalName()),
+            'original_name' => $this->sanitizeOriginalName($file->getClientOriginalName()),
             'file_path' => $path,
             'file_size' => $file->getSize(),
             'mime_type' => $file->getMimeType() ?: 'application/octet-stream',
             'disk' => 'public',
         ]);
+    }
+
+    private function sanitizeOriginalName(string $name): string
+    {
+        $name = basename($name);
+        $name = preg_replace('/[^\w.\- ]+/', '_', $name) ?: 'upload';
+
+        return Str::limit($name, 255, '');
     }
 }

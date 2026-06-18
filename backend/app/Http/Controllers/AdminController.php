@@ -65,7 +65,7 @@ class AdminController extends Controller
                 });
             })
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         return $this->paginated($users, AdminUserResource::class, 'Users retrieved successfully.');
     }
@@ -113,7 +113,7 @@ class AdminController extends Controller
             ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query
                 ->whereHas('robot.product', fn (Builder $query) => $query->where('family_id', $familyId)))
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         return $this->paginated($tickets, AdminTicketResource::class, 'Tickets retrieved successfully.');
     }
@@ -194,11 +194,11 @@ class AdminController extends Controller
                 ->chunk(500, function ($users) use ($handle): void {
                     foreach ($users as $user) {
                         fputcsv($handle, [
-                            $user->name,
-                            $user->email,
-                            $user->role,
+                            $this->csvCell($user->name),
+                            $this->csvCell($user->email),
+                            $this->csvCell($user->role),
                             $user->is_active ? 'true' : 'false',
-                            $user->created_at,
+                            $this->csvCell((string) $user->created_at),
                         ]);
                     }
                 });
@@ -224,12 +224,12 @@ class AdminController extends Controller
                 ->chunk(500, function ($tickets) use ($handle): void {
                     foreach ($tickets as $ticket) {
                         fputcsv($handle, [
-                            $ticket->title,
-                            $ticket->status,
-                            $ticket->priority,
-                            $ticket->user?->name,
-                            $ticket->robot?->name,
-                            $ticket->created_at,
+                            $this->csvCell($ticket->title),
+                            $this->csvCell($ticket->status),
+                            $this->csvCell($ticket->priority),
+                            $this->csvCell($ticket->user?->name),
+                            $this->csvCell($ticket->robot?->name),
+                            $this->csvCell((string) $ticket->created_at),
                             $ticket->csat_rating,
                         ]);
                     }
@@ -245,5 +245,12 @@ class AdminController extends Controller
     private function authorizeAdminDashboard(): void
     {
         Gate::authorize('viewAdminDashboard');
+    }
+
+    private function csvCell(mixed $value): string
+    {
+        $value = (string) $value;
+
+        return preg_match('/^[=+\-@\t\r]/', $value) === 1 ? "'{$value}" : $value;
     }
 }

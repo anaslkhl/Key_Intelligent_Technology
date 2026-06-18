@@ -13,7 +13,7 @@ use App\Http\Controllers\TicketMessageController;
 use App\Http\Controllers\UploadController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('throttle:5,1')->group(function () {
+Route::middleware('throttle:5,5')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -33,19 +33,25 @@ Route::get('/feature-requests/{id}', [FeatureRequestController::class, 'show'])-
 Route::get('/forum/questions', [ForumController::class, 'questions']);
 Route::get('/forum/questions/{id}', [ForumController::class, 'showQuestion'])->whereUuid('id');
 
-Route::middleware(['auth:sanctum', 'active'])->group(function () {
+Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', [AuthController::class, 'resendEmailVerification'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
 
     Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->whereUuid('id');
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->whereUuid('id');
 
-    Route::post('/upload', [UploadController::class, 'upload']);
-    Route::post('/uploads', [UploadController::class, 'uploadMultiple']);
+    Route::post('/upload', [UploadController::class, 'upload'])->middleware('throttle:10,1');
+    Route::post('/uploads', [UploadController::class, 'uploadMultiple'])->middleware('throttle:5,1');
     Route::get('/uploads/{id}', [UploadController::class, 'show'])->whereUuid('id');
     Route::delete('/uploads/{id}', [UploadController::class, 'destroy'])->whereUuid('id');
 
@@ -98,6 +104,3 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
         Route::get('/export/users', [AdminController::class, 'exportUsers']);
         Route::get('/export/tickets', [AdminController::class, 'exportTickets']);
     });
-
-
-    

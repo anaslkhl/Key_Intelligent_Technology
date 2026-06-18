@@ -7,6 +7,11 @@ use Illuminate\Http\JsonResponse;
 
 abstract class Controller
 {
+    protected function perPage(int $default = 15, int $max = 50): int
+    {
+        return min(max((int) request()->integer('per_page', $default), 1), $max);
+    }
+
     protected function success(mixed $data = null, string $message = 'OK', int $status = 200): JsonResponse
     {
         return response()->json([
@@ -49,7 +54,6 @@ abstract class Controller
         ]);
     }
 }
-
 
 
 

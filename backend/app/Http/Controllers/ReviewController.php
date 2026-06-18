@@ -25,7 +25,7 @@ class ReviewController extends Controller
             ->when($validated['product_id'] ?? null, fn ($query, string $productId) => $query
                 ->whereHas('robot', fn ($query) => $query->where('product_id', $productId)))
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         return $this->paginatedResponse($reviews, ReviewResource::class, 'Approved reviews retrieved successfully.');
     }
@@ -75,7 +75,7 @@ class ReviewController extends Controller
             ->where('user_id', $request->user()->id)
             ->with(['user:id,name', 'robot.product'])
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate($this->perPage());
 
         return $this->paginatedResponse($reviews, ReviewResource::class, 'Your reviews retrieved successfully.');
     }

@@ -15,7 +15,7 @@ class UpdateQuestionRequest extends FormRequest
     {
         return [
             'title' => ['sometimes', 'string', 'max:255'],
-            'content' => ['sometimes', 'string'],
+            'content' => ['sometimes', 'string', 'max:10000'],
             'tags' => ['nullable', 'array', 'max:5'],
             'tags.*' => ['string', 'max:50'],
         ];

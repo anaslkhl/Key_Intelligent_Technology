@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -16,7 +19,7 @@ class AuthController extends Controller
     /**
      * Register a new user
      */
-    public function register(Request $request)
+    public function register(Request $request): JsonResponse
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
@@ -33,8 +36,7 @@ class AuthController extends Controller
             'role' => 'client',
         ]);
 
-        // Generate email verification token
-        // $user->sendEmailVerificationNotification();
+        $user->sendEmailVerificationNotification();
 
         $token = $user->createToken('auth_token', ['*'], now()->addHours(24))->plainTextToken;
 
@@ -53,7 +55,7 @@ class AuthController extends Controller
     /**
      * Login user
      */
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $data = $request->validate([
             'email' => 'required|email',
@@ -61,7 +63,7 @@ class AuthController extends Controller
         ]);
 
         // Rate limiting
-        $key = 'login_attempts_' . $request->ip();
+        $key = 'login_attempts:'.Str::lower($data['email']).'|'.$request->ip();
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
             throw ValidationException::withMessages([
@@ -124,7 +126,7 @@ class AuthController extends Controller
     /**
      * Logout user
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         // Delete current token only
         $request->user()->currentAccessToken()->delete();
@@ -141,7 +143,7 @@ class AuthController extends Controller
     /**
      * Get authenticated user
      */
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         return response()->json([
             'data' => $request->user()->only([
@@ -155,7 +157,7 @@ class AuthController extends Controller
     /**
      * Refresh token
      */
-    public function refresh(Request $request)
+    public function refresh(Request $request): JsonResponse
     {
         $user = $request->user();
         
@@ -179,31 +181,22 @@ class AuthController extends Controller
     /**
      * Forgot password
      */
-    public function forgotPassword(Request $request)
+    public function forgotPassword(Request $request): JsonResponse
     {
-        $request->validate(['email' => 'required|email|exists:users']);
+        $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        if ($status === Password::RESET_LINK_SENT) {
-            return response()->json([
-                'message' => 'Password reset link sent to your email.',
-                'status' => 200
-            ]);
-        }
+        Password::sendResetLink($request->only('email'));
 
         return response()->json([
-            'message' => 'Unable to send reset link.',
-            'status' => 400
-        ], 400);
+            'message' => 'If that email exists, a password reset link has been sent.',
+            'status' => 200
+        ]);
     }
 
     /**
      * Reset password
      */
-    public function resetPassword(Request $request)
+    public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([
             'token' => 'required',
@@ -217,6 +210,8 @@ class AuthController extends Controller
                 $user->forceFill([
                     'password' => Hash::make($password),
                 ])->save();
+
+                $user->tokens()->delete();
             }
         );
 
@@ -236,7 +231,7 @@ class AuthController extends Controller
     /**
      * Change password (authenticated)
      */
-    public function changePassword(Request $request)
+    public function changePassword(Request $request): JsonResponse
     {
         $request->validate([
             'current_password' => 'required|string',
@@ -262,6 +257,42 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Password changed successfully. Please login again.',
             'status' => 200
+        ]);
+    }
+
+    public function verifyEmail(EmailVerificationRequest $request): JsonResponse
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Email is already verified.',
+                'status' => 200,
+            ]);
+        }
+
+        if ($request->user()->markEmailAsVerified()) {
+            event(new Verified($request->user()));
+        }
+
+        return response()->json([
+            'message' => 'Email verified successfully.',
+            'status' => 200,
+        ]);
+    }
+
+    public function resendEmailVerification(Request $request): JsonResponse
+    {
+        if ($request->user()->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Email is already verified.',
+                'status' => 200,
+            ]);
+        }
+
+        $request->user()->sendEmailVerificationNotification();
+
+        return response()->json([
+            'message' => 'Verification link sent.',
+            'status' => 200,
         ]);
     }
 }

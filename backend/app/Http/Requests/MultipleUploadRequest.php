@@ -18,7 +18,13 @@ class MultipleUploadRequest extends FormRequest
     {
         return [
             'files' => ['required', 'array', 'max:5'],
-            'files.*' => ['required', 'file', 'max:5120', 'mimes:jpg,jpeg,png,gif,webp,pdf,mp4'],
+            'files.*' => [
+                'required',
+                'file',
+                'max:5120',
+                'mimes:jpg,jpeg,png,gif,webp,pdf,mp4',
+                'mimetypes:image/jpeg,image/png,image/gif,image/webp,application/pdf,video/mp4',
+            ],
         ];
     }
 }

@@ -20,8 +20,6 @@ class UploadResource extends JsonResource
             'mime_type' => $this->mime_type,
             'disk' => $this->disk,
             'url' => '/storage/'.$this->file_path,
-            'attachable_type' => $this->attachable_type,
-            'attachable_id' => $this->attachable_id,
             'created_at' => $this->created_at,
         ];
     }

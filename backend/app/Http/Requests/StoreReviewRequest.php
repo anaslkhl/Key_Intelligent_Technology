@@ -22,9 +22,9 @@ class StoreReviewRequest extends FormRequest
             'robot_id' => ['required', 'uuid', 'exists:robots,id'],
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'title' => ['nullable', 'string', 'max:255'],
-            'comment' => ['nullable', 'string'],
-            'pros' => ['nullable', 'string'],
-            'cons' => ['nullable', 'string'],
+            'comment' => ['nullable', 'string', 'max:5000'],
+            'pros' => ['nullable', 'string', 'max:2000'],
+            'cons' => ['nullable', 'string', 'max:2000'],
         ];
     }
 

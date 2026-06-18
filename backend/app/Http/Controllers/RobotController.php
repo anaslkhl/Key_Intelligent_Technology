@@ -2,30 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RobotResource;
 use App\Models\Robot;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class RobotController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
-        $robots = Robot::with(['product', 'user'])
+        $robots = Robot::query()
+            ->with(['product.family:id,name'])
             ->where('user_id', $request->user()->id)
             ->latest()
-            ->paginate(15);
+            ->paginate($this->perPage());
 
-        return response()->json($robots);
+        return $this->paginated($robots, RobotResource::class, 'Robots retrieved successfully.');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        if (!$request->user()) {
-            return response()->json(['error' => 'Unauthenticated'], 401);
-        }
         $validated = $request->validate([
-            'product_id' => ['required', 'string', 'exists:products,id'],
-            'serial_number' => ['required', 'string', 'unique:robots,serial_number'],
+            'product_id' => ['required', 'uuid', 'exists:products,id'],
+            'serial_number' => ['required', 'string', 'max:255', 'unique:robots,serial_number'],
             'name' => ['nullable', 'string', 'max:255'],
             'purchase_date' => ['nullable', 'date'],
             'warranty_end' => ['nullable', 'date', 'after:purchase_date'],
@@ -41,20 +40,20 @@ class RobotController extends Controller
             'status' => 'active',
         ]);
 
-        return response()->json($robot, 201);
+        $robot->load('product.family:id,name');
+
+        return $this->success(new RobotResource($robot), 'Robot registered successfully.', 201);
     }
 
-    public function show(Request $request, $id)
+    public function show(Request $request, string $id): JsonResponse
     {
-        $robot = Robot::with(['product', 'user'])->findOrFail($id);
+        $robot = Robot::query()
+            ->with('product.family:id,name')
+            ->where('user_id', $request->user()->id)
+            ->findOrFail($id);
 
-        if ($robot->user_id !== $request->user()->id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        return response()->json($robot);
+        return $this->success(new RobotResource($robot), 'Robot retrieved successfully.');
     }
 }
-
 
 
