@@ -101,6 +101,14 @@ h1 { margin: 0; color: #ffffff; font-size: clamp(36px, 5vw, 60px); line-height: 
 .site-footer { position: relative; z-index: 10; border-top: 1px solid #253041; background: #0a0a0a; color: #7f8da0; }
 .footer-inner { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: 14px; }
 
+@media (max-width: 1024px) {
+  .header-inner { min-height: auto; padding: 14px 0; flex-wrap: wrap; gap: 14px; }
+  .primary-nav { order: 3; width: 100%; overflow-x: auto; border-top: 1px solid #253041; padding-top: 12px; }
+  .primary-nav .nav-link { flex: 0 0 auto; }
+  .user-summary, .role-badge { display: none; }
+  .auth-header .primary-nav { display: none; }
+}
+
 @media (max-width: 900px) {
   .auth-layout { grid-template-columns: 1fr; width: min(100% - 32px, 560px); gap: 22px; }
   .auth-statement { align-self: auto; padding: 0; }
@@ -111,11 +119,7 @@ h1 { margin: 0; color: #ffffff; font-size: clamp(36px, 5vw, 60px); line-height: 
 
 @media (max-width: 760px) {
   .container { width: min(100% - 28px, 1180px); }
-  .header-inner { min-height: auto; padding: 14px 0; flex-wrap: wrap; gap: 14px; }
-  .primary-nav { order: 3; width: 100%; overflow-x: auto; border-top: 1px solid #253041; padding-top: 12px; }
-  .auth-header .primary-nav { display: none; }
   .account-nav { gap: 10px; }
-  .user-summary, .role-badge { display: none; }
   .home-section { padding: 58px 0; }
   .home-grid { grid-template-columns: 1fr; gap: 36px; }
   .dashboard-grid { grid-template-columns: 1fr; }
