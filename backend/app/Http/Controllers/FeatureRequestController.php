@@ -12,13 +12,19 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class FeatureRequestController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'status' => ['nullable', Rule::in(['pending', 'under_review', 'planned', 'in_development', 'shipped', 'declined'])],
+        ]);
+
         $featureRequests = FeatureRequest::query()
             ->with('user:id,name')
+            ->when($validated['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
             ->orderByDesc('upvotes_count')
             ->latest()
             ->paginate($this->perPage());
