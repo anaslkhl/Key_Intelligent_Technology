@@ -6,6 +6,7 @@ use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\KbArticleController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProductFamilyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RobotController;
 use App\Http\Controllers\TicketController;
@@ -32,6 +33,7 @@ Route::get('/feature-requests/{id}', [FeatureRequestController::class, 'show'])-
 
 Route::get('/forum/questions', [ForumController::class, 'questions']);
 Route::get('/forum/questions/{id}', [ForumController::class, 'showQuestion'])->whereUuid('id');
+Route::get('/families', [ProductFamilyController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -62,6 +64,7 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function (
     Route::get('/tickets', [TicketController::class, 'index']);
     Route::post('/tickets', [TicketController::class, 'store']);
     Route::get('/tickets/{id}', [TicketController::class, 'show'])->whereUuid('id');
+    Route::patch('/tickets/{id}/close', [TicketController::class, 'close'])->whereUuid('id');
     Route::get('/tickets/{ticket}/messages', [TicketMessageController::class, 'index'])->whereUuid('ticket');
     Route::post('/tickets/{ticket}/messages', [TicketMessageController::class, 'store'])->whereUuid('ticket');
     Route::put('/messages/{message}', [TicketMessageController::class, 'update'])->whereUuid('message');
@@ -106,5 +109,3 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
     });
 
 
-
-    

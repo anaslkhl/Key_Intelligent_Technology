@@ -31,7 +31,7 @@ class TicketCreatedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): TicketCreatedMail
     {
-        return new TicketCreatedMail($this->ticket);
+        return (new TicketCreatedMail($this->ticket))->to($notifiable->email);
     }
 
     /**

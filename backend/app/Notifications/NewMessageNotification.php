@@ -31,7 +31,7 @@ class NewMessageNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): NewMessageMail
     {
-        return new NewMessageMail($this->message);
+        return (new NewMessageMail($this->message))->to($notifiable->email);
     }
 
     /**

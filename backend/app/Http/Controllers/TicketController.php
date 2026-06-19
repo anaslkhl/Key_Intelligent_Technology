@@ -20,8 +20,13 @@ class TicketController extends Controller
     {
         $this->authorizeClient($request);
 
+        $validated = $request->validate([
+            'status' => ['nullable', Rule::in(['new', 'open', 'in_progress', 'waiting_client', 'resolved', 'closed'])],
+        ]);
+
         $tickets = Ticket::query()
             ->where('user_id', $request->user()->id)
+            ->when($validated['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
             ->with([
                 'robot.product.family',
                 'category',
@@ -39,28 +44,39 @@ class TicketController extends Controller
         $this->authorizeClient($request);
 
         $validated = $request->validate([
-            'robot_id' => ['required', 'uuid', 'exists:robots,id'],
+            'robot_id' => [
+                'required',
+                'uuid',
+                Rule::exists('robots', 'id')->where(
+                    fn ($query) => $query->where('user_id', $request->user()->id)
+                ),
+            ],
             'category_id' => ['required', 'uuid', 'exists:ticket_categories,id'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'priority' => ['required', 'string', Rule::in(['low', 'medium', 'high', 'urgent'])],
             'attachments' => ['sometimes', 'array'],
             'attachments.*' => ['string', 'max:2048', 'exists:uploads,file_path'],
+        ], [
+            'robot_id.exists' => 'The selected robot does not exist or does not belong to your account.',
+            'category_id.exists' => 'The selected ticket category does not exist.',
         ]);
 
         $this->ensureAttachmentsBelongToUser($validated['attachments'] ?? [], $request->user()->id);
 
         $robot = Robot::query()
             ->with('product')
-            ->where('id', $validated['robot_id'])
-            ->where('user_id', $request->user()->id)
-            ->firstOrFail();
+            ->find($validated['robot_id']);
 
-        $category = TicketCategory::query()->findOrFail($validated['category_id']);
+        $category = TicketCategory::query()->find($validated['category_id']);
+
+        if (! $robot || ! $category) {
+            return $this->error('The selected robot or ticket category is no longer available.', [], 422);
+        }
 
         if ($category->family_id !== $robot->product->family_id) {
-            return response()->json([
-                'message' => 'The selected ticket category does not belong to this robot product family.',
+            return $this->error('The selected ticket category does not belong to this robot product family.', [
+                'category_id' => ['Choose a category from the selected robot product family.'],
             ], 422);
         }
 
@@ -125,6 +141,33 @@ class TicketController extends Controller
             ->firstOrFail();
 
         return $this->success(new TicketResource($ticket), 'Ticket retrieved successfully.');
+    }
+
+    public function close(Request $request, string $id): JsonResponse
+    {
+        $this->authorizeClient($request);
+
+        $validated = $request->validate([
+            'csat_rating' => ['required', 'integer', 'between:1,5'],
+        ]);
+
+        $ticket = Ticket::query()
+            ->where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        if ($ticket->status === 'closed') {
+            return $this->error('This ticket is already closed.', [], 422);
+        }
+
+        $ticket->update([
+            'status' => 'closed',
+            'csat_rating' => $validated['csat_rating'],
+        ]);
+
+        $ticket->load(['robot.product.family', 'category', 'assignee:id,name']);
+
+        return $this->success(new TicketResource($ticket), 'Ticket closed successfully.');
     }
 
     private function authorizeClient(Request $request): void

@@ -34,11 +34,13 @@ class TicketStatusChangedNotification extends Notification implements ShouldQueu
 
     public function toMail(object $notifiable): Mailable
     {
-        return match ($this->ticket->status) {
+        $mail = match ($this->ticket->status) {
             'resolved' => new TicketResolvedMail($this->ticket),
             'closed' => new TicketClosedMail($this->ticket),
             default => new TicketStatusChangedMail($this->ticket, $this->oldStatus),
         };
+
+        return $mail->to($notifiable->email);
     }
 
     /**
