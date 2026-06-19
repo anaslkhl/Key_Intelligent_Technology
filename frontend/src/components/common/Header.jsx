@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../contexts/auth'
 import { ROLE_LABELS } from '../../utils/roles'
@@ -29,6 +29,7 @@ export default function Header() {
   const { isAuthenticated, logout, user } = useAuth()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const location = useLocation()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -49,10 +50,11 @@ export default function Header() {
 
   const linkClass = ({ isActive }) => `nav-link${isActive ? ' active' : ''}`
   const navigation = isAuthenticated ? roleNavigation[user.role] || [] : []
+  const isAuthPage = ['/login', '/register'].includes(location.pathname)
 
   return (
     <>
-      <header className="site-header">
+      <header className={`site-header${isAuthPage ? ' auth-header' : ''}`}>
         <div className="container header-inner">
           <NavLink to="/" className="brand" aria-label="KIT Support Hub home">
             <span className="brand-mark">K</span>

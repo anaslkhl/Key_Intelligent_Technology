@@ -32,44 +32,58 @@ export default function Login() {
 
   return (
     <section className="auth-section">
-      <div className="auth-panel">
-        <p className="eyebrow">Client access</p>
-        <h1>Log in</h1>
-        <p className="form-intro">Access your tickets, robots, and support conversations.</p>
+      <div className="auth-backdrop" aria-hidden="true" />
+      <div className="auth-layout">
+        <div className="auth-statement">
+          <span className="auth-kicker">Autonomous systems support</span>
+          <h2>Keep every robot mission moving.</h2>
+          <p>One secure workspace for technical requests, product knowledge, and service history.</p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {errors.root?.server && <div className="form-alert" role="alert">{errors.root.server.message}</div>}
-          <label className="field">
-            <span>Email address</span>
-            <input
-              type="email"
-              autoComplete="email"
-              aria-invalid={Boolean(errors.email)}
-              {...register('email', {
-                required: 'Email is required',
-                pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email address' },
-              })}
-            />
-            {errors.email && <small className="field-error">{errors.email.message}</small>}
-          </label>
+        <div className="auth-panel">
+          <div className="auth-panel-header">
+            <span className="auth-panel-mark">KIT</span>
+            <p className="eyebrow">Secure portal access</p>
+            <h1>Welcome back</h1>
+            <p className="form-intro">Sign in to continue to KIT Support Hub.</p>
+          </div>
 
-          <label className="field">
-            <span>Password</span>
-            <input
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={Boolean(errors.password)}
-              {...register('password', { required: 'Password is required' })}
-            />
-            {errors.password && <small className="field-error">{errors.password.message}</small>}
-          </label>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            {errors.root?.server && <div className="form-alert" role="alert">{errors.root.server.message}</div>}
+            <label className="field">
+              <span>Email address</span>
+              <input
+                type="email"
+                autoComplete="email"
+                placeholder="you@company.com"
+                aria-invalid={Boolean(errors.email)}
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email address' },
+                })}
+              />
+              {errors.email && <small className="field-error">{errors.email.message}</small>}
+            </label>
 
-          <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Logging in...' : 'Log in'}
-          </button>
-        </form>
+            <label className="field">
+              <span>Password</span>
+              <input
+                type="password"
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                aria-invalid={Boolean(errors.password)}
+                {...register('password', { required: 'Password is required' })}
+              />
+              {errors.password && <small className="field-error">{errors.password.message}</small>}
+            </label>
 
-        <p className="auth-switch">New to KIT Support Hub? <Link to="/register">Create an account</Link></p>
+            <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
+            </button>
+          </form>
+
+          <p className="auth-switch">New to KIT Support Hub? <Link to="/register">Create an account</Link></p>
+        </div>
       </div>
     </section>
   )
