@@ -6,6 +6,11 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import PortalPage from './pages/PortalPage'
 import Register from './pages/Register'
+import RegisterRobot from './pages/robots/RegisterRobot'
+import RobotList from './pages/robots/RobotList'
+import CreateTicket from './pages/tickets/CreateTicket'
+import TicketDetail from './pages/tickets/TicketDetail'
+import TicketList from './pages/tickets/TicketList'
 
 const page = (eyebrow, title, description) => (
   <PortalPage eyebrow={eyebrow} title={title} description={description} />
@@ -22,8 +27,11 @@ const router = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={['client']} />,
         children: [
           { path: '/dashboard', element: <Dashboard /> },
-          { path: '/tickets', element: page('Client workspace', 'Support tickets', 'Create and track requests for your robots.') },
-          { path: '/robots', element: page('Client workspace', 'Your robots', 'View registered robots and product details.') },
+          { path: '/tickets', element: <TicketList /> },
+          { path: '/tickets/create', element: <CreateTicket /> },
+          { path: '/tickets/:id', element: <TicketDetail /> },
+          { path: '/robots', element: <RobotList /> },
+          { path: '/robots/register', element: <RegisterRobot /> },
           { path: '/reviews/my', element: page('Client workspace', 'Your reviews', 'Track submitted and approved product reviews.') },
           { path: '/feature-requests', element: page('Client workspace', 'Feature ideas', 'Submit ideas and vote for product improvements.') },
         ],
