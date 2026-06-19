@@ -44,7 +44,7 @@ export default function KbList() {
               {articles.map((article) => (
                 <article key={article.id} className="flex min-h-64 flex-col rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
                   <div className="flex items-center justify-between gap-3"><span className="text-xs font-bold uppercase text-blue-600">{article.family?.name || 'General'}</span><span className="text-xs text-slate-400">{article.views} views</span></div>
-                  <h2 className="mt-4 !text-xl !font-semibold !text-slate-900"><Link to={`/knowledge-base/${article.slug}`} className="hover:text-blue-600">{article.title}</Link></h2>
+                  <h2 className="mt-4 !text-xl !font-semibold text-slate-900"><Link to={`/knowledge-base/${article.slug}`} className="hover:text-blue-600">{article.title}</Link></h2>
                   <p className="mt-3 line-clamp-4 text-sm leading-6 text-slate-600">{article.excerpt}</p>
                   <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500"><span>{article.helpful_count} found helpful</span><Link to={`/knowledge-base/${article.slug}`} className="font-semibold text-blue-600">Read article</Link></div>
                 </article>

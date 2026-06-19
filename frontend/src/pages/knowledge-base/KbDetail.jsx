@@ -32,12 +32,12 @@ export default function KbDetail() {
       <article className="mx-auto mt-5 max-w-4xl rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-8 lg:p-10">
         <div className="border-b border-slate-200 pb-6">
           <p className="text-xs font-bold uppercase text-blue-600">{article.family?.name || 'General support'}</p>
-          <h1 className="mt-3 !text-3xl !font-bold !text-slate-900 sm:!text-4xl">{article.title}</h1>
+          <h1 className="mt-3 !text-3xl !font-bold text-slate-900 sm:!text-4xl">{article.title}</h1>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500"><span>{article.views} views</span><span>Updated {formatDate(article.updated_at)}</span>{article.product && <span>{article.product.model}</span>}</div>
         </div>
         <div className="kb-markdown mt-7"><ReactMarkdown>{article.content}</ReactMarkdown></div>
         <div className="mt-10 rounded-lg border border-slate-200 bg-slate-50 p-5">
-          <h2 className="!text-base !font-semibold !text-slate-900">Was this article helpful?</h2>
+          <h2 className="!text-base !font-semibold text-slate-900">Was this article helpful?</h2>
           {isAuthenticated ? (
             <div className="mt-3 flex flex-wrap gap-3"><button type="button" disabled={feedback.isPending} onClick={() => feedback.mutate(true)} className="rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-50">Yes, helpful</button><button type="button" disabled={feedback.isPending} onClick={() => feedback.mutate(false)} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Not helpful</button></div>
           ) : <p className="mt-2 text-sm text-slate-600"><Link to="/login" className="font-semibold text-blue-600">Log in</Link> to leave feedback.</p>}

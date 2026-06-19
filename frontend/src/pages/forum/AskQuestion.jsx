@@ -34,5 +34,6 @@ export default function AskQuestion() {
   )
 }
 
+
 const inputClass = 'h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
 function Field({ label, hint, error, children }) { return <label className="grid gap-1.5 text-sm font-semibold text-slate-700"><span>{label}</span>{children}{hint && <small className="font-normal text-slate-500">{hint}</small>}{error && <small className="font-normal text-red-600">{error}</small>}</label> }

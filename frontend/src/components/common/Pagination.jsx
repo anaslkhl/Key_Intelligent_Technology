@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
 export default function Pagination({ meta, onPageChange }) {
   if (!meta || meta.last_page <= 1) return null
 
@@ -15,7 +17,7 @@ export default function Pagination({ meta, onPageChange }) {
           disabled={meta.current_page <= 1}
           onClick={() => onPageChange(meta.current_page - 1)}
         >
-          Previous
+          <ChevronLeft size={16} /> Previous
         </button>
         <span className="grid min-w-10 place-items-center rounded-lg bg-slate-100 px-3 text-sm font-semibold text-slate-700">
           {meta.current_page}
@@ -26,7 +28,7 @@ export default function Pagination({ meta, onPageChange }) {
           disabled={meta.current_page >= meta.last_page}
           onClick={() => onPageChange(meta.current_page + 1)}
         >
-          Next
+          Next <ChevronRight size={16} />
         </button>
       </div>
     </div>

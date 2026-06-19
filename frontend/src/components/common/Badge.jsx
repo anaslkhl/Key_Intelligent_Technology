@@ -21,7 +21,7 @@ function label(value) {
 
 export function StatusBadge({ status }) {
   return (
-    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset ${statusStyles[status] || statusStyles.closed}`}>
+    <span className={`status-badge inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase ring-1 ring-inset ${statusStyles[status] || statusStyles.closed}`}>
       {label(status)}
     </span>
   )
@@ -29,7 +29,7 @@ export function StatusBadge({ status }) {
 
 export function PriorityBadge({ priority }) {
   return (
-    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize ring-1 ring-inset ${priorityStyles[priority] || priorityStyles.low}`}>
+    <span className={`status-badge inline-flex rounded-full px-2.5 py-1 text-xs font-semibold uppercase ring-1 ring-inset ${priorityStyles[priority] || priorityStyles.low}`}>
       {label(priority)}
     </span>
   )

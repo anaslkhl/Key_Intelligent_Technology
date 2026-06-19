@@ -63,7 +63,7 @@ export default function TicketDetail() {
       <div className="flex flex-col gap-5 border-b border-slate-200 pb-6 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2"><StatusBadge status={ticket.status} /><PriorityBadge priority={ticket.priority} /></div>
-          <h1 className="!text-3xl !font-bold !text-slate-900 sm:!text-4xl">{ticket.title}</h1>
+          <h1 className="!text-3xl !font-bold text-slate-900 sm:!text-4xl">{ticket.title}</h1>
           <p className="mt-3 text-sm text-slate-500">Created {formatDate(ticket.created_at)} · {ticket.category?.name || 'Support request'}</p>
         </div>
         {ticket.status !== 'closed' && (
@@ -74,13 +74,13 @@ export default function TicketDetail() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-6">
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="!text-lg !font-semibold !text-slate-900">Description</h2>
+            <h2 className="!text-lg !font-semibold text-slate-900">Description</h2>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-600">{ticket.description}</p>
           </section>
 
           {ticket.status !== 'closed' && (
             <form onSubmit={handleSubmit((values) => messageMutation.mutate(values))} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-              <h2 className="!text-lg !font-semibold !text-slate-900">Add message</h2>
+              <h2 className="!text-lg !font-semibold text-slate-900">Add message</h2>
               <p className="mt-1 text-sm text-slate-500">Continue the conversation with the support team.</p>
               {errors.root?.server && <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errors.root.server.message}</div>}
               <textarea
@@ -95,7 +95,7 @@ export default function TicketDetail() {
           )}
 
           <section>
-            <h2 className="!text-xl !font-semibold !text-slate-900">Conversation</h2>
+            <h2 className="!text-xl !font-semibold text-slate-900">Conversation</h2>
             <div className="mt-4 space-y-3">
               {messages.length === 0 && <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">No messages yet.</div>}
               {messages.map((message) => (
@@ -113,7 +113,7 @@ export default function TicketDetail() {
         </div>
 
         <aside className="h-fit rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="!text-base !font-semibold !text-slate-900">Ticket details</h2>
+          <h2 className="!text-base !font-semibold text-slate-900">Ticket details</h2>
           <dl className="mt-4 space-y-4 text-sm">
             <Detail label="Robot" value={ticket.robot?.name || ticket.robot?.product?.model || 'Not available'} />
             <Detail label="Product" value={ticket.robot?.product?.name || 'Not available'} />
@@ -127,7 +127,7 @@ export default function TicketDetail() {
       {showCloseModal && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4" role="presentation" onMouseDown={() => !closeMutation.isPending && setShowCloseModal(false)}>
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="csat-title" onMouseDown={(event) => event.stopPropagation()}>
-            <h2 id="csat-title" className="!text-xl !font-semibold !text-slate-900">Close this ticket?</h2>
+            <h2 id="csat-title" className="!text-xl !font-semibold text-slate-900">Close this ticket?</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">Rate your support experience before closing the conversation.</p>
             <div className="mt-5 flex justify-center gap-2" aria-label="Satisfaction rating">
               {[1, 2, 3, 4, 5].map((value) => <button key={value} type="button" onClick={() => setRating(value)} aria-label={`${value} stars`} className={`grid h-11 w-11 place-items-center rounded-lg border text-lg ${value <= rating ? 'border-amber-400 bg-amber-50 text-amber-500' : 'border-slate-300 text-slate-400'}`}>★</button>)}

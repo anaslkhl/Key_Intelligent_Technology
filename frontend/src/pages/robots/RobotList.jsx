@@ -47,7 +47,7 @@ function RobotCard({ robot }) {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-xs font-bold uppercase text-blue-600">{robot.product?.family?.name || 'KIT Robotics'}</p>
-          <h2 className="mt-2 truncate !text-xl !font-semibold !text-slate-900">{robot.name || robot.product?.model || 'Registered robot'}</h2>
+          <h2 className="mt-2 truncate !text-xl !font-semibold text-slate-900">{robot.name || robot.product?.model || 'Registered robot'}</h2>
           <p className="mt-1 text-sm text-slate-500">{robot.product?.model} · {robot.product?.name}</p>
         </div>
         <span className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${robot.status === 'active' ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-600'}`}>{robot.status}</span>

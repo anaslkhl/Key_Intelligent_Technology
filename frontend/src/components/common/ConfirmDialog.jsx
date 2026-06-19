@@ -1,3 +1,4 @@
+import { AlertTriangle } from 'lucide-react'
 import { useEffect } from 'react'
 
 export default function ConfirmDialog({ isOpen, title, message, confirmLabel, isBusy, onCancel, onConfirm }) {
@@ -23,6 +24,7 @@ export default function ConfirmDialog({ isOpen, title, message, confirmLabel, is
         aria-labelledby="confirm-dialog-title"
         onMouseDown={(event) => event.stopPropagation()}
       >
+        <span className="dialog-icon"><AlertTriangle size={22} /></span>
         <h2 id="confirm-dialog-title">{title}</h2>
         <p>{message}</p>
         <div className="dialog-actions">

@@ -43,14 +43,14 @@ export default function QuestionDetail() {
       <Link to="/forum" className="text-sm font-semibold text-blue-600">Back to forum</Link>
       <article className="mt-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
         <div className="flex flex-wrap items-center gap-2">{question.is_solved && <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">Solved</span>}<span className="text-sm text-slate-500">Asked by {question.user?.name} · {formatDateTime(question.created_at)}</span></div>
-        <h1 className="mt-4 !text-3xl !font-bold !text-slate-900 sm:!text-4xl">{question.title}</h1>
+        <h1 className="mt-4 !text-3xl !font-bold text-slate-900 sm:!text-4xl">{question.title}</h1>
         <p className="mt-5 whitespace-pre-wrap text-sm leading-7 text-slate-700 sm:text-base">{question.content}</p>
         <div className="mt-5 flex flex-wrap gap-2">{question.tags.map((tag) => <span key={tag} className="rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">{tag}</span>)}</div>
         <p className="mt-5 text-sm text-slate-500">{question.upvotes} upvotes · {question.downvotes} downvotes</p>
       </article>
 
       <section className="mt-8">
-        <h2 className="!text-xl !font-semibold !text-slate-900">{question.answers_count} answers</h2>
+        <h2 className="!text-xl !font-semibold text-slate-900">{question.answers_count} answers</h2>
         <div className="mt-4 space-y-4">
           {answers.length === 0 && <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">No answers yet.</div>}
           {answers.map((answer) => (
@@ -67,7 +67,7 @@ export default function QuestionDetail() {
       </section>
 
       <section className="mt-8 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
-        <h2 className="!text-xl !font-semibold !text-slate-900">Add your answer</h2>
+        <h2 className="!text-xl !font-semibold text-slate-900">Add your answer</h2>
         {isAuthenticated ? (
           <form onSubmit={handleSubmit((values) => answerMutation.mutate(values))} className="mt-4">
             {errors.root?.server && <div className="mb-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errors.root.server.message}</div>}

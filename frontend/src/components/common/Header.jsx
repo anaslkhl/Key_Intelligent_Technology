@@ -1,36 +1,20 @@
+import { LogOut, Menu, Moon, Sun } from 'lucide-react'
 import { useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
+import { useTheme } from '../../contexts/theme'
 import { ROLE_LABELS } from '../../utils/roles'
 import ConfirmDialog from './ConfirmDialog'
 
-const roleNavigation = {
-  client: [
-    { to: '/dashboard', label: 'Dashboard' },
-    { to: '/tickets', label: 'Tickets' },
-    { to: '/robots', label: 'Robots' },
-    { to: '/feature-requests', label: 'Ideas' },
-  ],
-  agent: [
-    { to: '/agent/tickets', label: 'Tickets' },
-    { to: '/agent/knowledge-base', label: 'Knowledge base' },
-    { to: '/forum', label: 'Forum' },
-  ],
-  admin: [
-    { to: '/admin/dashboard', label: 'Admin' },
-    { to: '/admin/users', label: 'Users' },
-    { to: '/admin/reviews', label: 'Reviews' },
-    { to: '/admin/analytics', label: 'Analytics' },
-  ],
-}
-
-export default function Header() {
+export default function Header({ onOpenNavigation }) {
   const { isAuthenticated, logout, user } = useAuth()
+  const { isDark, toggleTheme } = useTheme()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const isAuthPage = ['/login', '/register'].includes(location.pathname)
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -48,45 +32,47 @@ export default function Header() {
     }
   }
 
-  const linkClass = ({ isActive }) => `nav-link${isActive ? ' active' : ''}`
-  const navigation = isAuthenticated ? roleNavigation[user.role] || [] : []
-  const isAuthPage = ['/login', '/register'].includes(location.pathname)
-
   return (
     <>
       <header className={`site-header${isAuthPage ? ' auth-header' : ''}`}>
-        <div className="container header-inner">
+        <div className="header-inner">
+          {isAuthenticated && (
+            <button type="button" className="icon-button menu-button" onClick={onOpenNavigation} aria-label="Open navigation" title="Open navigation">
+              <Menu size={20} />
+            </button>
+          )}
+
           <NavLink to="/" className="brand" aria-label="KIT Support Hub home">
             <span className="brand-mark">K</span>
-            <span>
-              <strong>KIT</strong>
-              <small>Support Hub</small>
-            </span>
+            <span><strong>KIT</strong><small>Support Hub</small></span>
           </NavLink>
 
-          <nav className="primary-nav" aria-label="Primary navigation">
-            <NavLink to="/" className={linkClass}>Home</NavLink>
-            {navigation.map((item) => (
-              <NavLink key={item.to} to={item.to} className={linkClass}>{item.label}</NavLink>
-            ))}
-          </nav>
+          {!isAuthenticated && !isAuthPage && (
+            <nav className="public-nav" aria-label="Public navigation">
+              <NavLink to="/knowledge-base">Knowledge base</NavLink>
+              <NavLink to="/forum">Community</NavLink>
+            </nav>
+          )}
 
           <div className="account-nav">
+            <button type="button" className="icon-button" onClick={toggleTheme} aria-label={`Use ${isDark ? 'light' : 'dark'} mode`} title={`Use ${isDark ? 'light' : 'dark'} mode`}>
+              {isDark ? <Sun size={19} /> : <Moon size={19} />}
+            </button>
             {isAuthenticated ? (
               <>
                 <div className="user-summary">
                   <strong>{user.name}</strong>
-                  <span>{user.email}</span>
+                  <span>{ROLE_LABELS[user.role] || user.role}</span>
                 </div>
-                <span className={`role-badge role-${user.role}`}>{ROLE_LABELS[user.role] || user.role}</span>
-                <button type="button" className="button button-secondary" onClick={() => setShowLogoutDialog(true)}>
-                  Log out
+                <span className="user-avatar" aria-hidden="true">{user.name?.charAt(0).toUpperCase()}</span>
+                <button type="button" className="icon-button logout-button" onClick={() => setShowLogoutDialog(true)} aria-label="Log out" title="Log out">
+                  <LogOut size={19} />
                 </button>
               </>
-            ) : (
+            ) : !isAuthPage && (
               <>
-                <NavLink to="/login" className={linkClass}>Log in</NavLink>
-                <NavLink to="/register" className="button button-primary">Create account</NavLink>
+                <NavLink to="/login" className="header-login">Log in</NavLink>
+                <NavLink to="/register" className="button button-primary button-md">Create account</NavLink>
               </>
             )}
           </div>

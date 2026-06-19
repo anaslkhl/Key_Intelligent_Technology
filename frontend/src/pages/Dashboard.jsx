@@ -61,7 +61,7 @@ export default function Dashboard() {
       <section className="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-4 py-4 sm:px-6">
           <div>
-            <h2 className="!text-lg !font-semibold !text-slate-900">Recent tickets</h2>
+            <h2 className="!text-lg !font-semibold text-slate-900">Recent tickets</h2>
             <p className="mt-1 text-sm text-slate-500">Your latest support activity.</p>
           </div>
           <Link to="/tickets" className="text-sm font-semibold text-blue-600 hover:text-blue-700">View all</Link>
