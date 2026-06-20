@@ -7,7 +7,7 @@ import { useTheme } from '../../contexts/theme'
 import { ROLE_LABELS } from '../../utils/roles'
 import ConfirmDialog from './ConfirmDialog'
 
-export default function Header({ onOpenNavigation }) {
+export default function Header({ onOpenNavigation, showNavigation = false }) {
   const { isAuthenticated, logout, user } = useAuth()
   const { isDark, toggleTheme } = useTheme()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
@@ -36,7 +36,7 @@ export default function Header({ onOpenNavigation }) {
     <>
       <header className={`site-header${isAuthPage ? ' auth-header' : ''}`}>
         <div className="header-inner">
-          {isAuthenticated && (
+          {isAuthenticated && showNavigation && (
             <button type="button" className="icon-button menu-button" onClick={onOpenNavigation} aria-label="Open navigation" title="Open navigation">
               <Menu size={20} />
             </button>
@@ -44,7 +44,7 @@ export default function Header({ onOpenNavigation }) {
 
           <NavLink to="/" className="brand" aria-label="KIT Support Hub home">
             <span className="brand-mark">K</span>
-            <span><strong>KIT</strong><small>Support Hub</small></span>
+            <span className="brand-copy"><strong>KIT</strong><small>Support Hub</small></span>
           </NavLink>
 
           {!isAuthenticated && !isAuthPage && (

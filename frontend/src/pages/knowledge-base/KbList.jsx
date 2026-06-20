@@ -1,14 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import PageHeader from '../../components/common/PageHeader'
 import Pagination from '../../components/common/Pagination'
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/QueryState'
 
 export default function KbList() {
-  const [draftSearch, setDraftSearch] = useState('')
-  const [search, setSearch] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const initialSearch = searchParams.get('q') || ''
+  const [draftSearch, setDraftSearch] = useState(initialSearch)
+  const [search, setSearch] = useState(initialSearch)
   const [familyId, setFamilyId] = useState('')
   const [page, setPage] = useState(1)
   const familiesQuery = useQuery({ queryKey: ['families'], queryFn: () => apiClient.get('/families').then((response) => response.data.data) })
@@ -21,6 +23,7 @@ export default function KbList() {
   const submitSearch = (event) => {
     event.preventDefault()
     setSearch(draftSearch.trim())
+    setSearchParams(draftSearch.trim() ? { q: draftSearch.trim() } : {})
     setPage(1)
   }
 

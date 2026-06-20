@@ -13,7 +13,7 @@ export default function Layout() {
   const hasWorkspace = isAuthenticated && !isLanding
   return (
     <div className={`app-shell${hasWorkspace ? ' authenticated-shell' : ''}`}>
-      <Header onOpenNavigation={() => setIsNavigationOpen(true)} />
+      <Header showNavigation={hasWorkspace} onOpenNavigation={() => setIsNavigationOpen(true)} />
       {hasWorkspace && <Sidebar isOpen={isNavigationOpen} onClose={() => setIsNavigationOpen(false)} />}
       <main className="main-content page-enter">
         <RouteEnhancements />
