@@ -84,12 +84,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .authenticated-shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); grid-template-rows: 64px minmax(0, 1fr); }
 .authenticated-shell .site-header { grid-column: 1 / -1; grid-row: 1; }
 .authenticated-shell .main-content { grid-column: 2; grid-row: 2; }
-.sidebar { position: sticky; z-index: 30; top: 64px; grid-column: 1; grid-row: 2; height: calc(100vh - 64px); display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid #243247; background: #ffffffbd; color: #ffffff; padding: 22px 14px 18px; }
+.sidebar { position: sticky; z-index: 30; top: 64px; grid-column: 1; grid-row: 2; height: calc(100vh - 64px); display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid #cacacad3; background: #ffffffbd; color: #ffffff; padding: 22px 14px 18px; }
 .sidebar-mobile-header { display: none; }
 .sidebar-label { margin: 0 10px 10px; color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .sidebar-nav { display: grid; gap: 4px; }
-.sidebar-link { min-height: 42px; display: flex; align-items: center; gap: 11px; border-radius: 8px; padding: 0 12px; color: #aebccd; font-size: 14px; font-weight: 600; text-decoration: none; transition: background 160ms ease, color 160ms ease, transform 160ms ease; }
-.sidebar-link:hover { background: #1e293b; color: #ffffff; transform: translateX(2px); }
+.sidebar-link { min-height: 42px; display: flex; align-items: center; gap: 11px; border-radius: 8px; padding: 0 12px; color: #292929; font-size: 14px; font-weight: 600; text-decoration: none; transition: background 160ms ease, color 160ms ease, transform 160ms ease; }
+.sidebar-link:hover { background: #0062ff56; color: #ffffff; transform: translateX(2px); }
 .sidebar-link.active { background: #2563eb; color: #ffffff; box-shadow: 0 8px 20px rgba(37, 99, 235, .28); }
 .sidebar-support { display: flex; gap: 10px; margin-top: auto; border: 1px solid #334155; border-radius: 12px; padding: 14px; color: #7dd3fc; background: rgba(30, 41, 59, .72); }
 .sidebar-support svg { flex: 0 0 auto; }
