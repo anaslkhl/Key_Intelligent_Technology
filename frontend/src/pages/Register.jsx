@@ -25,27 +25,18 @@ export default function Register() {
 
   return (
     <section className="auth-section">
-      <div className="auth-backdrop" aria-hidden="true" />
-      <div className="auth-layout">
-        <div className="auth-statement">
-          <span className="auth-kicker">KIT Robotics client portal</span>
-          <h2>Connect your team to expert support.</h2>
-          <p>Create a secure client account for your organization and keep service requests close to every system.</p>
-        </div>
-
-        <div className="auth-panel auth-panel-wide">
+      <div className="auth-card">
           <div className="auth-panel-header">
-            <span className="auth-panel-mark">KIT</span>
-            <p className="eyebrow">Client registration</p>
+            <span className="auth-panel-mark" aria-hidden="true">K</span>
             <h1>Create your account</h1>
-            <p className="form-intro">Use your professional details to get started.</p>
+            <p className="form-intro">Create your KIT Support Hub client account.</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             {errors.root?.server && <div className="form-alert" role="alert">{errors.root.server.message}</div>}
             <label className="field">
               <span>Full name</span>
-              <input placeholder="Your full name" autoComplete="name" {...register('name', { required: 'Name is required', maxLength: 255 })} />
+              <input placeholder="Your full name" autoComplete="name" aria-invalid={Boolean(errors.name)} {...register('name', { required: 'Name is required', maxLength: { value: 255, message: 'Name must not exceed 255 characters' } })} />
               {errors.name && <small className="field-error">{errors.name.message}</small>}
             </label>
 
@@ -55,6 +46,7 @@ export default function Register() {
                 type="email"
                 placeholder="you@company.com"
                 autoComplete="email"
+                aria-invalid={Boolean(errors.email)}
                 {...register('email', {
                   required: 'Email is required',
                   pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email address' },
@@ -69,6 +61,7 @@ export default function Register() {
                 type="password"
                 placeholder="At least 8 characters"
                 autoComplete="new-password"
+                aria-invalid={Boolean(errors.password)}
                 {...register('password', {
                   required: 'Password is required',
                   minLength: { value: 8, message: 'Use at least 8 characters' },
@@ -87,6 +80,7 @@ export default function Register() {
                 type="password"
                 placeholder="Repeat your password"
                 autoComplete="new-password"
+                aria-invalid={Boolean(errors.password_confirmation)}
                 {...register('password_confirmation', {
                   required: 'Please confirm your password',
                   validate: (value) => value === getValues('password') || 'Passwords do not match',
@@ -95,13 +89,12 @@ export default function Register() {
               {errors.password_confirmation && <small className="field-error">{errors.password_confirmation.message}</small>}
             </label>
 
-            <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
+            <button className="auth-submit" type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 
           <p className="auth-switch">Already registered? <Link to="/login">Sign in</Link></p>
-        </div>
       </div>
     </section>
   )

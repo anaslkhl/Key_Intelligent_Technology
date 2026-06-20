@@ -11,13 +11,13 @@ const titles = [
   [/^\/tickets\/create$/, 'Create ticket'], [/^\/tickets\/[^/]+$/, 'Ticket details'], [/^\/tickets$/, 'Support tickets'],
   [/^\/robots\/register$/, 'Register robot'], [/^\/robots$/, 'Robots'], [/^\/knowledge-base\/[^/]+$/, 'Knowledge article'], [/^\/knowledge-base$/, 'Knowledge base'],
   [/^\/forum\/ask$/, 'Ask a question'], [/^\/forum\/[^/]+$/, 'Forum question'], [/^\/forum$/, 'Community forum'],
-  [/^\/reviews\/my$/, 'My reviews'], [/^\/reviews\/write$/, 'Write a review'], [/^\/features\/submit$/, 'Submit a feature'], [/^\/features$/, 'Feature requests'],
+  [/^\/reviews$/, 'Customer reviews'], [/^\/reviews\/my$/, 'My reviews'], [/^\/reviews\/write$/, 'Write a review'], [/^\/features\/submit$/, 'Submit a feature'], [/^\/features$/, 'Feature requests'],
   [/^\/agent\/dashboard$/, 'Agent dashboard'], [/^\/agent\/tickets\/[^/]+$/, 'Agent ticket'], [/^\/agent\/tickets$/, 'Ticket queue'], [/^\/agent\/kb\/create$/, 'Create KB article'], [/^\/agent\/kb\/edit\/[^/]+$/, 'Edit KB article'], [/^\/agent\/kb\/manage$/, 'Manage knowledge base'], [/^\/agent\/forum\/manage$/, 'Forum moderation'],
   [/^\/admin\/dashboard$/, 'Admin dashboard'], [/^\/admin\/users$/, 'User management'], [/^\/admin\/reviews$/, 'Review moderation'], [/^\/admin\/features$/, 'Feature roadmap'], [/^\/admin\/analytics$/, 'Support analytics'], [/^\/admin\/export$/, 'Export data'],
   [/^\/profile$/, 'Profile'], [/^\/notifications$/, 'Notifications'],
 ]
 
-const knownPaths = new Set(['/dashboard', '/tickets', '/robots', '/knowledge-base', '/forum', '/features', '/agent/dashboard', '/agent/tickets', '/agent/kb/manage', '/agent/forum/manage', '/admin/dashboard', '/admin/users', '/admin/reviews', '/admin/features', '/admin/analytics', '/admin/export', '/profile', '/notifications'])
+const knownPaths = new Set(['/dashboard', '/tickets', '/robots', '/knowledge-base', '/forum', '/reviews', '/features', '/agent/dashboard', '/agent/tickets', '/agent/kb/manage', '/agent/forum/manage', '/admin/dashboard', '/admin/users', '/admin/reviews', '/admin/features', '/admin/analytics', '/admin/export', '/profile', '/notifications'])
 
 export default function RouteEnhancements() {
   const location = useLocation(); const { isAuthenticated, user } = useAuth(); const pathname = location.pathname

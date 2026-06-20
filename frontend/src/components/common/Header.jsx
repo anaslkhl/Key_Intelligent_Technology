@@ -7,12 +7,26 @@ import { useTheme } from '../../contexts/theme'
 import { ROLE_LABELS } from '../../utils/roles'
 import ConfirmDialog from './ConfirmDialog'
 
-const marketingLinks = [
-  { to: '/knowledge-base', label: 'Solutions' },
-  { to: '/knowledge-base', label: 'Documentation' },
-  { to: '/forum', label: 'Community' },
-  { to: '/features', label: 'Enterprise' },
+const publicLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/knowledge-base', label: 'Knowledge Base' },
+  { to: '/forum', label: 'Forum' },
+  { to: '/reviews', label: 'Reviews' },
 ]
+
+const clientLinks = [
+  { to: '/', label: 'Home' },
+  { to: '/tickets', label: 'Tickets' },
+  { to: '/knowledge-base', label: 'Knowledge Base' },
+  { to: '/forum', label: 'Forum' },
+  { to: '/reviews', label: 'Reviews' },
+  { to: '/features', label: 'Features' },
+  { to: '/robots', label: 'Robots' },
+  { to: '/profile', label: 'Profile' },
+  { to: '/notifications', label: 'Notifications' },
+]
+
+const staffLinks = publicLinks.concat({ to: '/features', label: 'Features' })
 
 export default function Header({ onOpenNavigation, showNavigation = false }) {
   const { isAuthenticated, logout, user } = useAuth()
@@ -24,11 +38,8 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
   const location = useLocation()
   const navigate = useNavigate()
   const isAuthPage = ['/login', '/register'].includes(location.pathname)
-  const isStaff = isAuthenticated && ['agent', 'admin'].includes(user?.role)
-  const showTopNavigation = !isAuthPage && !isStaff
-  const links = isAuthenticated && user?.role === 'client'
-    ? [{ to: '/', label: 'Home' }, { to: '/tickets', label: 'Tickets' }, ...marketingLinks]
-    : marketingLinks
+  const showTopNavigation = !isAuthPage
+  const links = !isAuthenticated ? publicLinks : user?.role === 'client' ? clientLinks : staffLinks
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -55,7 +66,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
           {showNavigation && (
             <button type="button" className="icon-button menu-button" onClick={onOpenNavigation} aria-label="Open workspace navigation" title="Open navigation"><Menu size={20} /></button>
           )}
-          {showTopNavigation && (
+          {showTopNavigation && !showNavigation && (
             <button type="button" className="icon-button mobile-nav-button" onClick={() => setIsMobileMenuOpen((open) => !open)} aria-label={isMobileMenuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={isMobileMenuOpen}>{isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}</button>
           )}
 
@@ -67,7 +78,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
           {showTopNavigation && <nav className="marketing-nav" aria-label="Primary navigation">{links.map((item, index) => <Link key={`${item.label}-${index}`} to={item.to}>{item.label}</Link>)}</nav>}
 
           <div className="account-nav">
-            <button type="button" className="icon-button" onClick={toggleTheme} aria-label={`Use ${isDark ? 'light' : 'dark'} mode`} title={`Use ${isDark ? 'light' : 'dark'} mode`}>{isDark ? <Sun size={19} /> : <Moon size={19} />}</button>
+            {!isAuthPage && <button type="button" className="icon-button" onClick={toggleTheme} aria-label={`Use ${isDark ? 'light' : 'dark'} mode`} title={`Use ${isDark ? 'light' : 'dark'} mode`}>{isDark ? <Sun size={19} /> : <Moon size={19} />}</button>}
             {isAuthenticated ? (
               <div className="header-user-menu">
                 <button type="button" className="header-user-trigger" onClick={() => setIsUserMenuOpen((open) => !open)} aria-haspopup="menu" aria-expanded={isUserMenuOpen}>

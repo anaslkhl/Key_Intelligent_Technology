@@ -32,18 +32,9 @@ export default function Login() {
 
   return (
     <section className="auth-section">
-      <div className="auth-backdrop" aria-hidden="true" />
-      <div className="auth-layout">
-        <div className="auth-statement">
-          <span className="auth-kicker">Autonomous systems support</span>
-          <h2>Keep every robot mission moving.</h2>
-          <p>One secure workspace for technical requests, product knowledge, and service history.</p>
-        </div>
-
-        <div className="auth-panel">
+      <div className="auth-card">
           <div className="auth-panel-header">
-            <span className="auth-panel-mark">KIT</span>
-            <p className="eyebrow">Secure portal access</p>
+            <span className="auth-panel-mark" aria-hidden="true">K</span>
             <h1>Welcome back</h1>
             <p className="form-intro">Sign in to continue to KIT Support Hub.</p>
           </div>
@@ -77,13 +68,12 @@ export default function Login() {
               {errors.password && <small className="field-error">{errors.password.message}</small>}
             </label>
 
-            <button className="button button-primary button-full" type="submit" disabled={isSubmitting}>
+            <button className="auth-submit" type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
 
           <p className="auth-switch">New to KIT Support Hub? <Link to="/register">Create an account</Link></p>
-        </div>
       </div>
     </section>
   )

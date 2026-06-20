@@ -6,7 +6,7 @@ import NotFound from './components/common/NotFound'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
-import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, QuestionList, SubmitFeature, WriteReview } from './pages/phase3'
+import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, QuestionList, ReviewList, SubmitFeature, WriteReview } from './pages/phase3'
 import { AgentDashboard, AgentTicketDetail, AllTickets, KbForm, ManageForum, ManageKb } from './pages/phase4'
 import { AdminDashboard, Analytics, ExportData, ManageFeatures, ManageReviews, ManageUsers } from './pages/phase5'
 import Register from './pages/Register'
@@ -35,6 +35,8 @@ const router = createBrowserRouter([
       { path: '/knowledge-base/:slug', element: deferred(<KbDetail />) },
       { path: '/forum', element: deferred(<QuestionList />) },
       { path: '/forum/:id', element: deferred(<QuestionDetail />) },
+      { path: '/reviews', element: deferred(<ReviewList />) },
+      { path: '/features', element: deferred(<FeatureList />) },
       {
         element: <ProtectedRoute />,
         children: [
@@ -54,7 +56,6 @@ const router = createBrowserRouter([
           { path: '/forum/ask', element: deferred(<AskQuestion />) },
           { path: '/reviews/my', element: deferred(<MyReviews />) },
           { path: '/reviews/write', element: deferred(<WriteReview />) },
-          { path: '/features', element: deferred(<FeatureList />) },
           { path: '/features/submit', element: deferred(<SubmitFeature />) },
         ],
       },
