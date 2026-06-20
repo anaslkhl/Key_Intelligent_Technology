@@ -21,7 +21,7 @@ const knownPaths = new Set(['/dashboard', '/tickets', '/robots', '/knowledge-bas
 
 export default function RouteEnhancements() {
   const location = useLocation(); const { isAuthenticated, user } = useAuth(); const pathname = location.pathname
-  useEffect(() => { const title = titles.find(([pattern]) => pattern.test(pathname))?.[1] || 'Page not found'; document.title = `${title} | KIT Support Hub` }, [pathname])
+  useEffect(() => { const title = titles.find(([pattern]) => pattern.test(pathname))?.[1] || 'Page not found'; document.title = pathname === '/' ? title : `${title} | KIT Support Hub` }, [pathname])
   if (['/', '/login', '/register'].includes(pathname)) return null
   const segments = pathname.split('/').filter(Boolean); const home = isAuthenticated ? getRoleHome(user.role) : '/'
 

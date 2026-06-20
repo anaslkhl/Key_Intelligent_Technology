@@ -56,6 +56,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .container { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
 .page-enter { animation: page-enter 260ms ease-out both; }
 .landing-hero-enter { animation: landing-hero-in .6s ease-out both; }
+.dark .landing-page > section { background-color: #0f172a !important; }
+.dark .landing-page > section:nth-of-type(2), .dark .landing-page > section:nth-of-type(3), .dark .landing-page > section:nth-of-type(5), .dark .landing-page > section:nth-of-type(7) { background-color: #0b1120 !important; }
 .breadcrumb-bar { min-height: 38px; display: flex; align-items: center; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border); padding: 0 24px; background: var(--surface); color: var(--text-muted); font-size: 12px; white-space: nowrap; }
 .breadcrumb-bar a { display: inline-flex; align-items: center; color: var(--text-muted); font-weight: 600; text-decoration: none; }
 .breadcrumb-bar a:hover { color: var(--primary); }
@@ -263,7 +265,7 @@ th { font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 }
 
 @media (max-width: 380px) {
-  .brand-copy { display: none; }
+  .header-login-button { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

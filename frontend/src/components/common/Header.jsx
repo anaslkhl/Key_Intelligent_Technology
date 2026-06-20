@@ -72,7 +72,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
               </>
             ) : !isAuthPage && (
               <>
-                <NavLink to="/login" className="button button-secondary button-md">Log in</NavLink>
+                <NavLink to="/login" className="button button-secondary button-md header-login-button">Log in</NavLink>
                 <NavLink to="/register" className="button button-primary button-md">Get started</NavLink>
               </>
             )}
