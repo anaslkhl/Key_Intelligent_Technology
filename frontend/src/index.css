@@ -79,7 +79,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .authenticated-shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); grid-template-rows: 64px minmax(0, 1fr); }
 .authenticated-shell .site-header { grid-column: 1 / -1; grid-row: 1; }
 .authenticated-shell .main-content { grid-column: 2; grid-row: 2; }
-.sidebar { position: sticky; z-index: 30; top: 64px; grid-column: 1; grid-row: 2; height: calc(100vh - 64px); display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid #243247; background: #ffffff; color: #f1ecec; padding: 22px 14px 18px; }
+.sidebar { position: sticky; z-index: 30; top: 64px; grid-column: 1; grid-row: 2; height: calc(100vh - 64px); display: flex; flex-direction: column; overflow-y: auto; border-right: 1px solid #243247; background: #ffffffbd; color: #ffffff; padding: 22px 14px 18px; }
 .sidebar-mobile-header { display: none; }
 .sidebar-label { margin: 0 10px 10px; color: #64748b; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .sidebar-nav { display: grid; gap: 4px; }
