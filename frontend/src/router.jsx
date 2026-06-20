@@ -4,7 +4,7 @@ import Layout from './components/common/Layout'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import NotFound from './components/common/NotFound'
 import Dashboard from './pages/Dashboard'
-import Home from './pages/Home'
+import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
 import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, QuestionList, SubmitFeature, WriteReview } from './pages/phase3'
 import { AgentDashboard, AgentTicketDetail, AllTickets, KbForm, ManageForum, ManageKb } from './pages/phase4'
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      { path: '/', element: <Home /> },
+      { path: '/', element: <LandingPage /> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
       { path: '/knowledge-base', element: deferred(<KbList />) },
