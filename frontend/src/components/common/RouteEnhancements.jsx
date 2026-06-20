@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
 import { getRoleHome } from '../../utils/roles'
 
-const labels = { agent: 'Agent', admin: 'Admin', tickets: 'Tickets', kb: 'Knowledge base', manage: 'Manage', create: 'Create', edit: 'Edit', forum: 'Forum', knowledge-base: 'Knowledge base', reviews: 'Reviews', features: 'Features', analytics: 'Analytics', export: 'Export', users: 'Users', profile: 'Profile', notifications: 'Notifications', robots: 'Robots', register: 'Register', ask: 'Ask question', write: 'Write review', submit: 'Submit feature', dashboard: 'Dashboard', login: 'Log in', register: 'Register' }
+const labels = { agent: 'Agent', admin: 'Admin', tickets: 'Tickets', kb: 'Knowledge base', manage: 'Manage', create: 'Create', edit: 'Edit', forum: 'Forum', 'knowledge-base': 'Knowledge base', reviews: 'Reviews', features: 'Features', analytics: 'Analytics', export: 'Export', users: 'Users', profile: 'Profile', notifications: 'Notifications', robots: 'Robots', register: 'Register', ask: 'Ask question', write: 'Write review', submit: 'Submit feature', dashboard: 'Dashboard', login: 'Log in' }
 
 const titles = [
   [/^\/$/, 'KIT Support Hub'], [/^\/login$/, 'Log in'], [/^\/register$/, 'Create account'], [/^\/dashboard$/, 'Dashboard'],

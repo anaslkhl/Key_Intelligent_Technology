@@ -1,7 +1,8 @@
 import { Suspense } from 'react'
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import Layout from './components/common/Layout'
 import ProtectedRoute from './components/common/ProtectedRoute'
+import NotFound from './components/common/NotFound'
 import Dashboard from './pages/Dashboard'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -9,6 +10,8 @@ import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, 
 import { AgentDashboard, AgentTicketDetail, AllTickets, KbForm, ManageForum, ManageKb } from './pages/phase4'
 import { AdminDashboard, Analytics, ExportData, ManageFeatures, ManageReviews, ManageUsers } from './pages/phase5'
 import Register from './pages/Register'
+import Profile from './pages/Profile'
+import Notifications from './pages/Notifications'
 import RegisterRobot from './pages/robots/RegisterRobot'
 import RobotList from './pages/robots/RobotList'
 import CreateTicket from './pages/tickets/CreateTicket'
@@ -32,6 +35,13 @@ const router = createBrowserRouter([
       { path: '/knowledge-base/:slug', element: deferred(<KbDetail />) },
       { path: '/forum', element: deferred(<QuestionList />) },
       { path: '/forum/:id', element: deferred(<QuestionDetail />) },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: '/profile', element: <Profile /> },
+          { path: '/notifications', element: <Notifications /> },
+        ],
+      },
       {
         element: <ProtectedRoute allowedRoles={['client']} />,
         children: [
@@ -71,7 +81,7 @@ const router = createBrowserRouter([
           { path: '/admin/export', element: deferred(<ExportData />) },
         ],
       },
-      { path: '*', element: <Navigate to="/" replace /> },
+      { path: '*', element: <NotFound /> },
     ],
   },
 ])
