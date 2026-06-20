@@ -18,14 +18,14 @@ export default function KbForm() {
   const familiesQuery = useQuery({ queryKey: ['families'], queryFn: () => apiClient.get('/families').then((response) => response.data.data) })
   const articleQuery = useQuery({ queryKey: ['kb-manage-article', id], queryFn: () => apiClient.get(`/kb-articles/${id}`).then((response) => response.data.data), enabled: isEditing })
   const { register, handleSubmit, control, reset, setValue, setError, formState: { errors, dirtyFields } } = useForm({ defaultValues: { title: '', slug: '', content: '', family_id: '', product_id: '', tags: '', is_published: false } })
-  useEffect(() => { if (articleQuery.data) reset({ title: articleQuery.data.title, slug: articleQuery.data.slug, content: articleQuery.data.content, family_id: articleQuery.data.family?.id || '', product_id: articleQuery.data.product?.id || '', tags: (articleQuery.data.tags || []).join(', '), is_published: articleQuery.data.is_published }) }, [articleQuery.data, reset])
+  useEffect(() => { if (articleQuery.data && familiesQuery.data) reset({ title: articleQuery.data.title, slug: articleQuery.data.slug, content: articleQuery.data.content, family_id: articleQuery.data.family?.id || '', product_id: articleQuery.data.product?.id || '', tags: (articleQuery.data.tags || []).join(', '), is_published: articleQuery.data.is_published }) }, [articleQuery.data, familiesQuery.data, reset])
   const familyId = useWatch({ control, name: 'family_id' })
   const content = useWatch({ control, name: 'content' })
   const products = familiesQuery.data?.find((family) => family.id === familyId)?.products || []
   const save = useMutation({ mutationFn: (values) => isEditing ? apiClient.put(`/kb-articles/${id}`, values) : apiClient.post('/kb-articles', values), onSuccess: () => { toast.success(isEditing ? 'Article updated' : 'Article created'); navigate('/agent/kb/manage') }, onError: (error) => { const parsed = parseApiError(error, 'Unable to save article'); applyFieldErrors(setError, parsed.fieldErrors); setError('root.server', { message: parsed.message }) } })
   const submit = (values) => save.mutate({ ...values, family_id: values.family_id || null, product_id: values.product_id || null, tags: values.tags.split(',').map((tag) => tag.trim()).filter(Boolean), is_published: Boolean(values.is_published) })
 
-  if (isEditing && articleQuery.isLoading) return <AgentPage><LoadingState label="Loading article..." /></AgentPage>
+  if (isEditing && (articleQuery.isLoading || familiesQuery.isLoading)) return <AgentPage><LoadingState label="Loading article..." /></AgentPage>
   if (articleQuery.isError || familiesQuery.isError) return <AgentPage><ErrorState message="Unable to load the article editor." onRetry={() => { articleQuery.refetch(); familiesQuery.refetch() }} /></AgentPage>
 
   return <AgentPage><PageHeader eyebrow="Knowledge operations" title={isEditing ? 'Edit article' : 'Create article'} description="Write support content in Markdown and target it to a product family or model." />
