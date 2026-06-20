@@ -6,7 +6,8 @@ import PageHeader from '../../components/common/PageHeader'
 import Pagination from '../../components/common/Pagination'
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/QueryState'
 import { formatDate } from '../../utils/formatters'
-import { AdminPage, inputClass } from './shared'
+import AdminPage from './AdminPage'
+import { inputClass } from './adminConfig'
 
 const roles = ['client', 'agent', 'admin']
 

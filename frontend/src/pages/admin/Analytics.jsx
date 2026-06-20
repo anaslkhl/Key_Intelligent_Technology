@@ -3,10 +3,11 @@ import { Download } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import apiClient from '../../api/client'
-import ChartCard, { chartTooltipStyle } from '../../components/admin/ChartCard'
+import ChartCard from '../../components/admin/ChartCard'
+import { chartTooltipStyle } from '../../components/admin/chartConfig'
 import PageHeader from '../../components/common/PageHeader'
 import { ErrorState, LoadingState } from '../../components/common/QueryState'
-import { AdminPage } from './shared'
+import AdminPage from './AdminPage'
 
 export default function Analytics() {
   const query = useQuery({ queryKey: ['admin-analytics'], queryFn: () => apiClient.get('/admin/analytics').then((response) => response.data.data) })

@@ -8,7 +8,6 @@ import Login from './pages/Login'
 import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, QuestionList, SubmitFeature, WriteReview } from './pages/phase3'
 import { AgentDashboard, AgentTicketDetail, AllTickets, KbForm, ManageForum, ManageKb } from './pages/phase4'
 import { AdminDashboard, Analytics, ExportData, ManageFeatures, ManageReviews, ManageUsers } from './pages/phase5'
-import PortalPage from './pages/PortalPage'
 import Register from './pages/Register'
 import RegisterRobot from './pages/robots/RegisterRobot'
 import RobotList from './pages/robots/RobotList'
@@ -20,10 +19,6 @@ const deferred = (element) => (
   <Suspense fallback={<div className="route-loading" role="status">Loading page...</div>}>
     {element}
   </Suspense>
-)
-
-const page = (eyebrow, title, description) => (
-  <PortalPage eyebrow={eyebrow} title={title} description={description} />
 )
 
 const router = createBrowserRouter([

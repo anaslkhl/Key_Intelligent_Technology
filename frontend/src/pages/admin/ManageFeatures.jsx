@@ -6,7 +6,8 @@ import PageHeader from '../../components/common/PageHeader'
 import Pagination from '../../components/common/Pagination'
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/QueryState'
 import { formatDate } from '../../utils/formatters'
-import { AdminPage, featureStatuses, inputClass } from './shared'
+import AdminPage from './AdminPage'
+import { featureStatuses, inputClass } from './adminConfig'
 
 export default function ManageFeatures() {
   const client = useQueryClient(); const [page, setPage] = useState(1); const [status, setStatus] = useState('')

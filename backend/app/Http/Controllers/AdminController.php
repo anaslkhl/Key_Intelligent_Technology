@@ -234,7 +234,7 @@ class AdminController extends Controller
 
         $review->update(['is_approved' => true]);
 
-        return $this->success(new ReviewResource($review->refresh()), 'Review approved successfully.');
+        return $this->success(new ReviewResource($review->refresh()->load(['user:id,name', 'robot.product'])), 'Review approved successfully.');
     }
 
     public function getFeatureRequests(Request $request): JsonResponse
@@ -264,7 +264,7 @@ class AdminController extends Controller
         $feature = FeatureRequest::query()->with('user:id,name')->findOrFail($id);
         $feature->update(['status' => $validated['status']]);
 
-        return $this->success(new FeatureRequestResource($feature->refresh()), 'Feature request status updated successfully.');
+        return $this->success(new FeatureRequestResource($feature->refresh()->load('user:id,name')), 'Feature request status updated successfully.');
     }
 
     /**

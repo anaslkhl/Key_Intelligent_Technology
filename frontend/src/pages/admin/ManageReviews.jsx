@@ -8,12 +8,12 @@ import PageHeader from '../../components/common/PageHeader'
 import Pagination from '../../components/common/Pagination'
 import { EmptyState, ErrorState, LoadingState } from '../../components/common/QueryState'
 import { formatDate } from '../../utils/formatters'
-import { AdminPage } from './shared'
+import AdminPage from './AdminPage'
 
 export default function ManageReviews() {
   const client = useQueryClient(); const [page, setPage] = useState(1); const [rejecting, setRejecting] = useState(null)
   const query = useQuery({ queryKey: ['admin-reviews', page], queryFn: () => apiClient.get('/admin/reviews', { params: { page, per_page: 15 } }).then((response) => response.data) })
-  const moderate = useMutation({ mutationFn: ({ id, action }) => apiClient.patch(`/admin/reviews/${id}`, { action }), onSuccess: (_, values) => { toast.success(`Review ${values.action}d`); setRejecting(null); client.invalidateQueries({ queryKey: ['admin-reviews'] }); client.invalidateQueries({ queryKey: ['admin-stats'] }) }, onError: () => toast.error('Unable to moderate review') })
+  const moderate = useMutation({ mutationFn: ({ id, action }) => apiClient.patch(`/admin/reviews/${id}`, { action }), onSuccess: (_, values) => { toast.success(values.action === 'approve' ? 'Review approved' : 'Review rejected'); setRejecting(null); client.invalidateQueries({ queryKey: ['admin-reviews'] }); client.invalidateQueries({ queryKey: ['admin-stats'] }) }, onError: () => toast.error('Unable to moderate review') })
   const reviews = query.data?.data || []
 
   return <AdminPage><PageHeader eyebrow="Administration" title="Review moderation" description="Approve client feedback before it appears publicly." />

@@ -3,6 +3,7 @@ import {
   BookOpen,
   Bot,
   CircleHelp,
+  Download,
   Gauge,
   Lightbulb,
   MessageSquareText,
