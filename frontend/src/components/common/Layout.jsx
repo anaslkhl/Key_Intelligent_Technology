@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
 import Header from './Header'
+import RouteEnhancements from './RouteEnhancements'
 import Sidebar from './Sidebar'
 
 export default function Layout() {
@@ -12,6 +13,7 @@ export default function Layout() {
       <Header onOpenNavigation={() => setIsNavigationOpen(true)} />
       {isAuthenticated && <Sidebar isOpen={isNavigationOpen} onClose={() => setIsNavigationOpen(false)} />}
       <main className="main-content page-enter">
+        <RouteEnhancements />
         <Outlet />
       </main>
       {!isAuthenticated && (

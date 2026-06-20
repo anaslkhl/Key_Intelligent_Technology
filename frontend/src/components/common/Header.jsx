@@ -1,4 +1,4 @@
-import { LogOut, Menu, Moon, Sun } from 'lucide-react'
+import { Bell, LogOut, Menu, Moon, Sun } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
@@ -64,7 +64,8 @@ export default function Header({ onOpenNavigation }) {
                   <strong>{user.name}</strong>
                   <span>{ROLE_LABELS[user.role] || user.role}</span>
                 </div>
-                <span className="user-avatar" aria-hidden="true">{user.name?.charAt(0).toUpperCase()}</span>
+                <NavLink to="/notifications" className="icon-button" aria-label="Notifications" title="Notifications"><Bell size={19} /></NavLink>
+                <NavLink to="/profile" className="user-avatar" aria-label="Profile" title="Profile">{user.name?.charAt(0).toUpperCase()}</NavLink>
                 <button type="button" className="icon-button logout-button" onClick={() => setShowLogoutDialog(true)} aria-label="Log out" title="Log out">
                   <LogOut size={19} />
                 </button>

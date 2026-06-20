@@ -39,6 +39,8 @@ Route::get('/families', [ProductFamilyController::class, 'index']);
 Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::patch('/profile', [AuthController::class, 'updateProfile']);
+    Route::patch('/notification-preferences', [AuthController::class, 'updateNotificationPreferences']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])

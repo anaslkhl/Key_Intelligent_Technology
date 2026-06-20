@@ -73,6 +73,15 @@ export function AuthProvider({ children }) {
     return response.data
   }, [])
 
+  const refreshUser = useCallback(async () => {
+    const response = await apiClient.get('/me')
+    const freshUser = response.data.data
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(freshUser))
+    setUser(freshUser)
+
+    return freshUser
+  }, [])
+
   const logout = useCallback(async () => {
     try {
       if (localStorage.getItem(AUTH_TOKEN_KEY)) {
@@ -89,11 +98,12 @@ export function AuthProvider({ children }) {
       token,
       login,
       register,
+      refreshUser,
       logout,
       isInitializing,
       isAuthenticated: Boolean(token && user),
     }),
-    [isInitializing, login, logout, register, token, user],
+    [isInitializing, login, logout, refreshUser, register, token, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

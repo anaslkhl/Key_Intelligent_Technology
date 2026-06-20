@@ -3,6 +3,7 @@ import { RouterProvider } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './contexts/AuthContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+import ErrorBoundary from './components/common/ErrorBoundary'
 import router from './router'
 
 const queryClient = new QueryClient({
@@ -20,7 +21,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <RouterProvider router={router} />
+          <ErrorBoundary><RouterProvider router={router} /></ErrorBoundary>
           <Toaster
             position="top-right"
             toastOptions={{

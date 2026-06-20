@@ -148,9 +148,44 @@ class AuthController extends Controller
         return response()->json([
             'data' => $request->user()->only([
                 'id', 'name', 'email', 'company_name', 'role', 
-                'is_active', 'email_verified_at', 'last_login_at'
+                'is_active', 'email_verified_at', 'last_login_at', 'notification_preferences'
             ]),
             'status' => 200
+        ]);
+    }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $request->user()->update($validated);
+
+        return response()->json([
+            'data' => $request->user()->fresh()->only([
+                'id', 'name', 'email', 'company_name', 'role', 'is_active',
+                'email_verified_at', 'last_login_at', 'notification_preferences',
+            ]),
+            'message' => 'Profile updated successfully.',
+            'status' => 200,
+        ]);
+    }
+
+    public function updateNotificationPreferences(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'email' => ['required', 'boolean'],
+            'in_app' => ['required', 'boolean'],
+        ]);
+
+        $request->user()->update(['notification_preferences' => $validated]);
+
+        return response()->json([
+            'data' => $validated,
+            'message' => 'Notification preferences updated successfully.',
+            'status' => 200,
         ]);
     }
 
