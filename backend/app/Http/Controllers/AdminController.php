@@ -8,6 +8,9 @@ use App\Http\Requests\UpdateUserRoleRequest;
 use App\Http\Resources\AdminStatsResource;
 use App\Http\Resources\AdminTicketResource;
 use App\Http\Resources\AdminUserResource;
+use App\Http\Resources\FeatureRequestResource;
+use App\Http\Resources\ReviewResource;
+use App\Models\FeatureRequest;
 use App\Models\KbArticle;
 use App\Models\Review;
 use App\Models\Robot;
@@ -17,6 +20,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminController extends Controller
@@ -170,26 +174,114 @@ class AdminController extends Controller
             ->limit(5)
             ->get();
 
+        $csatTrend = Ticket::query()
+            ->selectRaw('DATE(updated_at) as date, ROUND(AVG(csat_rating)::numeric, 2) as average')
+            ->whereNotNull('csat_rating')
+            ->where('updated_at', '>=', now()->subDays(30)->startOfDay())
+            ->groupByRaw('DATE(updated_at)')
+            ->orderBy('date')
+            ->get();
+
+        $resolutionTime = Ticket::query()
+            ->selectRaw("DATE(updated_at) as date, ROUND(AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 3600)::numeric, 2) as hours")
+            ->whereIn('status', ['resolved', 'closed'])
+            ->where('updated_at', '>=', now()->subDays(30)->startOfDay())
+            ->groupByRaw('DATE(updated_at)')
+            ->orderBy('date')
+            ->get();
+
+        $popularFeatures = FeatureRequest::query()
+            ->with('user:id,name')
+            ->orderByDesc('upvotes_count')
+            ->limit(5)
+            ->get();
+
         return $this->success([
             'ticket_volume' => $ticketVolume,
             'csat_average' => round((float) Ticket::query()->whereNotNull('csat_rating')->avg('csat_rating'), 2),
             'popular_kb' => $popularKb,
+            'popular_features' => FeatureRequestResource::collection($popularFeatures),
             'tickets_by_status' => $ticketsByStatus,
+            'csat_trend' => $csatTrend,
+            'resolution_time' => $resolutionTime,
         ], 'Analytics retrieved successfully.');
+    }
+
+    public function getReviews(Request $request): JsonResponse
+    {
+        $this->authorizeAdminDashboard();
+
+        $reviews = Review::query()
+            ->where('is_approved', false)
+            ->with(['user:id,name,email', 'robot.product'])
+            ->latest()
+            ->paginate($this->perPage());
+
+        return $this->paginated($reviews, ReviewResource::class, 'Pending reviews retrieved successfully.');
+    }
+
+    public function moderateReview(Request $request, string $id): JsonResponse
+    {
+        $this->authorizeAdminDashboard();
+        $validated = $request->validate(['action' => ['required', Rule::in(['approve', 'reject'])]]);
+        $review = Review::query()->with(['user:id,name', 'robot.product'])->findOrFail($id);
+
+        if ($validated['action'] === 'reject') {
+            $review->delete();
+
+            return $this->success(null, 'Review rejected successfully.');
+        }
+
+        $review->update(['is_approved' => true]);
+
+        return $this->success(new ReviewResource($review->refresh()), 'Review approved successfully.');
+    }
+
+    public function getFeatureRequests(Request $request): JsonResponse
+    {
+        $this->authorizeAdminDashboard();
+        $validated = $request->validate([
+            'status' => ['nullable', Rule::in(['pending', 'under_review', 'planned', 'in_development', 'shipped', 'declined'])],
+        ]);
+
+        $features = FeatureRequest::query()
+            ->with('user:id,name,email')
+            ->when($validated['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
+            ->orderByDesc('upvotes_count')
+            ->latest()
+            ->paginate($this->perPage());
+
+        return $this->paginated($features, FeatureRequestResource::class, 'Feature requests retrieved successfully.');
+    }
+
+    public function updateFeatureStatus(Request $request, string $id): JsonResponse
+    {
+        $this->authorizeAdminDashboard();
+        $validated = $request->validate([
+            'status' => ['required', Rule::in(['pending', 'under_review', 'planned', 'in_development', 'shipped', 'declined'])],
+        ]);
+
+        $feature = FeatureRequest::query()->with('user:id,name')->findOrFail($id);
+        $feature->update(['status' => $validated['status']]);
+
+        return $this->success(new FeatureRequestResource($feature->refresh()), 'Feature request status updated successfully.');
     }
 
     /**
      * Export users as CSV.
      */
-    public function exportUsers(): StreamedResponse
+    public function exportUsers(Request $request): StreamedResponse
     {
         $this->authorizeAdminDashboard();
+        $dates = $this->validatedDateRange($request);
 
-        return response()->streamDownload(function (): void {
+        return response()->streamDownload(function () use ($dates): void {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, ['name', 'email', 'role', 'is_active', 'created_at']);
 
             User::query()
+                ->when($dates['date_from'] ?? null, fn (Builder $query, string $date) => $query->whereDate('created_at', '>=', $date))
+                ->when($dates['date_to'] ?? null, fn (Builder $query, string $date) => $query->whereDate('created_at', '<=', $date))
                 ->orderBy('created_at')
                 ->chunk(500, function ($users) use ($handle): void {
                     foreach ($users as $user) {
@@ -210,16 +302,19 @@ class AdminController extends Controller
     /**
      * Export tickets as CSV.
      */
-    public function exportTickets(): StreamedResponse
+    public function exportTickets(Request $request): StreamedResponse
     {
         $this->authorizeAdminDashboard();
+        $dates = $this->validatedDateRange($request);
 
-        return response()->streamDownload(function (): void {
+        return response()->streamDownload(function () use ($dates): void {
             $handle = fopen('php://output', 'w');
             fputcsv($handle, ['title', 'status', 'priority', 'user', 'robot', 'created_at', 'csat_rating']);
 
             Ticket::query()
                 ->with(['user:id,name', 'robot:id,name'])
+                ->when($dates['date_from'] ?? null, fn (Builder $query, string $date) => $query->whereDate('created_at', '>=', $date))
+                ->when($dates['date_to'] ?? null, fn (Builder $query, string $date) => $query->whereDate('created_at', '<=', $date))
                 ->orderBy('created_at')
                 ->chunk(500, function ($tickets) use ($handle): void {
                     foreach ($tickets as $ticket) {
@@ -252,5 +347,13 @@ class AdminController extends Controller
         $value = (string) $value;
 
         return preg_match('/^[=+\-@\t\r]/', $value) === 1 ? "'{$value}" : $value;
+    }
+
+    private function validatedDateRange(Request $request): array
+    {
+        return $request->validate([
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+        ]);
     }
 }

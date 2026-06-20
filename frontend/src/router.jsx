@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, QuestionList, SubmitFeature, WriteReview } from './pages/phase3'
 import { AgentDashboard, AgentTicketDetail, AllTickets, KbForm, ManageForum, ManageKb } from './pages/phase4'
+import { AdminDashboard, Analytics, ExportData, ManageFeatures, ManageReviews, ManageUsers } from './pages/phase5'
 import PortalPage from './pages/PortalPage'
 import Register from './pages/Register'
 import RegisterRobot from './pages/robots/RegisterRobot'
@@ -67,10 +68,12 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute allowedRoles={['admin']} />,
         children: [
-          { path: '/admin/dashboard', element: page('Administration', 'Admin dashboard', 'Monitor support operations across KIT Robotics.') },
-          { path: '/admin/users', element: page('Administration', 'User management', 'Manage user roles and account status.') },
-          { path: '/admin/reviews', element: page('Administration', 'Review moderation', 'Approve or reject client product reviews.') },
-          { path: '/admin/analytics', element: page('Administration', 'Analytics', 'Inspect ticket, CSAT, and knowledge-base trends.') },
+          { path: '/admin/dashboard', element: deferred(<AdminDashboard />) },
+          { path: '/admin/users', element: deferred(<ManageUsers />) },
+          { path: '/admin/reviews', element: deferred(<ManageReviews />) },
+          { path: '/admin/features', element: deferred(<ManageFeatures />) },
+          { path: '/admin/analytics', element: deferred(<Analytics />) },
+          { path: '/admin/export', element: deferred(<ExportData />) },
         ],
       },
       { path: '*', element: <Navigate to="/" replace /> },

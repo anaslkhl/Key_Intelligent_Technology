@@ -35,7 +35,9 @@ const navigation = {
     { to: '/admin/dashboard', label: 'Overview', icon: Gauge },
     { to: '/admin/users', label: 'Users', icon: Users },
     { to: '/admin/reviews', label: 'Review moderation', icon: ShieldCheck },
+    { to: '/admin/features', label: 'Feature roadmap', icon: Lightbulb },
     { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/admin/export', label: 'Export data', icon: Download },
   ],
 }
 

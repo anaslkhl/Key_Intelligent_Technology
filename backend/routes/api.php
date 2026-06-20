@@ -105,6 +105,10 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
         Route::get('/tickets', [AdminController::class, 'getTickets']);
         Route::get('/tickets/{id}', [AdminController::class, 'getTicketDetail'])->whereUuid('id');
         Route::get('/analytics', [AdminController::class, 'getAnalytics']);
+        Route::get('/reviews', [AdminController::class, 'getReviews']);
+        Route::patch('/reviews/{id}', [AdminController::class, 'moderateReview'])->whereUuid('id');
+        Route::get('/feature-requests', [AdminController::class, 'getFeatureRequests']);
+        Route::patch('/feature-requests/{id}', [AdminController::class, 'updateFeatureStatus'])->whereUuid('id');
         Route::get('/export/users', [AdminController::class, 'exportUsers']);
         Route::get('/export/tickets', [AdminController::class, 'exportTickets']);
     });
@@ -125,4 +129,3 @@ Route::middleware(['auth:sanctum', 'active', 'role:agent,admin', 'throttle:60,1'
         Route::put('/kb-articles/{id}', [KbArticleController::class, 'update'])->whereUuid('id');
         Route::delete('/kb-articles/{id}', [KbArticleController::class, 'destroy'])->whereUuid('id');
     });
-
