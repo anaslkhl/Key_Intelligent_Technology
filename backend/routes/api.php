@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AgentController;
 use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\KbArticleController;
@@ -108,4 +109,20 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
         Route::get('/export/tickets', [AdminController::class, 'exportTickets']);
     });
 
+Route::middleware(['auth:sanctum', 'active', 'role:agent,admin', 'throttle:60,1'])
+    ->group(function () {
+        Route::prefix('agent')->group(function () {
+            Route::get('/stats', [AgentController::class, 'stats']);
+            Route::get('/staff', [AgentController::class, 'staff']);
+            Route::get('/tickets', [AgentController::class, 'tickets']);
+            Route::get('/tickets/{id}', [AgentController::class, 'ticket'])->whereUuid('id');
+            Route::patch('/tickets/{id}', [AgentController::class, 'updateTicket'])->whereUuid('id');
+        });
+
+        Route::get('/kb-articles', [KbArticleController::class, 'manageIndex']);
+        Route::get('/kb-articles/{id}', [KbArticleController::class, 'manageShow'])->whereUuid('id');
+        Route::post('/kb-articles', [KbArticleController::class, 'store']);
+        Route::put('/kb-articles/{id}', [KbArticleController::class, 'update'])->whereUuid('id');
+        Route::delete('/kb-articles/{id}', [KbArticleController::class, 'destroy'])->whereUuid('id');
+    });
 

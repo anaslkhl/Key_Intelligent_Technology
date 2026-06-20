@@ -26,9 +26,10 @@ const navigation = {
     { to: '/features', label: 'Feature requests', icon: Lightbulb },
   ],
   agent: [
+    { to: '/agent/dashboard', label: 'Dashboard', icon: Gauge },
     { to: '/agent/tickets', label: 'Ticket queue', icon: TicketCheck },
-    { to: '/agent/knowledge-base', label: 'Knowledge base', icon: BookOpen },
-    { to: '/forum', label: 'Community', icon: MessageSquareText },
+    { to: '/agent/kb/manage', label: 'Knowledge base', icon: BookOpen },
+    { to: '/agent/forum/manage', label: 'Forum moderation', icon: MessageSquareText },
   ],
   admin: [
     { to: '/admin/dashboard', label: 'Overview', icon: Gauge },
@@ -63,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
         <div className="sidebar-support">
           <CircleHelp size={20} />
-          <div><strong>Need urgent help?</strong><span>Create a priority ticket for the support team.</span></div>
+          <div><strong>{user?.role === 'client' ? 'Need urgent help?' : 'Support workspace'}</strong><span>{user?.role === 'client' ? 'Create a priority ticket for the support team.' : 'Keep client requests moving forward.'}</span></div>
         </div>
       </aside>
     </>

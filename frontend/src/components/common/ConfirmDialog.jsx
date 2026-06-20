@@ -1,7 +1,7 @@
 import { AlertTriangle } from 'lucide-react'
 import { useEffect } from 'react'
 
-export default function ConfirmDialog({ isOpen, title, message, confirmLabel, isBusy, onCancel, onConfirm }) {
+export default function ConfirmDialog({ isOpen, title, message, confirmLabel, busyLabel = 'Working...', isBusy, onCancel, onConfirm }) {
   useEffect(() => {
     if (!isOpen) return undefined
 
@@ -30,7 +30,7 @@ export default function ConfirmDialog({ isOpen, title, message, confirmLabel, is
         <div className="dialog-actions">
           <button type="button" className="button button-secondary" onClick={onCancel} disabled={isBusy}>Cancel</button>
           <button type="button" className="button button-danger" onClick={onConfirm} disabled={isBusy} autoFocus>
-            {isBusy ? 'Signing out...' : confirmLabel}
+            {isBusy ? busyLabel : confirmLabel}
           </button>
         </div>
       </div>

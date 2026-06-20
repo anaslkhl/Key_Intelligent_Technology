@@ -14,6 +14,6 @@ class QuestionPolicy
 
     public function delete(User $user, ForumQuestion $question): bool
     {
-        return $question->user_id === $user->id || $user->role === 'admin';
+        return $question->user_id === $user->id || in_array($user->role, ['agent', 'admin'], true);
     }
 }

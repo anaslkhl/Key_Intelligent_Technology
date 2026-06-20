@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import { AskQuestion, FeatureList, KbDetail, KbList, MyReviews, QuestionDetail, QuestionList, SubmitFeature, WriteReview } from './pages/phase3'
+import { AgentDashboard, AgentTicketDetail, AllTickets, KbForm, ManageForum, ManageKb } from './pages/phase4'
 import PortalPage from './pages/PortalPage'
 import Register from './pages/Register'
 import RegisterRobot from './pages/robots/RegisterRobot'
@@ -54,8 +55,13 @@ const router = createBrowserRouter([
       {
         element: <ProtectedRoute allowedRoles={['agent', 'admin']} />,
         children: [
-          { path: '/agent/tickets', element: page('Support operations', 'Ticket queue', 'Review, assign, and respond to client tickets.') },
-          { path: '/agent/knowledge-base', element: page('Support operations', 'Knowledge base', 'Create and maintain support documentation.') },
+          { path: '/agent/dashboard', element: deferred(<AgentDashboard />) },
+          { path: '/agent/tickets', element: deferred(<AllTickets />) },
+          { path: '/agent/tickets/:id', element: deferred(<AgentTicketDetail />) },
+          { path: '/agent/kb/manage', element: deferred(<ManageKb />) },
+          { path: '/agent/kb/create', element: deferred(<KbForm />) },
+          { path: '/agent/kb/edit/:id', element: deferred(<KbForm />) },
+          { path: '/agent/forum/manage', element: deferred(<ManageForum />) },
         ],
       },
       {

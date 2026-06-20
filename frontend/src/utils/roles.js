@@ -1,6 +1,6 @@
 export const ROLE_HOME = {
   client: '/dashboard',
-  agent: '/agent/tickets',
+  agent: '/agent/dashboard',
   admin: '/admin/dashboard',
 }
 

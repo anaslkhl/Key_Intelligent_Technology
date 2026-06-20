@@ -12,6 +12,41 @@ use Illuminate\Validation\Rule;
 
 class KbArticleController extends Controller
 {
+    public function manageIndex(Request $request): JsonResponse
+    {
+        $this->authorizeKnowledgeBaseWriter($request);
+        $validated = $request->validate([
+            'family_id' => ['nullable', 'uuid', 'exists:product_families,id'],
+            'q' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $articles = KbArticle::query()
+            ->with(['family:id,name', 'product:id,model,name', 'author:id,name,email,role'])
+            ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query->where('family_id', $familyId))
+            ->when($validated['q'] ?? null, fn (Builder $query, string $term) => $this->applySearch($query, $term))
+            ->latest()
+            ->paginate($this->perPage());
+
+        $articles->getCollection()->transform(fn (KbArticle $article) => [
+            ...$this->articleListPayload($article),
+            'is_published' => $article->is_published,
+            'product' => $article->product,
+            'updated_at' => $article->updated_at,
+        ]);
+
+        return $this->success($this->paginatorPayload($articles), 'Knowledge base management articles retrieved successfully.');
+    }
+
+    public function manageShow(Request $request, string $id): JsonResponse
+    {
+        $this->authorizeKnowledgeBaseWriter($request);
+        $article = KbArticle::query()
+            ->with(['family:id,name', 'product:id,model,name', 'author:id,name,email,role'])
+            ->findOrFail($id);
+
+        return $this->success($this->articleDetailPayload($article), 'Knowledge base management article retrieved successfully.');
+    }
+
     public function index(Request $request): JsonResponse
     {
         $validated = $request->validate([
