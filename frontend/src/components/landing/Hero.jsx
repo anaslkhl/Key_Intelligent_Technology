@@ -1,10 +1,71 @@
-import { Bot, Search } from 'lucide-react'
-import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-import roboticsImage from '../../assets/kit-auth-industrial.png'
+import { Bot, Search } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+
+const suggestions = [
+  "OMNIE calibration",
+  "Battery Issues",
+  "F20MT setup",
+  "Fleet management",
+];
 
 export default function Hero() {
-  const navigate = useNavigate(); const { register, handleSubmit } = useForm({ defaultValues: { query: '' } })
-  return <section className="bg-white px-3 py-10 text-center dark:bg-slate-900 sm:px-4 sm:py-20 lg:py-[120px]" aria-labelledby="landing-heading"><div className="mx-auto max-w-[1200px]"><div className="landing-hero-enter"><span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300 sm:mb-6"><Bot size={25} /></span><h1 id="landing-heading" className="mx-auto max-w-3xl !text-[40px] !font-bold !leading-[1.2] text-slate-900 dark:text-slate-50 sm:!text-[48px]">How can we help you today?</h1><p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-400 sm:text-xl">Search for solutions, ask the community, or report an issue to our support team.</p><form onSubmit={handleSubmit(({ query }) => navigate(`/knowledge-base?q=${encodeURIComponent(query.trim())}`))} role="search" className="mx-auto mt-7 flex max-w-3xl items-center rounded-xl border-2 border-slate-200 bg-white shadow-lg transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/15 dark:border-slate-700 dark:bg-slate-800 sm:mt-9"><Search size={21} className="ml-4 shrink-0 text-slate-400 sm:ml-5" aria-hidden="true" /><input aria-label="Search support articles" placeholder="Search support..." className="h-14 min-w-0 flex-1 border-0 bg-transparent px-3 text-base text-slate-900 outline-none dark:text-slate-50 sm:px-4 sm:placeholder:text-base" {...register('query')} /><button type="submit" aria-label="Search knowledge base" className="mr-1 inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-4 font-semibold text-white transition hover:scale-[1.02] hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:px-6"><Search size={18} className="sm:hidden" /><span className="hidden sm:inline">Search</span></button></form>
-        <figure className="mx-auto mt-8 h-20 max-w-4xl overflow-hidden rounded-xl border border-slate-200 shadow-md dark:border-slate-700 sm:mt-10 sm:h-28"><img src={roboticsImage} alt="KIT Robotics autonomous systems support environment" className="h-full w-full object-cover object-[center_42%]" /></figure></div></div></section>
+  const navigate = useNavigate();
+  const { register, handleSubmit } = useForm({ defaultValues: { query: "" } });
+
+  return (
+    <section className="w-full bg-white px-3 py-10 dark:bg-black sm:px-4 sm:py-20 lg:py-[120px]">
+      <div className="mx-auto max-w-3xl text-center">
+        <div className="landing-hero-enter">
+          <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300 sm:mb-6">
+            <Bot size={25} />
+          </span>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white sm:text-5xl">
+            How can we help you today?
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600 dark:text-zinc-400 sm:text-xl">
+            Search for solutions, ask the community, or report an issue to our support team.
+          </p>
+
+          <form
+            onSubmit={handleSubmit(({ query }) =>
+              navigate(`/knowledge-base?q=${encodeURIComponent(query.trim())}`)
+            )}
+            className="mt-7 flex items-center rounded-xl border-2 border-slate-200 bg-white shadow-lg transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/15 dark:border-zinc-800 dark:bg-[#111111]"
+          >
+            <Search size={21} className="ml-4 shrink-0 text-slate-400" />
+            <input
+              placeholder="Search for solutions, articles, or questions..."
+              className="h-14 w-full border-0 bg-transparent px-3 text-base text-slate-900 outline-none dark:text-white"
+              {...register("query")}
+            />
+            <button
+              type="submit"
+              className="mr-1 inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-6 font-semibold text-white transition hover:scale-[1.02] hover:bg-blue-700"
+            >
+              Search
+            </button>
+          </form>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <span className="text-xs font-semibold text-slate-500 dark:text-zinc-500">
+              Popular:
+            </span>
+            {suggestions.map((suggestion) => (
+              <button
+                key={suggestion}
+                type="button"
+                onClick={() =>
+                  navigate(`/knowledge-base?q=${encodeURIComponent(suggestion)}`)
+                }
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-300 dark:hover:border-blue-700 dark:hover:text-blue-400"
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

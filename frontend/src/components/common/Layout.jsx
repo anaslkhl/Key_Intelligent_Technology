@@ -6,11 +6,11 @@ import RouteEnhancements from './RouteEnhancements'
 import Sidebar from './Sidebar'
 
 export default function Layout() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const { pathname } = useLocation()
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
   const isLanding = pathname === '/'
-  const hasWorkspace = isAuthenticated && !isLanding
+  const hasWorkspace = isAuthenticated && ['agent', 'admin'].includes(user?.role) && !isLanding
   return (
     <div className={`app-shell${hasWorkspace ? ' authenticated-shell' : ''}`}>
       <Header showNavigation={hasWorkspace} onOpenNavigation={() => setIsNavigationOpen(true)} />

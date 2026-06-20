@@ -1,14 +1,12 @@
 import {
   BarChart3,
   BookOpen,
-  Bot,
   CircleHelp,
   Download,
   Gauge,
   Lightbulb,
   MessageSquareText,
   ShieldCheck,
-  Star,
   TicketCheck,
   Users,
   X,
@@ -17,15 +15,6 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
 
 const navigation = {
-  client: [
-    { to: '/dashboard', label: 'Dashboard', icon: Gauge },
-    { to: '/tickets', label: 'Tickets', icon: TicketCheck },
-    { to: '/robots', label: 'Robots', icon: Bot },
-    { to: '/knowledge-base', label: 'Knowledge base', icon: BookOpen },
-    { to: '/forum', label: 'Community', icon: MessageSquareText },
-    { to: '/reviews/my', label: 'My reviews', icon: Star },
-    { to: '/features', label: 'Feature requests', icon: Lightbulb },
-  ],
   agent: [
     { to: '/agent/dashboard', label: 'Dashboard', icon: Gauge },
     { to: '/agent/tickets', label: 'Ticket queue', icon: TicketCheck },
@@ -67,7 +56,7 @@ export default function Sidebar({ isOpen, onClose }) {
         </nav>
         <div className="sidebar-support">
           <CircleHelp size={20} />
-          <div><strong>{user?.role === 'client' ? 'Need urgent help?' : 'Support workspace'}</strong><span>{user?.role === 'client' ? 'Create a priority ticket for the support team.' : 'Keep client requests moving forward.'}</span></div>
+          <div><strong>Support workspace</strong><span>Keep client requests moving forward.</span></div>
         </div>
       </aside>
     </>
