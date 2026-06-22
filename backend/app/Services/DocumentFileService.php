@@ -48,7 +48,7 @@ class DocumentFileService
             return Storage::disk($document->upload->disk)->url($document->thumbnail);
         }
 
-        if ($document->document_type === 'image') {
+        if (in_array($document->document_type, ['pdf', 'image', 'video'], true)) {
             return Storage::disk($document->upload->disk)->url($document->upload->file_path);
         }
 
