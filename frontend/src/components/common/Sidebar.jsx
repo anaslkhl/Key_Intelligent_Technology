@@ -3,6 +3,7 @@ import {
   BookOpen,
   CircleHelp,
   Download,
+  Files,
   Gauge,
   Lightbulb,
   MessageSquareText,
@@ -19,6 +20,7 @@ const navigation = {
     { to: '/agent/dashboard', label: 'Dashboard', icon: Gauge },
     { to: '/agent/tickets', label: 'Ticket queue', icon: TicketCheck },
     { to: '/agent/kb/manage', label: 'Knowledge base', icon: BookOpen },
+    { to: '/agent/documents', label: 'Documents', icon: Files },
     { to: '/agent/forum/manage', label: 'Forum moderation', icon: MessageSquareText },
   ],
   admin: [
@@ -26,6 +28,7 @@ const navigation = {
     { to: '/admin/users', label: 'Users', icon: Users },
     { to: '/admin/reviews', label: 'Review moderation', icon: ShieldCheck },
     { to: '/admin/features', label: 'Feature roadmap', icon: Lightbulb },
+    { to: '/admin/documents', label: 'Documents', icon: Files },
     { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     { to: '/admin/export', label: 'Export data', icon: Download },
   ],

@@ -10,6 +10,7 @@ use App\Models\Robot;
 use App\Models\Upload;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -63,11 +64,13 @@ class DocumentModuleTest extends TestCase
         ]);
         $targeted->productFamilies()->attach($family);
 
-        $this->getJson('/api/documents')
+        $response = $this->getJson('/api/documents')
             ->assertOk()
-            ->assertJsonPath('status', 200)
-            ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.id', $visible->id);
+            ->assertJsonPath('status', 200);
+        $documentIds = collect($response->json('data'))->pluck('id');
+
+        $this->assertTrue($documentIds->contains($visible->id));
+        $this->assertFalse($documentIds->contains($targeted->id));
 
         $this->getJson('/api/documents/targeted-manual')->assertNotFound();
     }
@@ -102,10 +105,15 @@ class DocumentModuleTest extends TestCase
             ->assertJsonPath('data.id', $document->id)
             ->assertJsonPath('data.expires_in', 900);
 
-        $this->getJson('/api/documents')
+        $response = $this->getJson('/api/documents')->assertOk();
+        $listedDocument = collect($response->json('data'))->firstWhere('id', $document->id);
+
+        $this->assertNotNull($listedDocument);
+        $this->assertIsString($listedDocument['upload']['url']);
+        $this->assertStringContainsString('/documents/', $listedDocument['upload']['url']);
+        $this->getJson("/api/documents/{$document->slug}")
             ->assertOk()
-            ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.id', $document->id);
+            ->assertJsonPath('data.id', $document->id);
     }
 
     public function test_unsigned_download_is_rejected(): void
@@ -171,6 +179,26 @@ class DocumentModuleTest extends TestCase
         Sanctum::actingAs($client);
 
         $this->postJson('/api/documents', [])->assertForbidden();
+    }
+
+    public function test_agent_can_upload_a_document_file_and_load_document_by_id(): void
+    {
+        Storage::fake('public');
+        $agent = User::factory()->create(['role' => 'agent']);
+        Sanctum::actingAs($agent);
+
+        $response = $this->post('/api/documents/upload', [
+            'file' => UploadedFile::fake()->create('training-guide.pdf', 1024, 'application/pdf'),
+        ], ['Accept' => 'application/json']);
+
+        $response->assertCreated()
+            ->assertJsonPath('status', 201)
+            ->assertJsonPath('data.original_name', 'training-guide.pdf');
+
+        $document = $this->document($agent, $this->category(), ['slug' => 'uuid-lookup']);
+        $this->getJson("/api/documents/{$document->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $document->id);
     }
 
     private function category(): DocumentCategory

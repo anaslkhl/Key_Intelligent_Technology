@@ -18,6 +18,7 @@ const clientLinks = [
   { to: '/', label: 'Home' },
   { to: '/tickets', label: 'Tickets' },
   { to: '/knowledge-base', label: 'Knowledge Base' },
+  { to: '/documents', label: 'Documents' },
   { to: '/forum', label: 'Forum' },
   { to: '/reviews', label: 'Reviews' },
   { to: '/features', label: 'Features' },

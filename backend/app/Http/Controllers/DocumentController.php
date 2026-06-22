@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreDocumentRequest;
 use App\Http\Requests\DocumentUploadRequest;
+use App\Http\Requests\StoreDocumentRequest;
 use App\Http\Requests\UpdateDocumentRequest;
 use App\Http\Resources\DocumentCollection;
 use App\Http\Resources\DocumentResource;
@@ -65,7 +65,7 @@ class DocumentController extends Controller
         $user = Auth::guard('sanctum')->user();
 
         if ($user instanceof User) {
-            Gate::authorize('view', $document);
+            Gate::forUser($user)->authorize('view', $document);
         } else {
             abort_unless($this->isPublicDocument($document), 404);
         }

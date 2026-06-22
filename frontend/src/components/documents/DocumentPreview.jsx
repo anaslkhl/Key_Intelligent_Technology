@@ -14,7 +14,7 @@ export default function DocumentPreview({ document }) {
     return <div className="grid min-h-80 place-items-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-zinc-700 dark:bg-zinc-950"><div><FileQuestion className="mx-auto text-slate-400" size={38} /><h2 className="mt-4 !text-lg !font-semibold">Preview unavailable</h2><p className="mt-2 text-sm text-slate-500">Download this file to view it in its native application.</p></div></div>
   }
 
-  if (document.document_type === 'image') return <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-zinc-800 dark:bg-zinc-950"><img src={preview.preview_url} alt={`Preview of ${document.title}`} className="mx-auto max-h-[70vh] w-auto object-contain" /></div>
+  if (document.document_type === 'image') return <div className="flex min-h-[520px] items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-100 p-4 dark:border-zinc-800 dark:bg-zinc-950"><img src={preview.preview_url} alt={`Preview of ${document.title}`} className="max-h-[70vh] max-w-full object-contain" /></div>
   if (document.document_type === 'video') return <video controls preload="metadata" className="aspect-video w-full rounded-xl bg-black" src={preview.preview_url}>Your browser does not support video playback.</video>
 
   return <iframe title={`Preview of ${document.title}`} src={preview.preview_url} className="h-[70vh] min-h-[520px] w-full rounded-xl border border-slate-200 bg-white dark:border-zinc-800" />
