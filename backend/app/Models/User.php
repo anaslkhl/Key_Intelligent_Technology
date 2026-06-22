@@ -129,7 +129,7 @@ class User extends Authenticatable implements MustVerifyEmailContract
     // Security methods
     public function isActive(): bool
     {
-        return $this->is_active && !is_null($this->email_verified_at);
+        return $this->is_active && ! is_null($this->email_verified_at);
     }
 
     public function hasRole(string $role): bool
