@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreDocumentRequest;
+use App\Http\Requests\DocumentUploadRequest;
 use App\Http\Requests\UpdateDocumentRequest;
 use App\Http\Resources\DocumentCollection;
 use App\Http\Resources\DocumentResource;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class DocumentController extends Controller
@@ -52,7 +54,13 @@ class DocumentController extends Controller
     {
         $document = Document::query()
             ->with(['category', 'upload', 'uploadedBy:id,name', 'productFamilies', 'products', 'solutionTypes'])
-            ->where('slug', $slug)
+            ->where(function ($query) use ($slug): void {
+                $query->where('slug', $slug);
+
+                if (Str::isUuid($slug)) {
+                    $query->orWhere('id', $slug);
+                }
+            })
             ->firstOrFail();
         $user = Auth::guard('sanctum')->user();
 
@@ -77,6 +85,18 @@ class DocumentController extends Controller
         $document = $this->documentService->create($data);
 
         return $this->success(new DocumentResource($document), 'Document created successfully.', 201);
+    }
+
+    public function upload(DocumentUploadRequest $request): JsonResponse
+    {
+        $upload = $this->fileService->store($request->file('file'), $request->user());
+
+        return $this->success([
+            'id' => $upload->id,
+            'original_name' => $upload->original_name,
+            'file_size' => $upload->file_size,
+            'mime_type' => $upload->mime_type,
+        ], 'Document file uploaded successfully.', 201);
     }
 
     public function update(UpdateDocumentRequest $request, Document $document): JsonResponse

@@ -3,9 +3,13 @@
 namespace App\Services;
 
 use App\Models\Document;
+use App\Models\Upload;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class DocumentFileService
 {
@@ -49,6 +53,23 @@ class DocumentFileService
         }
 
         return null;
+    }
+
+    public function store(UploadedFile $file, User $user): Upload
+    {
+        $metadata = $this->validateFile($file);
+        $directory = 'uploads/documents/'.now()->format('Y/m');
+        $filename = Str::uuid()->toString().'.'.$metadata['extension'];
+        $path = $file->storeAs($directory, $filename, 'public');
+
+        return DB::transaction(fn () => Upload::query()->create([
+            'user_id' => $user->id,
+            'original_name' => Str::limit(basename($metadata['original_name']), 255, ''),
+            'file_path' => $path,
+            'file_size' => $metadata['size'],
+            'mime_type' => $metadata['mime_type'],
+            'disk' => 'public',
+        ]));
     }
 
     private function documentTypeFor(string $extension): string

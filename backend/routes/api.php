@@ -146,6 +146,7 @@ Route::middleware(['auth:sanctum', 'active', 'role:agent,admin', 'throttle:60,1'
         Route::delete('/kb-articles/{id}', [KbArticleController::class, 'destroy'])->whereUuid('id');
 
         Route::post('/documents', [DocumentController::class, 'store']);
+        Route::post('/documents/upload', [DocumentController::class, 'upload'])->middleware('throttle:10,1');
         Route::put('/documents/{document}', [DocumentController::class, 'update'])->whereUuid('document');
         Route::patch('/documents/{document}/publish', [DocumentController::class, 'publish'])->whereUuid('document');
     });
