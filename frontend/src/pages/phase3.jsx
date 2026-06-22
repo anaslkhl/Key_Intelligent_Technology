@@ -2,6 +2,7 @@ import { lazy } from 'react'
 
 export const KbList = lazy(() => import('./knowledge-base/KbList'))
 export const KbDetail = lazy(() => import('./knowledge-base/KbDetail'))
+export const ErrorCodeList = lazy(() => import('./knowledge-base/ErrorCodeList'))
 export const QuestionList = lazy(() => import('./forum/QuestionList'))
 export const QuestionDetail = lazy(() => import('./forum/QuestionDetail'))
 export const AskQuestion = lazy(() => import('./forum/AskQuestion'))

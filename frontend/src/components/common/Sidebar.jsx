@@ -30,6 +30,7 @@ const navigation = {
     { to: '/admin/features', label: 'Feature roadmap', icon: Lightbulb },
     { to: '/admin/documents', label: 'Documents', icon: Files },
     { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/admin/analytics/knowledge-base', label: 'KB analytics', icon: BookOpen },
     { to: '/admin/export', label: 'Export data', icon: Download },
   ],
 }

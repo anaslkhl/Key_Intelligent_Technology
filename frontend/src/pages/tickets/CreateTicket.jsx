@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
@@ -12,7 +12,8 @@ export default function CreateTicket() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const queryClient = useQueryClient()
-  const [familyId, setFamilyId] = useState('')
+  const prefillApplied = useRef(false)
+  const [familyId, setFamilyId] = useState(searchParams.get('family_id') || '')
   const { register, handleSubmit, control, setValue, setError, formState: { errors } } = useForm({ defaultValues: { priority: 'medium', title: searchParams.get('title') || '', description: searchParams.get('context') || '' } })
   const robotId = useWatch({ control, name: 'robot_id' })
   const familiesQuery = useQuery({ queryKey: ['families'], queryFn: () => apiClient.get('/families').then((response) => response.data.data) })
@@ -22,6 +23,25 @@ export default function CreateTicket() {
   const family = families.find((item) => item.id === familyId)
   const availableRobots = useMemo(() => robots.filter((robot) => !familyId || robot.product?.family?.id === familyId), [familyId, robots])
   const selectedRobot = robots.find((robot) => robot.id === robotId)
+
+  useEffect(() => {
+    if (prefillApplied.current || families.length === 0 || robots.length === 0) return
+
+    const productId = searchParams.get('product_id')
+    const requestedCategoryId = searchParams.get('category_id')
+    const matchingRobot = productId ? robots.find((robot) => robot.product?.id === productId) : null
+    const targetFamilyId = matchingRobot?.product?.family?.id || searchParams.get('family_id') || ''
+    const targetFamily = families.find((item) => item.id === targetFamilyId)
+
+    if (matchingRobot) setValue('robot_id', matchingRobot.id)
+
+    const categories = targetFamily?.ticket_categories || []
+    const requestedCategory = categories.find((item) => item.id === requestedCategoryId)
+    if (requestedCategory) setValue('category_id', requestedCategory.id)
+    else if (categories.length > 0 && searchParams.get('article_slug')) setValue('category_id', categories[0].id)
+
+    prefillApplied.current = true
+  }, [families, robots, searchParams, setValue])
 
   const mutation = useMutation({
     mutationFn: async (values) => {

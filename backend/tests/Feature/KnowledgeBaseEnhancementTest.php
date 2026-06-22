@@ -2,9 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\ErrorCode;
 use App\Models\KbArticle;
+use App\Models\KbSearchLog;
+use App\Models\Product;
+use App\Models\ProductFamily;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class KnowledgeBaseEnhancementTest extends TestCase
@@ -61,6 +66,52 @@ class KnowledgeBaseEnhancementTest extends TestCase
         $response = $this->getJson("/api/knowledge-base/{$article->slug}")->assertOk();
 
         $this->assertTrue(collect($response->json('data.related_articles'))->pluck('id')->contains($related->id));
+    }
+
+    public function test_error_codes_can_be_searched_by_code_and_product(): void
+    {
+        $family = ProductFamily::query()->create(['name' => 'Diagnostics '.str()->uuid(), 'sort_order' => 99]);
+        $product = Product::query()->create(['family_id' => $family->id, 'model' => 'TEST-'.str()->random(6), 'name' => 'Test robot']);
+        $errorCode = ErrorCode::query()->create([
+            'code' => 'E-'.str()->upper(str()->random(8)),
+            'meaning' => 'Navigation sensor unavailable',
+            'severity' => 'high',
+            'cause' => 'The sensor is obstructed.',
+            'solution' => 'Clean and recalibrate the sensor.',
+            'product_id' => $product->id,
+        ]);
+
+        $response = $this->getJson("/api/error-codes?q={$errorCode->code}&product_id={$product->id}")->assertOk();
+
+        $response->assertJsonPath('data.0.id', $errorCode->id);
+        $response->assertJsonPath('data.0.product.id', $product->id);
+    }
+
+    public function test_authenticated_article_views_are_kept_in_recent_history(): void
+    {
+        $user = User::factory()->create();
+        $article = $this->article(['slug' => 'recent-history-'.str()->uuid()]);
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/knowledge-base/{$article->slug}")->assertOk();
+        $response = $this->getJson('/api/knowledge-base/highlights')->assertOk();
+
+        $this->assertDatabaseHas('kb_recent_views', ['user_id' => $user->id, 'article_id' => $article->id]);
+        $this->assertSame($article->id, $response->json('data.recently_viewed.0.id'));
+    }
+
+    public function test_searches_and_no_result_terms_are_available_to_admin_analytics(): void
+    {
+        $term = 'missing-'.str()->uuid();
+        $this->getJson('/api/knowledge-base?q='.urlencode($term))->assertOk();
+        $this->assertTrue(KbSearchLog::query()->where('normalized_query', str($term)->lower())->where('results_count', 0)->exists());
+
+        $admin = User::factory()->create(['role' => 'admin']);
+        Sanctum::actingAs($admin);
+        $response = $this->getJson('/api/admin/knowledge-base/analytics')->assertOk();
+
+        $this->assertTrue(collect($response->json('data.no_result_searches'))->pluck('keyword')->contains(str($term)->lower()->toString()));
+        $response->assertJsonStructure(['data' => ['most_viewed', 'least_helpful', 'no_result_searches', 'most_searched']]);
     }
 
     /**

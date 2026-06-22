@@ -19,6 +19,7 @@ import ConfirmDialog from "./ConfirmDialog";
 const publicLinks = [
   { to: "/", label: "Home" },
   { to: "/knowledge-base", label: "Knowledge Base" },
+  { to: "/error-codes", label: "Error Codes" },
   { to: "/forum", label: "Forum" },
   { to: "/reviews", label: "Reviews" },
 ];
@@ -27,6 +28,7 @@ const clientLinks = [
   { to: "/", label: "Home" },
   { to: "/tickets", label: "Tickets" },
   { to: "/knowledge-base", label: "Knowledge Base" },
+  { to: "/error-codes", label: "Error Codes" },
   { to: "/documents", label: "Documents" },
   { to: "/forum", label: "Forum" },
   { to: "/reviews", label: "Reviews" },
