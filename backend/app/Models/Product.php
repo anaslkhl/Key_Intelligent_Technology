@@ -47,4 +47,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Document::class, 'document_product');
     }
+
+    public function errorCodes(): HasMany
+    {
+        return $this->hasMany(ErrorCode::class);
+    }
 }

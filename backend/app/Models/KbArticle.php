@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class KbArticle extends Model
@@ -64,6 +65,16 @@ class KbArticle extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function errorCodes(): HasMany
+    {
+        return $this->hasMany(ErrorCode::class, 'article_id');
+    }
+
+    public function recentViews(): HasMany
+    {
+        return $this->hasMany(KbRecentView::class, 'article_id');
     }
 
     public function readingTime(): int

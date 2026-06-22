@@ -126,6 +126,16 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(DocumentVersion::class, 'uploaded_by');
     }
 
+    public function kbSearchLogs(): HasMany
+    {
+        return $this->hasMany(KbSearchLog::class);
+    }
+
+    public function kbRecentViews(): HasMany
+    {
+        return $this->hasMany(KbRecentView::class);
+    }
+
     // Security methods
     public function isActive(): bool
     {

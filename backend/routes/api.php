@@ -6,9 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentPermissionController;
+use App\Http\Controllers\ErrorCodeController;
 use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\KbArticleController;
+use App\Http\Controllers\KbAnalyticsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductFamilyController;
 use App\Http\Controllers\ReviewController;
@@ -29,7 +31,10 @@ Route::middleware('throttle:5,5')->group(function () {
 Route::get('/knowledge-base', [KbArticleController::class, 'index']);
 Route::get('/knowledge-base/search', [KbArticleController::class, 'search']);
 Route::get('/knowledge-base/suggest', [KbArticleController::class, 'suggest']);
+Route::get('/knowledge-base/highlights', [KbArticleController::class, 'highlights']);
 Route::get('/knowledge-base/{slug}', [KbArticleController::class, 'show']);
+Route::get('/error-codes', [ErrorCodeController::class, 'index']);
+Route::get('/error-codes/{id}', [ErrorCodeController::class, 'show'])->whereUuid('id');
 
 Route::get('/reviews', [ReviewController::class, 'index']);
 Route::get('/reviews/{id}', [ReviewController::class, 'show'])->whereUuid('id');
@@ -93,6 +98,10 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function (
     Route::delete('/knowledge-base/{id}', [KbArticleController::class, 'destroy'])->whereUuid('id');
     Route::post('/knowledge-base/{id}/feedback', [KbArticleController::class, 'feedback'])->whereUuid('id');
 
+    Route::post('/error-codes', [ErrorCodeController::class, 'store']);
+    Route::put('/error-codes/{errorCode}', [ErrorCodeController::class, 'update'])->whereUuid('errorCode');
+    Route::delete('/error-codes/{errorCode}', [ErrorCodeController::class, 'destroy'])->whereUuid('errorCode');
+
     Route::get('/reviews/my', [ReviewController::class, 'myReviews']);
     Route::post('/reviews', [ReviewController::class, 'store']);
     Route::patch('/reviews/{id}/approve', [ReviewController::class, 'approve'])->whereUuid('id');
@@ -122,6 +131,7 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
         Route::get('/tickets', [AdminController::class, 'getTickets']);
         Route::get('/tickets/{id}', [AdminController::class, 'getTicketDetail'])->whereUuid('id');
         Route::get('/analytics', [AdminController::class, 'getAnalytics']);
+        Route::get('/knowledge-base/analytics', KbAnalyticsController::class);
         Route::get('/reviews', [AdminController::class, 'getReviews']);
         Route::patch('/reviews/{id}', [AdminController::class, 'moderateReview'])->whereUuid('id');
         Route::get('/feature-requests', [AdminController::class, 'getFeatureRequests']);

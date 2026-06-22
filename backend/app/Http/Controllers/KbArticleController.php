@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\KbArticle;
+use App\Models\KbRecentView;
 use App\Models\Product;
+use App\Models\User;
 use App\Services\KbSearchService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -69,6 +71,10 @@ class KbArticleController extends Controller
 
         $articles->getCollection()->transform(fn (KbArticle $article) => $this->articleListPayload($article));
 
+        if (! empty($validated['q'])) {
+            $this->searchService->track($validated['q'], $articles->total(), $this->sanctumUser($request));
+        }
+
         return $this->success($this->paginatorPayload($articles), 'Knowledge base articles retrieved successfully.');
     }
 
@@ -89,10 +95,14 @@ class KbArticleController extends Controller
 
         $articles->getCollection()->transform(fn (KbArticle $article) => $this->articleListPayload($article));
 
+        if (! empty($validated['q'])) {
+            $this->searchService->track($validated['q'], $articles->total(), $this->sanctumUser($request));
+        }
+
         return $this->success($this->paginatorPayload($articles), 'Knowledge base search results retrieved successfully.');
     }
 
-    public function show(string $slug): JsonResponse
+    public function show(Request $request, string $slug): JsonResponse
     {
         $article = $this->publishedArticleQuery()
             ->where('slug', $slug)
@@ -101,7 +111,51 @@ class KbArticleController extends Controller
         $article->increment('views');
         $article->refresh();
 
+        if ($user = $this->sanctumUser($request)) {
+            $this->searchService->recordView($user, $article);
+        }
+
         return $this->success($this->articleDetailPayload($article), 'Knowledge base article retrieved successfully.');
+    }
+
+    public function highlights(Request $request): JsonResponse
+    {
+        $mostViewed = $this->publishedArticleQuery()
+            ->orderByDesc('views')
+            ->limit(5)
+            ->get()
+            ->map(fn (KbArticle $article) => $this->articleListPayload($article));
+
+        $mostHelpful = $this->publishedArticleQuery()
+            ->orderByDesc('helpful_count')
+            ->orderByDesc('views')
+            ->limit(5)
+            ->get()
+            ->map(fn (KbArticle $article) => $this->articleListPayload($article));
+
+        $recentlyViewed = collect();
+        if ($user = $this->sanctumUser($request)) {
+            $recentlyViewed = KbRecentView::query()
+                ->where('user_id', $user->id)
+                ->with(['article' => fn ($query) => $query
+                    ->where('is_published', true)
+                    ->with(['family:id,name', 'product:id,model,name'])])
+                ->latest('viewed_at')
+                ->limit(5)
+                ->get()
+                ->filter(fn (KbRecentView $view) => $view->article !== null)
+                ->map(fn (KbRecentView $view) => [
+                    ...$this->articleListPayload($view->article),
+                    'viewed_at' => $view->viewed_at,
+                ])
+                ->values();
+        }
+
+        return $this->success([
+            'most_viewed' => $mostViewed,
+            'most_helpful' => $mostHelpful,
+            'recently_viewed' => $recentlyViewed,
+        ], 'Knowledge base highlights retrieved successfully.');
     }
 
     public function suggest(Request $request): JsonResponse
@@ -296,6 +350,7 @@ class KbArticleController extends Controller
             'is_published' => $article->is_published,
             'created_at' => $article->created_at,
             'updated_at' => $article->updated_at,
+            'suggested_ticket_category_id' => $this->searchService->suggestedTicketCategoryId($article),
             'related_articles' => $this->searchService->relatedArticles($article)->map(fn (KbArticle $related) => [
                 'id' => $related->id,
                 'title' => $related->title,
@@ -309,6 +364,13 @@ class KbArticleController extends Controller
     private function renderMarkdown(string $content): string
     {
         return (string) Str::markdown(strip_tags($content));
+    }
+
+    private function sanctumUser(Request $request): ?User
+    {
+        $user = $request->user('sanctum');
+
+        return $user instanceof User ? $user : null;
     }
 
     private function paginatorPayload($paginator): array
