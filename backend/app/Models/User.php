@@ -106,6 +106,26 @@ class User extends Authenticatable implements MustVerifyEmailContract
         return $this->hasMany(ForumAnswerVote::class);
     }
 
+    public function uploadedDocuments(): HasMany
+    {
+        return $this->hasMany(Document::class, 'uploaded_by');
+    }
+
+    public function documentPermissions(): HasMany
+    {
+        return $this->hasMany(DocumentPermission::class);
+    }
+
+    public function grantedDocumentPermissions(): HasMany
+    {
+        return $this->hasMany(DocumentPermission::class, 'granted_by');
+    }
+
+    public function documentVersions(): HasMany
+    {
+        return $this->hasMany(DocumentVersion::class, 'uploaded_by');
+    }
+
     // Security methods
     public function isActive(): bool
     {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductFamily extends Model
 {
@@ -37,5 +38,10 @@ class ProductFamily extends Model
     public function kbArticles(): HasMany
     {
         return $this->hasMany(KbArticle::class, 'family_id');
+    }
+
+    public function documents(): BelongsToMany
+    {
+        return $this->belongsToMany(Document::class, 'document_product_family');
     }
 }
