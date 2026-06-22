@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DocumentCategoryController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\DocumentPermissionController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\FeatureRequestController;
@@ -10,6 +13,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductFamilyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RobotController;
+use App\Http\Controllers\SolutionTypeController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\TicketMessageController;
 use App\Http\Controllers\UploadController;
@@ -35,6 +39,10 @@ Route::get('/feature-requests/{id}', [FeatureRequestController::class, 'show'])-
 Route::get('/forum/questions', [ForumController::class, 'questions']);
 Route::get('/forum/questions/{id}', [ForumController::class, 'showQuestion'])->whereUuid('id');
 Route::get('/families', [ProductFamilyController::class, 'index']);
+Route::get('/documents', [DocumentController::class, 'index']);
+Route::get('/documents/{slug}', [DocumentController::class, 'show']);
+Route::get('/document-categories', [DocumentCategoryController::class, 'index']);
+Route::get('/solution-types', [SolutionTypeController::class, 'index']);
 
 Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -59,6 +67,12 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function (
     Route::post('/uploads', [UploadController::class, 'uploadMultiple'])->middleware('throttle:5,1');
     Route::get('/uploads/{id}', [UploadController::class, 'show'])->whereUuid('id');
     Route::delete('/uploads/{id}', [UploadController::class, 'destroy'])->whereUuid('id');
+
+    Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])->whereUuid('document');
+    Route::get('/documents/{document}/download', [DocumentController::class, 'download'])
+        ->middleware('signed')
+        ->whereUuid('document')
+        ->name('documents.download');
 
     Route::get('/robots', [RobotController::class, 'index']);
     Route::post('/robots', [RobotController::class, 'store']);
@@ -130,4 +144,17 @@ Route::middleware(['auth:sanctum', 'active', 'role:agent,admin', 'throttle:60,1'
         Route::post('/kb-articles', [KbArticleController::class, 'store']);
         Route::put('/kb-articles/{id}', [KbArticleController::class, 'update'])->whereUuid('id');
         Route::delete('/kb-articles/{id}', [KbArticleController::class, 'destroy'])->whereUuid('id');
+
+        Route::post('/documents', [DocumentController::class, 'store']);
+        Route::put('/documents/{document}', [DocumentController::class, 'update'])->whereUuid('document');
+        Route::patch('/documents/{document}/publish', [DocumentController::class, 'publish'])->whereUuid('document');
+    });
+
+Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
+    ->group(function () {
+        Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->whereUuid('document');
+        Route::get('/documents/{document}/permissions', [DocumentPermissionController::class, 'index'])->whereUuid('document');
+        Route::post('/documents/{document}/permissions', [DocumentPermissionController::class, 'store'])->whereUuid('document');
+        Route::patch('/document-permissions/{permission}', [DocumentPermissionController::class, 'update'])->whereUuid('permission');
+        Route::delete('/document-permissions/{permission}', [DocumentPermissionController::class, 'destroy'])->whereUuid('permission');
     });
