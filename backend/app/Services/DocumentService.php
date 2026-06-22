@@ -49,6 +49,8 @@ class DocumentService
             $productFamilyIds = Arr::pull($data, 'product_family_ids', []);
             $productIds = Arr::pull($data, 'product_ids', []);
             $solutionTypeIds = Arr::pull($data, 'solution_type_ids', []);
+            $changeNotes = Arr::pull($data, 'change_notes');
+            $updatedBy = Arr::pull($data, 'updated_by', $document->uploaded_by);
             $previousVersion = $document->version;
 
             if (($data['is_published'] ?? false) && ! $document->published_at) {
@@ -77,8 +79,8 @@ class DocumentService
                 $document->versions()->create([
                     'upload_id' => $document->upload_id,
                     'version' => $document->version,
-                    'change_notes' => $data['change_notes'] ?? null,
-                    'uploaded_by' => $data['updated_by'] ?? $document->uploaded_by,
+                    'change_notes' => $changeNotes,
+                    'uploaded_by' => $updatedBy,
                 ]);
             }
 

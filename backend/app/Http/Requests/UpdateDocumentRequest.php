@@ -23,6 +23,9 @@ class UpdateDocumentRequest extends FormRequest
     {
         /** @var Document $document */
         $document = $this->route('document');
+        $currentVersionId = $document->versions()
+            ->where('version', $document->version)
+            ->value('id');
 
         return [
             'title' => ['sometimes', 'string', 'max:255'],
@@ -33,7 +36,7 @@ class UpdateDocumentRequest extends FormRequest
             'document_type' => ['sometimes', Rule::in(['pdf', 'image', 'video', 'presentation', 'other'])],
             'visibility' => ['sometimes', Rule::in(['client', 'internal', 'restricted'])],
             'is_published' => ['sometimes', 'boolean'],
-            'version' => ['sometimes', 'string', 'max:50', Rule::unique('document_versions', 'version')->where('document_id', $document->id)],
+            'version' => ['sometimes', 'string', 'max:50', Rule::unique('document_versions', 'version')->where('document_id', $document->id)->ignore($currentVersionId)],
             'change_notes' => ['sometimes', 'nullable', 'string', 'max:2000'],
             'language' => ['sometimes', 'string', 'max:10', 'regex:/^[a-z]{2,3}(?:-[A-Z]{2})?$/'],
             'thumbnail' => ['sometimes', 'nullable', 'string', 'max:2048'],
