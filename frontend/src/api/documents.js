@@ -23,6 +23,7 @@ export async function downloadDocument(document, suppliedUrl = null) {
   URL.revokeObjectURL(objectUrl)
 }
 
+
 export function inferDocumentType(fileName = '') {
   const extension = fileName.split('.').pop()?.toLowerCase()
   if (extension === 'pdf') return 'pdf'
