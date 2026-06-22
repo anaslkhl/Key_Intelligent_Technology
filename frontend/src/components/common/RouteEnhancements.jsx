@@ -25,7 +25,7 @@ const knownPaths = new Set(['/dashboard', '/tickets', '/robots', '/knowledge-bas
 export default function RouteEnhancements() {
   const location = useLocation(); const { isAuthenticated, user } = useAuth(); const pathname = location.pathname
   useEffect(() => { const title = titles.find(([pattern]) => pattern.test(pathname))?.[1] || 'Page not found'; document.title = pathname === '/' ? title : `${title} | KIT Support Hub` }, [pathname])
-  if (['/', '/login', '/register'].includes(pathname)) return null
+  if (['/', '/login', '/register'].includes(pathname) || pathname.startsWith('/knowledge-base')) return null
   const segments = pathname.split('/').filter(Boolean); const home = isAuthenticated ? getRoleHome(user.role) : '/'
 
   return <nav className="breadcrumb-bar" aria-label="Breadcrumb"><Link to={home} aria-label="Dashboard"><Home size={14} /></Link>{segments.map((segment, index) => { const path = `/${segments.slice(0, index + 1).join('/')}`; const isLast = index === segments.length - 1; const label = /^[0-9a-f-]{30,}$/i.test(segment) ? 'Details' : labels[segment] || segment.replaceAll('-', ' '); return <span key={path} className="breadcrumb-item"><ChevronRight size={13} aria-hidden="true" />{!isLast && knownPaths.has(path) ? <Link to={path}>{label}</Link> : <span aria-current={isLast ? 'page' : undefined}>{label}</span>}</span> })}</nav>

@@ -202,6 +202,7 @@ th { font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 .kb-markdown pre { overflow-x: auto; border-radius: 12px; background: #0f172a; padding: 16px; color: #e2e8f0; }
 .kb-markdown pre code { background: transparent; padding: 0; color: inherit; }
 .kb-markdown blockquote { border-left: 3px solid var(--primary); padding-left: 16px; color: var(--text-muted); }
+.kb-markdown [id] { scroll-margin-top: 96px; }
 
 .dialog-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(15, 23, 42, .5); backdrop-filter: blur(8px); animation: fade-in 160ms ease both; }
 .confirm-dialog { width: min(100%, 440px); border: 1px solid color-mix(in srgb, var(--border) 70%, transparent); border-radius: 16px; padding: 32px; background: color-mix(in srgb, var(--surface) 92%, transparent); box-shadow: var(--shadow-lg); animation: dialog-in 200ms ease both; }

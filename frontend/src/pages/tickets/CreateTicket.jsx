@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { applyFieldErrors, parseApiError } from '../../api/errors'
 import PageHeader from '../../components/common/PageHeader'
@@ -10,9 +10,10 @@ import { ErrorState, LoadingState } from '../../components/common/QueryState'
 
 export default function CreateTicket() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const queryClient = useQueryClient()
   const [familyId, setFamilyId] = useState('')
-  const { register, handleSubmit, control, setValue, setError, formState: { errors } } = useForm({ defaultValues: { priority: 'medium' } })
+  const { register, handleSubmit, control, setValue, setError, formState: { errors } } = useForm({ defaultValues: { priority: 'medium', title: searchParams.get('title') || '', description: searchParams.get('context') || '' } })
   const robotId = useWatch({ control, name: 'robot_id' })
   const familiesQuery = useQuery({ queryKey: ['families'], queryFn: () => apiClient.get('/families').then((response) => response.data.data) })
   const robotsQuery = useQuery({ queryKey: ['robots', 'options'], queryFn: () => apiClient.get('/robots', { params: { per_page: 50 } }).then((response) => response.data.data) })

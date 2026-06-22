@@ -24,7 +24,7 @@ export function parseMarkdownHeadings(content = '') {
   return content.split('\n').flatMap((line) => {
     const match = /^(#{1,3})\s+(.+?)\s*#*\s*$/.exec(line.trim())
     if (!match) return []
-    const text = match[2].replace(/\[([^\]]+)\]\([^\)]+\)|[*_`~]/g, '$1').trim()
+    const text = match[2].replace(/\[([^\]]+)\]\([^)]+\)|[*_`~]/g, '$1').trim()
     return [{ level: match[1].length, text, id: uniqueHeadingId(text, counts) }]
   })
 }
@@ -34,4 +34,25 @@ export function uniqueHeadingId(text, counts) {
   const count = counts.get(base) || 0
   counts.set(base, count + 1)
   return count === 0 ? base : `${base}-${count + 1}`
+}
+
+export function remarkHeadingIds() {
+  return (tree) => {
+    const counts = new Map()
+
+    visitHeadings(tree, (node) => {
+      const id = uniqueHeadingId(astText(node), counts)
+      node.data = { ...(node.data || {}), hProperties: { ...(node.data?.hProperties || {}), id } }
+    })
+  }
+}
+
+function visitHeadings(node, callback) {
+  if (node.type === 'heading' && node.depth <= 3) callback(node)
+  node.children?.forEach((child) => visitHeadings(child, callback))
+}
+
+function astText(node) {
+  if (typeof node.value === 'string') return node.value
+  return node.children?.map(astText).join('') || ''
 }

@@ -22,7 +22,8 @@ export default function Login() {
     try {
       const loggedInUser = await login(values.email, values.password)
       toast.success('Welcome back')
-      navigate(location.state?.from?.pathname || getRoleHome(loggedInUser.role), { replace: true })
+      const requestedLocation = location.state?.from
+      navigate(requestedLocation ? `${requestedLocation.pathname}${requestedLocation.search || ''}` : getRoleHome(loggedInUser.role), { replace: true })
     } catch (error) {
       const apiError = parseApiError(error, 'Unable to log in')
       applyFieldErrors(setError, apiError.fieldErrors)
