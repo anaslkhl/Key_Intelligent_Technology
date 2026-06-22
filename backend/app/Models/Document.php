@@ -14,6 +14,15 @@ class Document extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
+    protected $attributes = [
+        'visibility' => 'client',
+        'is_published' => false,
+        'version' => '1.0',
+        'language' => 'en',
+        'download_count' => 0,
+        'view_count' => 0,
+    ];
+
     protected $fillable = [
         'title',
         'slug',

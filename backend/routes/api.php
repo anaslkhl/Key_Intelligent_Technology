@@ -1,11 +1,11 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\DocumentPermissionController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\AgentController;
 use App\Http\Controllers\FeatureRequestController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\KbArticleController;

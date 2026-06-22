@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use App\Models\FeatureRequest;
 use App\Models\Document;
+use App\Models\FeatureRequest;
 use App\Models\ForumAnswer;
 use App\Models\ForumQuestion;
 use App\Models\Review;
 use App\Models\TicketMessage;
-use App\Policies\AnswerPolicy;
 use App\Policies\AdminPolicy;
-use App\Policies\FeatureRequestPolicy;
+use App\Policies\AnswerPolicy;
 use App\Policies\DocumentPolicy;
+use App\Policies\FeatureRequestPolicy;
 use App\Policies\QuestionPolicy;
 use App\Policies\ReviewPolicy;
 use App\Policies\TicketMessagePolicy;

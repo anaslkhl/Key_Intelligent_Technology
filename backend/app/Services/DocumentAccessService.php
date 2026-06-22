@@ -73,6 +73,7 @@ class DocumentAccessService
             'productFamilies',
             'products',
             'solutionTypes',
+            'permissions',
         ]);
 
         if ($user->isAdmin()) {

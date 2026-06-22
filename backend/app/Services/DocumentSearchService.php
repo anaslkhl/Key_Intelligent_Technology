@@ -30,7 +30,11 @@ class DocumentSearchService
 
         $builder
             ->when($filters['family_id'] ?? null, fn (Builder $builder, string $id) => $builder
-                ->whereHas('productFamilies', fn (Builder $query) => $query->where('product_families.id', $id)))
+                ->where(function (Builder $query) use ($id): void {
+                    $query
+                        ->whereHas('productFamilies', fn (Builder $query) => $query->where('product_families.id', $id))
+                        ->orWhereHas('products', fn (Builder $query) => $query->where('products.family_id', $id));
+                }))
             ->when($filters['product_id'] ?? null, fn (Builder $builder, string $id) => $builder
                 ->whereHas('products', fn (Builder $query) => $query->where('products.id', $id)))
             ->when($filters['category_id'] ?? null, fn (Builder $builder, string $id) => $builder->where('category_id', $id))

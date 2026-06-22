@@ -11,6 +11,11 @@ class DocumentPermission extends Model
 {
     use HasFactory, HasUuids;
 
+    protected $attributes = [
+        'can_view' => true,
+        'can_download' => true,
+    ];
+
     protected $fillable = [
         'document_id',
         'user_id',
