@@ -24,12 +24,13 @@ export default function Hero() {
             How can we help you today?
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600 dark:text-zinc-400 sm:text-xl">
-            Search for solutions, ask the community, or report an issue to our support team.
+            Search for solutions, ask the community, or report an issue to our
+            support team.
           </p>
 
           <form
             onSubmit={handleSubmit(({ query }) =>
-              navigate(`/knowledge-base?q=${encodeURIComponent(query.trim())}`)
+              navigate(`/knowledge-base?q=${encodeURIComponent(query.trim())}`),
             )}
             className="mt-7 flex items-center rounded-xl border-2 border-slate-200 bg-white shadow-lg transition focus-within:border-blue-600 focus-within:ring-4 focus-within:ring-blue-600/15 dark:border-zinc-800 dark:bg-[#111111]"
           >
@@ -56,7 +57,9 @@ export default function Hero() {
                 key={suggestion}
                 type="button"
                 onClick={() =>
-                  navigate(`/knowledge-base?q=${encodeURIComponent(suggestion)}`)
+                  navigate(
+                    `/knowledge-base?q=${encodeURIComponent(suggestion)}`,
+                  )
                 }
                 className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 dark:border-zinc-800 dark:bg-[#111111] dark:text-zinc-300 dark:hover:border-blue-700 dark:hover:text-blue-400"
               >
