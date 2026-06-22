@@ -28,6 +28,7 @@ Route::middleware('throttle:5,5')->group(function () {
 
 Route::get('/knowledge-base', [KbArticleController::class, 'index']);
 Route::get('/knowledge-base/search', [KbArticleController::class, 'search']);
+Route::get('/knowledge-base/suggest', [KbArticleController::class, 'suggest']);
 Route::get('/knowledge-base/{slug}', [KbArticleController::class, 'show']);
 
 Route::get('/reviews', [ReviewController::class, 'index']);

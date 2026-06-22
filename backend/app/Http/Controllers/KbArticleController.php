@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\KbArticle;
 use App\Models\Product;
+use App\Services\KbSearchService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,18 +13,22 @@ use Illuminate\Validation\Rule;
 
 class KbArticleController extends Controller
 {
+    public function __construct(private readonly KbSearchService $searchService) {}
+
     public function manageIndex(Request $request): JsonResponse
     {
         $this->authorizeKnowledgeBaseWriter($request);
         $validated = $request->validate([
             'family_id' => ['nullable', 'uuid', 'exists:product_families,id'],
             'q' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', Rule::in(KbArticle::CATEGORIES)],
         ]);
 
         $articles = KbArticle::query()
             ->with(['family:id,name', 'product:id,model,name', 'author:id,name,email,role'])
             ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query->where('family_id', $familyId))
             ->when($validated['q'] ?? null, fn (Builder $query, string $term) => $this->applySearch($query, $term))
+            ->when($validated['category'] ?? null, fn (Builder $query, string $category) => $query->where('category', $category))
             ->latest()
             ->paginate($this->perPage());
 
@@ -52,15 +57,17 @@ class KbArticleController extends Controller
         $validated = $request->validate([
             'family_id' => ['nullable', 'uuid', 'exists:product_families,id'],
             'q' => ['nullable', 'string', 'max:255'],
+            'category' => ['nullable', Rule::in(KbArticle::CATEGORIES)],
         ]);
 
         $articles = $this->publishedArticleQuery()
-            ->when($validated['family_id'] ?? null, fn(Builder $query, string $familyId) => $query->where('family_id', $familyId))
-            ->when($validated['q'] ?? null, fn(Builder $query, string $term) => $this->applySearch($query, $term))
+            ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query->where('family_id', $familyId))
+            ->when($validated['q'] ?? null, fn (Builder $query, string $term) => $this->applySearch($query, $term))
+            ->when($validated['category'] ?? null, fn (Builder $query, string $category) => $query->where('category', $category))
             ->latest()
             ->paginate($this->perPage());
 
-        $articles->getCollection()->transform(fn(KbArticle $article) => $this->articleListPayload($article));
+        $articles->getCollection()->transform(fn (KbArticle $article) => $this->articleListPayload($article));
 
         return $this->success($this->paginatorPayload($articles), 'Knowledge base articles retrieved successfully.');
     }
@@ -70,15 +77,17 @@ class KbArticleController extends Controller
         $validated = $request->validate([
             'q' => ['nullable', 'string', 'max:255'],
             'family_id' => ['nullable', 'uuid', 'exists:product_families,id'],
+            'category' => ['nullable', Rule::in(KbArticle::CATEGORIES)],
         ]);
 
         $articles = $this->publishedArticleQuery()
-            ->when($validated['q'] ?? null, fn(Builder $query, string $term) => $this->applySearch($query, $term))
-            ->when($validated['family_id'] ?? null, fn(Builder $query, string $familyId) => $query->where('family_id', $familyId))
+            ->when($validated['q'] ?? null, fn (Builder $query, string $term) => $this->applySearch($query, $term))
+            ->when($validated['family_id'] ?? null, fn (Builder $query, string $familyId) => $query->where('family_id', $familyId))
+            ->when($validated['category'] ?? null, fn (Builder $query, string $category) => $query->where('category', $category))
             ->latest()
             ->paginate($this->perPage());
 
-        $articles->getCollection()->transform(fn(KbArticle $article) => $this->articleListPayload($article));
+        $articles->getCollection()->transform(fn (KbArticle $article) => $this->articleListPayload($article));
 
         return $this->success($this->paginatorPayload($articles), 'Knowledge base search results retrieved successfully.');
     }
@@ -93,6 +102,18 @@ class KbArticleController extends Controller
         $article->refresh();
 
         return $this->success($this->articleDetailPayload($article), 'Knowledge base article retrieved successfully.');
+    }
+
+    public function suggest(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'q' => ['required', 'string', 'min:2', 'max:255'],
+        ]);
+
+        return $this->success(
+            $this->searchService->autocomplete($validated['q']),
+            'Knowledge base suggestions retrieved successfully.',
+        );
     }
 
     public function store(Request $request): JsonResponse
@@ -190,6 +211,7 @@ class KbArticleController extends Controller
             'title' => [$required, 'string', 'max:255'],
             'slug' => ['sometimes', 'string', 'max:255', $slugRule],
             'content' => [$required, 'string'],
+            'category' => [$required, Rule::in(KbArticle::CATEGORIES)],
             'family_id' => ['nullable', 'uuid', 'exists:product_families,id'],
             'product_id' => ['nullable', 'uuid', 'exists:products,id'],
             'tags' => ['nullable', 'array'],
@@ -227,7 +249,7 @@ class KbArticleController extends Controller
 
         while (KbArticle::query()
             ->where('slug', $slug)
-            ->when($ignoreId, fn(Builder $query) => $query->where('id', '!=', $ignoreId))
+            ->when($ignoreId, fn (Builder $query) => $query->where('id', '!=', $ignoreId))
             ->exists()
         ) {
             $slug = "{$baseSlug}-{$suffix}";
@@ -244,6 +266,8 @@ class KbArticleController extends Controller
             'title' => $article->title,
             'slug' => $article->slug,
             'excerpt' => Str::limit(strip_tags($this->renderMarkdown($article->content)), 180),
+            'category' => $article->category,
+            'reading_time' => $article->readingTime(),
             'family' => $article->family,
             'tags' => $article->tags ?? [],
             'helpful_count' => $article->helpful_count,
@@ -260,6 +284,8 @@ class KbArticleController extends Controller
             'slug' => $article->slug,
             'content' => $article->content,
             'content_html' => $this->renderMarkdown($article->content),
+            'category' => $article->category,
+            'reading_time' => $article->readingTime(),
             'family' => $article->family,
             'product' => $article->product,
             'tags' => $article->tags ?? [],
@@ -270,6 +296,13 @@ class KbArticleController extends Controller
             'is_published' => $article->is_published,
             'created_at' => $article->created_at,
             'updated_at' => $article->updated_at,
+            'related_articles' => $this->searchService->relatedArticles($article)->map(fn (KbArticle $related) => [
+                'id' => $related->id,
+                'title' => $related->title,
+                'slug' => $related->slug,
+                'category' => $related->category,
+                'reading_time' => $related->readingTime(),
+            ])->values(),
         ];
     }
 

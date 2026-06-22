@@ -6,15 +6,30 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class KbArticle extends Model
 {
     use HasFactory, HasUuids;
 
+    public const CATEGORIES = [
+        'getting_started',
+        'troubleshooting',
+        'maintenance',
+        'product_guides',
+        'faqs',
+        'video_tutorials',
+    ];
+
+    protected $attributes = [
+        'category' => 'getting_started',
+    ];
+
     protected $fillable = [
         'title',
         'slug',
         'content',
+        'category',
         'family_id',
         'product_id',
         'tags',
@@ -49,5 +64,13 @@ class KbArticle extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function readingTime(): int
+    {
+        $plainText = trim(strip_tags((string) Str::markdown($this->content)));
+        $words = $plainText === '' ? 0 : count(preg_split('/\s+/u', $plainText) ?: []);
+
+        return max(1, (int) ceil($words / 200));
     }
 }
