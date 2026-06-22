@@ -250,6 +250,7 @@ class AuthController extends Controller
             }
         );
 
+        
         if ($status === Password::PASSWORD_RESET) {
             return response()->json([
                 'message' => 'Password reset successfully.',
