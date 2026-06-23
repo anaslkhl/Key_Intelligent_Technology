@@ -119,7 +119,7 @@ export default function DocumentForm() {
       let uploadId = documentQuery.data?.upload?.id;
       if (file) {
         const body = new FormData();
-        body.append("file", file);
+        body.append("document", file);
         const uploadResponse = await apiClient.post("/documents/upload", body, {
           headers: { "Content-Type": "multipart/form-data" },
         });

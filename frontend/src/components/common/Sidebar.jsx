@@ -6,14 +6,18 @@ import {
   Files,
   Gauge,
   Lightbulb,
+  LogOut,
   MessageSquareText,
   ShieldCheck,
   TicketCheck,
   Users,
   X,
 } from 'lucide-react'
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
+import ConfirmDialog from './ConfirmDialog'
 
 const navigation = {
   agent: [
@@ -36,8 +40,26 @@ const navigation = {
 }
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { user } = useAuth()
+  const { logout, user } = useAuth()
+  const navigate = useNavigate()
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const items = navigation[user?.role] || []
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logout()
+      toast.success('Signed out successfully')
+    } catch {
+      toast.error('You were signed out locally')
+    } finally {
+      setIsLoggingOut(false)
+      setShowLogoutDialog(false)
+      onClose()
+      navigate('/login')
+    }
+  }
 
   return (
     <>
@@ -62,7 +84,20 @@ export default function Sidebar({ isOpen, onClose }) {
           <CircleHelp size={20} />
           <div><strong>Support workspace</strong><span>Keep client requests moving forward.</span></div>
         </div>
+        <button type="button" className="sidebar-logout" onClick={() => setShowLogoutDialog(true)}>
+          <LogOut size={18} strokeWidth={1.9} />
+          <span>Log out</span>
+        </button>
       </aside>
+      <ConfirmDialog
+        isOpen={showLogoutDialog}
+        title="Log out of KIT Support Hub?"
+        message="You will need to enter your credentials again to access protected support pages."
+        confirmLabel="Log out"
+        isBusy={isLoggingOut}
+        onCancel={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+      />
     </>
   )
 }

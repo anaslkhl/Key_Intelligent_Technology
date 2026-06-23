@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Menu } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
 import Header from './Header'
@@ -11,11 +12,22 @@ export default function Layout() {
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)
   const isLanding = pathname === '/'
   const isAuthPage = ['/login', '/register'].includes(pathname)
-  const hasWorkspace = isAuthenticated && ['agent', 'admin'].includes(user?.role) && !isLanding
+  const hasWorkspace = isAuthenticated && ['agent', 'admin'].includes(user?.role) && !isAuthPage
   return (
     <div className={`app-shell${hasWorkspace ? ' authenticated-shell' : ''}`}>
-      <Header showNavigation={hasWorkspace} onOpenNavigation={() => setIsNavigationOpen(true)} />
+      {!hasWorkspace && <Header />}
       {hasWorkspace && <Sidebar isOpen={isNavigationOpen} onClose={() => setIsNavigationOpen(false)} />}
+      {hasWorkspace && (
+        <button
+          type="button"
+          className="sidebar-toggle"
+          onClick={() => setIsNavigationOpen(true)}
+          aria-label="Open workspace navigation"
+          title="Open navigation"
+        >
+          <Menu size={20} aria-hidden="true" />
+        </button>
+      )}
       <main className="main-content page-enter">
         <RouteEnhancements />
         <Outlet />

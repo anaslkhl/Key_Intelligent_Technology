@@ -89,7 +89,10 @@ class DocumentController extends Controller
 
     public function upload(DocumentUploadRequest $request): JsonResponse
     {
-        $upload = $this->fileService->store($request->file('file'), $request->user());
+        $file = $request->file('document') ?? $request->file('file');
+        abort_unless($file, 422, 'Choose a document file to upload.');
+
+        $upload = $this->fileService->store($file, $request->user());
 
         return $this->success([
             'id' => $upload->id,
@@ -132,6 +135,7 @@ class DocumentController extends Controller
         Gate::authorize('download', $document);
 
         $upload = $document->upload;
+        abort_unless($upload, 404, 'Document file not found.');
         abort_unless(Storage::disk($upload->disk)->exists($upload->file_path), 404, 'Document file not found.');
         $this->documentService->incrementDownload($document);
 
@@ -146,6 +150,11 @@ class DocumentController extends Controller
     {
         Gate::authorize('view', $document);
         $document->loadMissing('upload');
+        abort_unless($document->upload, 404, 'Document file not found.');
+
+        $disk = Storage::disk($document->upload->disk);
+        abort_unless($disk->exists($document->upload->file_path), 404, 'Document file not found.');
+
         $canDownload = Gate::allows('download', $document);
 
         return $this->success([
@@ -159,6 +168,7 @@ class DocumentController extends Controller
                 'documents.download',
                 now()->addMinutes(15),
                 ['document' => $document->id],
+                false,
             ) : null,
             'expires_in' => $canDownload ? 900 : null,
         ], 'Document preview retrieved successfully.');

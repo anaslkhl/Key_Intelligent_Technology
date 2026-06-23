@@ -8,7 +8,8 @@ export const getDocument = (slugOrId) => apiClient.get(`/documents/${slugOrId}`)
 export const getDocumentPreview = (id) => apiClient.get(`/documents/${id}/preview`).then((response) => response.data.data)
 
 export async function downloadDocument(document, suppliedUrl = null) {
-  const downloadUrl = suppliedUrl || document.upload?.url || (await getDocumentPreview(document.id)).download_url
+  const preview = suppliedUrl ? null : await getDocumentPreview(document.id)
+  const downloadUrl = normalizeApiUrl(suppliedUrl || preview?.download_url || document.upload?.url)
 
   if (!downloadUrl) throw new Error('You do not have permission to download this document.')
 
@@ -23,6 +24,16 @@ export async function downloadDocument(document, suppliedUrl = null) {
   URL.revokeObjectURL(objectUrl)
 }
 
+export function normalizeApiUrl(url) {
+  if (!url) return null
+
+  try {
+    const parsed = new URL(url, window.location.origin)
+    return parsed.pathname.replace(/^\/api(?=\/)/, '') + parsed.search
+  } catch {
+    return url.replace(/^\/api(?=\/)/, '')
+  }
+}
 
 export function inferDocumentType(fileName = '') {
   const extension = fileName.split('.').pop()?.toLowerCase()

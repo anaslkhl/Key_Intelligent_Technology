@@ -188,7 +188,7 @@ class DocumentModuleTest extends TestCase
         Sanctum::actingAs($agent);
 
         $response = $this->post('/api/documents/upload', [
-            'file' => UploadedFile::fake()->create('training-guide.pdf', 1024, 'application/pdf'),
+            'document' => UploadedFile::fake()->create('training-guide.pdf', 1024, 'application/pdf'),
         ], ['Accept' => 'application/json']);
 
         $response->assertCreated()
@@ -199,6 +199,19 @@ class DocumentModuleTest extends TestCase
         $this->getJson("/api/documents/{$document->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $document->id);
+    }
+
+    public function test_document_preview_returns_not_found_when_file_is_missing(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['role' => 'admin']);
+        $document = $this->document($admin, $this->category(), ['slug' => 'missing-file-preview']);
+        Storage::disk('public')->delete($document->upload->file_path);
+        Sanctum::actingAs($admin);
+
+        $this->getJson("/api/documents/{$document->id}/preview")
+            ->assertNotFound()
+            ->assertJsonPath('message', 'Document file not found.');
     }
 
     private function category(): DocumentCategory
@@ -230,6 +243,7 @@ class DocumentModuleTest extends TestCase
     private function upload(User $owner): Upload
     {
         Storage::fake('public');
+        Storage::disk('public')->put('uploads/tests/manual.pdf', 'PDF test content');
 
         return Upload::query()->create([
             'user_id' => $owner->id,

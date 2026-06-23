@@ -76,7 +76,7 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function (
 
     Route::get('/documents/{document}/preview', [DocumentController::class, 'preview'])->whereUuid('document');
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])
-        ->middleware('signed')
+        ->middleware('signed:relative')
         ->whereUuid('document')
         ->name('documents.download');
 

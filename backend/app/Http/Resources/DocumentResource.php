@@ -66,6 +66,7 @@ class DocumentResource extends JsonResource
                     'documents.download',
                     now()->addMinutes(15),
                     ['document' => $this->id],
+                    false,
                 ) : null,
             ]),
         ];

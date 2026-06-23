@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -45,11 +46,11 @@ class DocumentFileService
     public function generatePreview(Document $document): ?string
     {
         if ($document->thumbnail) {
-            return Storage::disk($document->upload->disk)->url($document->thumbnail);
+            return URL::to(Storage::disk($document->upload->disk)->url($document->thumbnail));
         }
 
         if (in_array($document->document_type, ['pdf', 'image', 'video'], true)) {
-            return Storage::disk($document->upload->disk)->url($document->upload->file_path);
+            return URL::to(Storage::disk($document->upload->disk)->url($document->upload->file_path));
         }
 
         return null;
