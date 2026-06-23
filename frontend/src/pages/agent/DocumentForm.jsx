@@ -139,6 +139,7 @@ export default function DocumentForm() {
         ? apiClient.put(`/documents/${id}`, payload)
         : apiClient.post("/documents", payload);
     },
+
     onSuccess: () => {
       toast.success(isEditing ? "Document updated" : "Document created");
       queryClient.invalidateQueries({ queryKey: ["documents"] });
