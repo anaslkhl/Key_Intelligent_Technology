@@ -143,8 +143,8 @@ button.rounded-lg:hover, a.rounded-lg:hover { transform: translateY(-1px); }
 .trusted-logo-marquee::after { right: 0; background: linear-gradient(270deg, var(--surface), transparent); }
 .trusted-logo-track { width: max-content; display: flex; align-items: center; gap: var(--trusted-logo-gap); animation: trusted-logo-scroll 28s linear infinite; will-change: transform; }
 .trusted-logo-marquee:hover .trusted-logo-track { animation-play-state: paused; }
-.trusted-logo-item { height: 72px; display: grid; flex: 0 0 230px; place-items: center; color: #64748b; filter: grayscale(1); opacity: .72; transition: opacity 160ms ease, color 160ms ease, transform 160ms ease; }
-.trusted-logo-item:hover { color: #334155; opacity: .95; transform: translateY(-1px); }
+.trusted-logo-item { height: 72px; display: grid; flex: 0 0 230px; place-items: center; color: #64748b; opacity: .88; transition: opacity 160ms ease, color 160ms ease, transform 160ms ease; }
+.trusted-logo-item:hover { color: #334155; opacity: 1; transform: translateY(-1px); }
 .trusted-logo { width: 100%; max-width: 230px; height: 72px; display: block; object-fit: contain; }
 .dark .trusted-logo-marquee { color: #94a3b8; background: color-mix(in srgb, var(--surface) 86%, transparent); }
 .dark .trusted-logo-marquee::before { background: linear-gradient(90deg, #000000, transparent); }
