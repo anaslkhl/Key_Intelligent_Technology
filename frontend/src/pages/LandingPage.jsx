@@ -5,6 +5,7 @@ import Hero from "../components/landing/Hero";
 import QuickActions from "../components/landing/QuickActions";
 import SocialProof from "../components/landing/SocialProof";
 import Statistics from "../components/landing/Statistics";
+import TechnologyPartners from "../components/landing/TechnologyPartners";
 import UseCases from "../components/landing/UseCases";
 
 export default function LandingPage() {
@@ -16,6 +17,7 @@ export default function LandingPage() {
       <ActivityFeed />
       <UseCases />
       <SocialProof />
+      <TechnologyPartners />
       <CTA />
       <Footer />
     </div>
