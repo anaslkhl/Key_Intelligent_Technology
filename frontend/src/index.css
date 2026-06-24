@@ -27,17 +27,18 @@
   --shadow-lg: 0 24px 60px rgba(15, 23, 42, .18);
 }
 
+/* Dark Mode - Dark Blue */
 .dark {
-  color: #ffffff;
-  background: #000000;
-  --background: #000000;
-  --surface: #111111;
-  --surface-muted: #0a0a0a;
-  --surface-hover: #181818;
-  --text: #ffffff;
-  --text-muted: #a1a1aa;
-  --border: #27272a;
-  --border-strong: #3f3f46;
+  color: #e8f0fe;
+  background: #0a1628;
+  --background: #0a1628;
+  --surface: #0f1f3a;
+  --surface-muted: #0a1628;
+  --surface-hover: #1a2d4a;
+  --text: #e8f0fe;
+  --text-muted: #94a3b8;
+  --border: #1a2d4a;
+  --border-strong: #2a3d5a;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, .24);
   --shadow-md: 0 12px 30px rgba(0, 0, 0, .24);
   --shadow-lg: 0 28px 70px rgba(0, 0, 0, .4);
@@ -45,7 +46,14 @@
 
 * { box-sizing: border-box; }
 html { min-width: 320px; scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--background); color: var(--text); }
+body { 
+  margin: 0; 
+  min-width: 320px; 
+  min-height: 100vh; 
+  background: var(--background); 
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 button, input, select, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; }
@@ -152,23 +160,130 @@ button.rounded-lg:hover, a.rounded-lg:hover { transform: translateY(-1px); }
 .dark .trusted-logo-item { color: #94a3b8; opacity: .78; }
 .dark .trusted-logo-item:hover { color: #cbd5e1; opacity: 1; }
 
-.technology-partners { border-top: 1px solid var(--border); }
-.partner-logo-card { min-height: 100px; display: grid; place-items: center; border: 1px solid #e5e7eb; border-radius: 8px; background: #ffffff; padding: 16px; box-shadow: 0 10px 24px rgba(15, 23, 42, .06); transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
-.partner-logo-card:hover { border-color: #cbd5e1; box-shadow: 0 16px 34px rgba(15, 23, 42, .1); transform: translateY(-2px); }
-.partner-logo-card-dark { background: #050505; border-color: #050505; }
-.partner-logo { width: 100%; max-width: 190px; height: 66px; display: block; object-fit: contain; filter: grayscale(100%); opacity: .82; transition: filter 180ms ease, opacity 180ms ease, transform 180ms ease; }
-.partner-logo-card:hover .partner-logo { filter: grayscale(0%); opacity: 1; transform: scale(1.02); }
-.partner-logo-fallback { display: inline-flex; min-height: 66px; align-items: center; justify-content: center; color: #334155; font-size: 30px; font-weight: 800; letter-spacing: 0; filter: grayscale(100%); opacity: .82; transition: filter 180ms ease, opacity 180ms ease, color 180ms ease; }
-.partner-logo-card:hover .partner-logo-fallback { filter: grayscale(0%); opacity: 1; color: #159bd7; }
-.partner-case-studies-button { width: fit-content; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 18px; border: 1px solid #0f172a; border-radius: 999px; padding: 0 24px; background: transparent; color: #0f172a; font-size: 14px; font-weight: 700; text-decoration: none; transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease; }
-.partner-case-studies-button:hover { background: #0f172a; color: #ffffff; transform: translateY(-1px); }
-.dark .partner-logo-card { border-color: #27272a; background: #111111; box-shadow: 0 12px 30px rgba(0, 0, 0, .22); }
-.dark .partner-logo-card:hover { border-color: #3f3f46; box-shadow: 0 16px 38px rgba(0, 0, 0, .34); }
-.dark .partner-logo-card-dark { background: #050505; border-color: #27272a; }
-.dark .partner-logo-fallback { color: #cbd5e1; }
-.dark .partner-logo-card:hover .partner-logo-fallback { color: #38bdf8; }
-.dark .partner-case-studies-button { border-color: #f8fafc; color: #f8fafc; }
-.dark .partner-case-studies-button:hover { background: #f8fafc; color: #0f172a; }
+.technology-partners {
+  border-top: 1px solid var(--border);
+}
+
+.partner-logo-card {
+  min-height: 100px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.partner-logo-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.1);
+  transform: translateY(-2px);
+}
+
+.partner-logo-card-dark {
+  background: #050505;
+  border-color: #050505;
+}
+
+/* Logos in ORIGINAL colors always */
+.partner-logo {
+  width: 100%;
+  max-width: 190px;
+  height: 66px;
+  display: block;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.partner-logo-card:hover .partner-logo {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.partner-logo-fallback {
+  display: inline-flex;
+  min-height: 66px;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0;
+  opacity: 0.85;
+  transition: opacity 180ms ease, color 180ms ease;
+}
+
+.partner-logo-card:hover .partner-logo-fallback {
+  opacity: 1;
+  color: #159bd7;
+}
+
+.partner-case-studies-button {
+  width: fit-content;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  border: 1px solid #0f172a;
+  border-radius: 999px;
+  padding: 0 24px;
+  background: transparent;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.partner-case-studies-button:hover {
+  background: #0f172a;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Dark Mode */
+.dark .partner-logo-card {
+  border-color: #27272a;
+  background: #111111;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+}
+
+.dark .partner-logo-card:hover {
+  border-color: #3f3f46;
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.34);
+}
+
+.dark .partner-logo-card-dark {
+  background: #050505;
+  border-color: #27272a;
+}
+
+.dark .partner-logo-fallback {
+  color: #cbd5e1;
+}
+
+.dark .partner-logo-card:hover .partner-logo-fallback {
+  color: #38bdf8;
+}
+
+.dark .partner-case-studies-button {
+  border-color: #f8fafc;
+  color: #f8fafc;
+}
+
+.dark .partner-case-studies-button:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+.partner-logo-card-dark {
+  background: #111111;
+  border-color: #27272a;
+}
+
 
 .home-section { flex: 1; padding: 96px 0 84px; border-bottom: 1px solid var(--border); background: radial-gradient(circle at 78% 18%, rgba(6, 182, 212, .08), transparent 28%), var(--background); }
 .home-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 72px; align-items: center; }
@@ -338,4 +453,60 @@ th { font-size: 12px; font-weight: 700; letter-spacing: .02em; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+
+/* Force transparent header on hero page */
+.site-header.hero-transparent {
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.site-header.hero-transparent .brand-copy strong,
+.site-header.hero-transparent .brand-copy small,
+.site-header.hero-transparent .marketing-nav a,
+.site-header.hero-transparent .icon-button {
+  color: white !important;
+}
+
+.site-header.hero-transparent .marketing-nav a:hover {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.site-header.hero-transparent .brand-mark {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+.dark .site-header.hero-transparent {
+  background: transparent !important;
+}
+
+/* When scrolled - white background */
+.site-header.scrolled {
+  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.dark .site-header.scrolled {
+  background: rgba(0, 0, 0, 0.92) !important;
+}
+
+.site-header.scrolled .brand-copy strong,
+.site-header.scrolled .brand-copy small,
+.site-header.scrolled .marketing-nav a,
+.site-header.scrolled .icon-button {
+  color: var(--text) !important;
+}
+
+.site-header.scrolled .brand-copy small {
+  color: var(--text-muted) !important;
+}
+
+.site-header.scrolled .brand-mark {
+  background: #2563eb !important;
+  color: white !important;
 }

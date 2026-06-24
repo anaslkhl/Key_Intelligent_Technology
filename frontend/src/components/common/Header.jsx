@@ -8,7 +8,7 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth";
@@ -45,6 +45,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
@@ -54,6 +55,15 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
     : user?.role === "client"
       ? clientLinks
       : staffLinks;
+
+  // Scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -73,10 +83,46 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
+  // Determine header style based on scroll and page
+  const isHeroPage = location.pathname === "/";
+  const isTransparent = !scrolled && isHeroPage && !isAuthPage;
+
   return (
     <>
-      <header className={`site-header${isAuthPage ? " auth-header" : ""}`}>
-        <div className="header-inner">
+      <header
+        className={`${isTransparent ? "hero-transparent" : ""} ${scrolled ? "scrolled" : ""}`}
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 50,
+          width: "100%",
+          background: isTransparent
+            ? "transparent !important"
+            : scrolled
+              ? "#ffffff"
+              : isAuthPage
+                ? "#ffffff"
+                : "var(--surface)",
+          borderBottom: isTransparent
+            ? "none !important"
+            : scrolled
+              ? "1px solid var(--border)"
+              : "1px solid var(--border)",
+          boxShadow: isTransparent
+            ? "none !important"
+            : scrolled
+              ? "var(--shadow-sm)"
+              : "none",
+          backdropFilter: isTransparent ? "blur(12px)" : "none",
+          transition: "background 0.3s ease, backdrop-filter 0.3s ease",
+        }}
+      >
+        <div
+          className="header-inner"
+          style={{
+            color: isTransparent ? "white !important" : "",
+          }}
+        >
           {showNavigation && (
             <button
               type="button"
