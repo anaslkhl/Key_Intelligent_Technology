@@ -64,18 +64,18 @@ export default function Hero() {
 
   return (
     <section
-      className="relative min-h-screen w-full bg-cover bg-center bg-no-repeat"
+      className="relative -mt-16 h-screen w-full bg-cover bg-center bg-no-repeat"
       style={{
         backgroundImage: `url(${heroBackground})`,
-        minHeight: "100vh",
-        backgroundSize: "cover",
+        backgroundSize: "100% 100%",
         backgroundPosition: "center",
+        height: "100vh",
       }}
     >
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/50" />
 
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 sm:py-20">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4">
         <div className="mx-auto w-full max-w-4xl text-center">
           <div className="landing-hero-enter space-y-10">
             {/* Badge */}

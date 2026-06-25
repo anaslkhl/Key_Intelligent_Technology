@@ -47,6 +47,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const location = useLocation();
   const navigate = useNavigate();
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
@@ -59,10 +60,18 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogout = async () => {
@@ -83,8 +92,45 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
 
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
-  const isHeroPage = location.pathname === "/";
-  const isTransparent = isHeroPage && !isAuthPage && scrolled;
+  const isHomePage = location.pathname === "/";
+  const isTransparent = !scrolled && isHomePage && !isAuthPage;
+
+  const getTextColor = () => {
+    if (isTransparent) return "#ffffff";
+    if (isDark) return "#ffffff";
+    return "#0f172a";
+  };
+
+  const getBackground = () => {
+    if (isTransparent) return "transparent";
+    if (isDark) return "#0a1628";
+    return "#ffffff";
+  };
+
+  const getBorderColor = () => {
+    if (isTransparent) return "none";
+    if (isDark) return "1px solid #1a2d4a";
+    return "1px solid #e2e8f0";
+  };
+
+  const getLinkColor = (isActive) => {
+    if (isTransparent) {
+      return isActive ? "#ffffff" : "#ffffff";
+    }
+    if (isDark) {
+      return isActive ? "#60a5fa" : "#94a3b8";
+    }
+    return isActive ? "#2563eb" : "#64748b";
+  };
+
+  const getLinkBackground = (isActive) => {
+    if (isActive) {
+      if (isTransparent) return "rgba(255,255,255,0.15)";
+      if (isDark) return "rgba(37, 99, 235, 0.2)";
+      return "#eff6ff";
+    }
+    return "transparent";
+  };
 
   return (
     <>
@@ -97,15 +143,15 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
           height: "64px",
           display: "flex",
           alignItems: "center",
-          background: isTransparent ? "transparent" : "#ffffff",
-          borderBottom: isTransparent ? "none" : "1px solid #e2e8f0",
+          background: getBackground(),
+          borderBottom: getBorderColor(),
           boxShadow: isTransparent ? "none" : "0 1px 2px rgba(0,0,0,0.05)",
           backdropFilter: isTransparent ? "blur(12px)" : "none",
-          transition: "background 0.3s ease, backdrop-filter 0.3s ease",
+          transition:
+            "background 0.3s ease, backdrop-filter 0.3s ease, border-bottom 0.3s ease, box-shadow 0.3s ease",
         }}
       >
         <div
-          className="header-inner"
           style={{
             height: "100%",
             display: "flex",
@@ -115,20 +161,27 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
             width: "100%",
             maxWidth: "1280px",
             margin: "0 auto",
-            color: "#0f172a",
+            color: getTextColor(),
           }}
         >
           {showNavigation && (
             <button
               type="button"
-              className="icon-button menu-button"
               onClick={onOpenNavigation}
               aria-label="Open workspace navigation"
               title="Open navigation"
               style={{
-                background: isTransparent ? "rgba(0,0,0,0.05)" : "transparent",
-                borderColor: isTransparent ? "rgba(0,0,0,0.1)" : "#e2e8f0",
-                color: "#0f172a",
+                background: isTransparent ? "rgba(255,255,255,0.15)" : "transparent",
+                borderColor: isTransparent ? "rgba(255,255,255,0.3)" : "#e2e8f0",
+                color: getTextColor(),
+                width: "40px",
+                height: "40px",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "8px",
+                border: "1px solid",
+                cursor: "pointer",
               }}
             >
               <Menu size={20} />
@@ -137,16 +190,23 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
           {showTopNavigation && !showNavigation && (
             <button
               type="button"
-              className="icon-button mobile-nav-button"
               onClick={() => setIsMobileMenuOpen((open) => !open)}
               aria-label={
                 isMobileMenuOpen ? "Close navigation" : "Open navigation"
               }
               aria-expanded={isMobileMenuOpen}
               style={{
-                background: isTransparent ? "rgba(0,0,0,0.05)" : "transparent",
-                borderColor: isTransparent ? "rgba(0,0,0,0.1)" : "#e2e8f0",
-                color: "#0f172a",
+                background: isTransparent ? "rgba(255,255,255,0.15)" : "transparent",
+                borderColor: isTransparent ? "rgba(255,255,255,0.3)" : "#e2e8f0",
+                color: getTextColor(),
+                width: "40px",
+                height: "40px",
+                display: isMobile ? "inline-flex" : "none",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "8px",
+                border: "1px solid",
+                cursor: "pointer",
               }}
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -155,17 +215,15 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
 
           <NavLink
             to="/"
-            className="brand"
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: "10px",
               textDecoration: "none",
-              color: "#0f172a",
+              color: getTextColor(),
             }}
           >
             <span
-              className="brand-mark"
               style={{
                 width: "34px",
                 height: "34px",
@@ -179,24 +237,19 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
             >
               K
             </span>
-            <span className="brand-copy">
+            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", width: "max-content"}}>
               <strong
                 style={{
-                  display: "block",
-                  lineHeight: 1.05,
                   fontSize: "15px",
-                  color: "#0f172a",
+                  color: getTextColor(),
                 }}
               >
                 KIT
               </strong>
               <small
                 style={{
-                  display: "block",
-                  lineHeight: 1.05,
-                  marginTop: "4px",
                   fontSize: "11px",
-                  color: "#64748b",
+                  color: isTransparent ? "rgba(255,255,255,0.7)" : isDark ? "rgba(255,255,255,0.7)" : "#64748b",
                 }}
               >
                 Support Hub
@@ -206,74 +259,96 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
 
           {showTopNavigation && (
             <nav
-              className="marketing-nav"
               style={{
-                display: "flex",
+                display: isMobile ? "none" : "flex",
                 alignItems: "center",
-                gap: "18px",
+                gap: "4px",
                 flex: "1 1 auto",
                 justifyContent: "center",
               }}
             >
-              {links.map((item, index) => (
-                <Link
-                  key={`${item.label}-${index}`}
-                  to={item.to}
-                  style={{
-                    color: "#0f172a",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                    transition: "color 160ms ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.color = "#2563eb";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.color = "#0f172a";
-                  }}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {links.map((item) => {
+                const isActive = location.pathname === item.to;
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    style={{
+                      color: getLinkColor(isActive),
+                      fontSize: "14px",
+                      fontWeight: isActive ? 700 : 500,
+                      padding: "6px 14px",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      whiteSpace: "nowrap",
+                      transition: "all 0.2s ease",
+                      background: getLinkBackground(isActive),
+                    }}
+                    onMouseEnter={(e) => {
+                      const isActiveLink = location.pathname === item.to;
+                      if (!isActiveLink) {
+                        e.currentTarget.style.color = isTransparent
+                          ? "#ffffff"
+                          : isDark
+                          ? "#ffffff"
+                          : "#2563eb";
+                        e.currentTarget.style.background = isTransparent
+                          ? "rgba(255,255,255,0.1)"
+                          : isDark
+                          ? "rgba(255,255,255,0.05)"
+                          : "#f1f5f9";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const isActiveLink = location.pathname === item.to;
+                      if (!isActiveLink) {
+                        e.currentTarget.style.color = getLinkColor(false);
+                        e.currentTarget.style.background = "transparent";
+                      }
+                    }}
+                  >
+                    {item.label}
+                  </NavLink>
+                );
+              })}
             </nav>
           )}
 
           <div
-            className="account-nav"
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "18px",
+              gap: "12px",
               marginLeft: "auto",
             }}
           >
             {!isAuthPage && (
               <button
                 type="button"
-                className="icon-button"
                 onClick={toggleTheme}
                 aria-label={`Use ${isDark ? "light" : "dark"} mode`}
                 title={`Use ${isDark ? "light" : "dark"} mode`}
                 style={{
-                  background: isTransparent
-                    ? "rgba(0,0,0,0.05)"
-                    : "transparent",
-                  borderColor: isTransparent ? "rgba(0,0,0,0.1)" : "#e2e8f0",
-                  color: "#0f172a",
+                  background: isTransparent ? "rgba(255,255,255,0.15)" : "transparent",
+                  borderColor: isTransparent ? "rgba(255,255,255,0.3)" : "#e2e8f0",
+                  color: getTextColor(),
+                  width: "40px",
+                  height: "40px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px",
+                  border: "1px solid",
+                  cursor: "pointer",
                 }}
               >
                 {isDark ? <Sun size={19} /> : <Moon size={19} />}
               </button>
             )}
             {isAuthenticated ? (
-              <div
-                className="header-user-menu"
-                style={{ position: "relative" }}
-              >
+              <div style={{ position: "relative" }}>
                 <button
                   type="button"
-                  className="header-user-trigger"
                   onClick={() => setIsUserMenuOpen((open) => !open)}
                   aria-haspopup="menu"
                   aria-expanded={isUserMenuOpen}
@@ -285,21 +360,20 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                     border: "0",
                     borderRadius: "8px",
                     padding: "4px 7px",
-                    background: "transparent",
-                    color: "#0f172a",
+                    background: isTransparent ? "rgba(255,255,255,0.1)" : "transparent",
+                    color: getTextColor(),
                     cursor: "pointer",
                   }}
                 >
                   <span
-                    className="user-avatar"
                     style={{
                       width: "34px",
                       height: "34px",
                       display: "grid",
                       placeItems: "center",
                       borderRadius: "50%",
-                      background: "#dbeafe",
-                      color: "#1d4ed8",
+                      background: isTransparent ? "rgba(255,255,255,0.2)" : "#dbeafe",
+                      color: isTransparent ? "#ffffff" : "#1d4ed8",
                       fontSize: "13px",
                       fontWeight: 800,
                     }}
@@ -307,7 +381,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                     {user.name?.charAt(0).toUpperCase()}
                   </span>
                   <span
-                    className="header-user-copy"
                     style={{
                       minWidth: 0,
                       textAlign: "left",
@@ -322,7 +395,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
-                        color: "#0f172a",
+                        color: getTextColor(),
                       }}
                     >
                       {user.name}
@@ -331,7 +404,7 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                       style={{
                         display: "block",
                         marginTop: "2px",
-                        color: "#64748b",
+                        color: isTransparent ? "rgba(255,255,255,0.7)" : isDark ? "rgba(255,255,255,0.7)" : "#64748b",
                         fontSize: "11px",
                         textTransform: "capitalize",
                       }}
@@ -342,12 +415,11 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                   <ChevronDown
                     size={15}
                     aria-hidden="true"
-                    style={{ color: "#0f172a" }}
+                    style={{ color: getTextColor() }}
                   />
                 </button>
                 {isUserMenuOpen && (
                   <div
-                    className="user-dropdown"
                     style={{
                       position: "absolute",
                       zIndex: 80,
@@ -363,7 +435,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                   >
                     <NavLink
                       to="/profile"
-                      role="menuitem"
                       onClick={() => setIsUserMenuOpen(false)}
                       style={{
                         width: "100%",
@@ -387,7 +458,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                     </NavLink>
                     <NavLink
                       to="/notifications"
-                      role="menuitem"
                       onClick={() => setIsUserMenuOpen(false)}
                       style={{
                         width: "100%",
@@ -411,7 +481,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                     </NavLink>
                     <button
                       type="button"
-                      role="menuitem"
                       onClick={() => setShowLogoutDialog(true)}
                       style={{
                         width: "100%",
@@ -440,18 +509,17 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                 <>
                   <NavLink
                     to="/login"
-                    className="button button-secondary button-md header-login-button"
                     style={{
                       minHeight: "40px",
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
                       gap: "8px",
-                      border: "1px solid #cbd5e1",
+                      border: isTransparent ? "1px solid rgba(255,255,255,0.3)" : "1px solid #cbd5e1",
                       borderRadius: "8px",
                       padding: "0 16px",
-                      background: "transparent",
-                      color: "#0f172a",
+                      background: isTransparent ? "rgba(255,255,255,0.1)" : "#ffffff",
+                      color: getTextColor(),
                       fontSize: "14px",
                       fontWeight: 700,
                       textDecoration: "none",
@@ -462,7 +530,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                   </NavLink>
                   <NavLink
                     to="/register"
-                    className="button button-primary button-md header-cta"
                     style={{
                       minHeight: "40px",
                       display: "inline-flex",
@@ -488,9 +555,8 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
           </div>
         </div>
 
-        {showTopNavigation && isMobileMenuOpen && (
+        {showTopNavigation && isMobileMenuOpen && isMobile && (
           <nav
-            className="mobile-marketing-menu"
             style={{
               position: "absolute",
               top: "64px",
@@ -504,9 +570,9 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
               boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
             }}
           >
-            {links.map((item, index) => (
+            {links.map((item) => (
               <Link
-                key={`${item.label}-${index}`}
+                key={item.to}
                 to={item.to}
                 onClick={closeMobileMenu}
                 style={{
@@ -523,7 +589,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
             ))}
             {!isAuthenticated && (
               <div
-                className="mobile-auth-actions"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
@@ -536,7 +601,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                 <Link
                   to="/login"
                   onClick={closeMobileMenu}
-                  className="button button-secondary"
                   style={{
                     minHeight: "40px",
                     display: "inline-flex",
@@ -559,7 +623,6 @@ export default function Header({ onOpenNavigation, showNavigation = false }) {
                 <Link
                   to="/register"
                   onClick={closeMobileMenu}
-                  className="button button-primary"
                   style={{
                     minHeight: "40px",
                     display: "inline-flex",
