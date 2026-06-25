@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
 import { applyFieldErrors, parseApiError } from '../api/errors'
 import { useAuth } from '../contexts/auth'
-import backgroundImage from "../assets/images/login.png";
+import backgroundImage from "../assets/images/image1.png";
 
 export default function Register() {
   const { register: createAccount } = useAuth()
@@ -38,7 +38,7 @@ export default function Register() {
       
       <div className="relative z-10 flex min-h-[calc(100vh-96px)] items-center justify-center lg:justify-start lg:ml-20">
         <div
-          className={`w-[700px] max-w-[700px] ml-[100px] transform rounded-2xl bg-white p-8 shadow-xl transition-all duration-700 ${
+          className={`w-full max-w-lg transform rounded-2xl bg-white p-8 shadow-xl transition-all duration-700 ${
             isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'
           }`}
         >
@@ -62,7 +62,7 @@ export default function Register() {
               <input
                 placeholder="Your full name"
                 autoComplete="name"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 aria-invalid={Boolean(errors.name)}
                 {...register('name', { required: 'Name is required', maxLength: { value: 255, message: 'Name must not exceed 255 characters' } })}
               />
@@ -75,7 +75,7 @@ export default function Register() {
                 type="email"
                 placeholder="you@company.com"
                 autoComplete="email"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 aria-invalid={Boolean(errors.email)}
                 {...register('email', {
                   required: 'Email is required',
@@ -85,13 +85,24 @@ export default function Register() {
               {errors.email && <small className="field-error">{errors.email.message}</small>}
             </label>
 
+            {/* Company Name - Added */}
+            <label className="field mt-4">
+              <span className="text-sm font-semibold text-slate-700">Company name</span>
+              <input
+                placeholder="Your company name"
+                autoComplete="organization"
+                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                {...register('company_name')}
+              />
+            </label>
+
             <label className="field mt-4">
               <span className="text-sm font-semibold text-slate-700">Password</span>
               <input
                 type="password"
                 placeholder="At least 8 characters"
                 autoComplete="new-password"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 aria-invalid={Boolean(errors.password)}
                 {...register('password', {
                   required: 'Password is required',
@@ -111,7 +122,7 @@ export default function Register() {
                 type="password"
                 placeholder="Repeat your password"
                 autoComplete="new-password"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                 aria-invalid={Boolean(errors.password_confirmation)}
                 {...register('password_confirmation', {
                   required: 'Please confirm your password',

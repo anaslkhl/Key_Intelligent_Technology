@@ -19,7 +19,7 @@ export default function Login() {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) navigate(getRoleHome(user.role), { replace: true })
+    if (isAuthenticated) navigate('/', { replace: true })  // ← Changed
   }, [isAuthenticated, navigate, user])
 
   const onSubmit = async (values) => {
@@ -28,14 +28,13 @@ export default function Login() {
       const loggedInUser = await login(values.email, values.password)
       toast.success('Welcome back')
       const requestedLocation = location.state?.from
-      navigate(requestedLocation ? `${requestedLocation.pathname}${requestedLocation.search || ''}` : getRoleHome(loggedInUser.role), { replace: true })
+      navigate(requestedLocation ? `${requestedLocation.pathname}${requestedLocation.search || ''}` : '/', { replace: true })
     } catch (error) {
       const apiError = parseApiError(error, 'Unable to log in')
       applyFieldErrors(setError, apiError.fieldErrors)
       setError('root.server', { message: apiError.message })
     }
   }
-
   return (
     <section
       className="relative min-h-screen bg-cover bg-center bg-no-repeat px-6 py-12 lg:px-0"

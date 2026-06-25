@@ -26,6 +26,7 @@ const publicLinks = [
 
 const clientLinks = [
   { to: "/", label: "Home" },
+  { to: "/dashboard", label: "Dashboard" },
   { to: "/tickets", label: "Tickets" },
   { to: "/knowledge-base", label: "Knowledge Base" },
   { to: "/error-codes", label: "Error Codes" },
