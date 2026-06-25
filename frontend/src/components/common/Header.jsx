@@ -61,11 +61,6 @@ export default function Header() {
     return () => window.removeEventListener('scroll', updateScrolled)
   }, [])
 
-  useEffect(() => {
-    setIsMobileMenuOpen(false)
-    setIsUserMenuOpen(false)
-  }, [location.pathname])
-
   const handleLogout = async () => {
     setIsLoggingOut(true)
     try {
