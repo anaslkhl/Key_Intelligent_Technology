@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Star } from "lucide-react";
 import { useState } from "react";
-import { Star } from 'lucide-react';
+// import { Star } from 'lucide-react';
 import { Link } from "react-router-dom";
 import apiClient from "../../api/client";
 import PageHeader from "../../components/common/PageHeader";

@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell, Check, CheckCheck, Trash2 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Bell } from 'lucide-react';
+// import { Bell } from 'lucide-react';
 import apiClient from "../api/client";
 import PageHeader from "../components/common/PageHeader";
 import Pagination from "../components/common/Pagination";
