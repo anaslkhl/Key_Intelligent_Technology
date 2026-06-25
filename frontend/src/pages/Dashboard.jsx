@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard } from "lucide-react";
 import apiClient from "../api/client";
 import { PriorityBadge, StatusBadge } from "../components/common/Badge";
 import PageHeader from "../components/common/PageHeader";
@@ -85,7 +85,7 @@ export default function Dashboard() {
       <WelcomeBanner />
       <PageHeader
         icon={<LayoutDashboard size={20} />}
-        eyebrow="Dashboard"
+        eyebrow="Overview"
         title={`Welcome back, ${user.name}`}
         description="Here's what's happening with your robots and support tickets."
         actions={
