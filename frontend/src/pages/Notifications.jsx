@@ -13,6 +13,8 @@ import {
 } from "../components/common/QueryState";
 import { formatDateTime } from "../utils/formatters";
 
+
+
 export default function Notifications() {
   const client = useQueryClient();
   const [page, setPage] = useState(1);

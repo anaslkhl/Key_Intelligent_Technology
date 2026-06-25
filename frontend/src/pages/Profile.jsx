@@ -11,6 +11,8 @@ import PageHeader from "../components/common/PageHeader";
 import { ErrorState, LoadingState } from "../components/common/QueryState";
 import { useAuth } from "../contexts/auth";
 
+
+
 export default function Profile() {
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
