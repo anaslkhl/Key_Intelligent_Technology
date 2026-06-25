@@ -6,6 +6,7 @@ import PageHeader from '../components/common/PageHeader'
 import { ErrorState, LoadingState } from '../components/common/QueryState'
 import { useAuth } from '../contexts/auth'
 import { formatDate } from '../utils/formatters'
+import WelcomeBanner from '../../components/dashboard/WelcomeBanner';
 
 const activeStatuses = new Set(['new', 'open', 'in_progress', 'waiting_client'])
 
@@ -37,6 +38,7 @@ export default function Dashboard() {
 
   return (
     <ClientPage>
+    <WelcomeBanner />
       <PageHeader
         eyebrow="Client dashboard"
         title={`Welcome, ${user.name}`}
