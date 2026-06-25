@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-// import { BookOpen } from "lucide-react";
 import {
   BookOpen,
   ChevronRight,
@@ -151,15 +150,19 @@ export default function KbList() {
         title="Knowledge Base"
         description="Browse articles, troubleshooting guides, and product documentation to find answers quickly."
         actions={
-          <Link to="/error-codes" className="button button-secondary">
+          <Link
+            to="/error-codes"
+            className="button button-secondary kb-header-action"
+          >
             <Wrench size={17} />
             Error codes
           </Link>
         }
       />
+
       <form
         onSubmit={submitSearch}
-        className="mt-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#111111] lg:grid-cols-[minmax(0,1fr)_220px_240px]"
+        className="kb-search-form mt-6 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-[#111111] sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px_240px]"
       >
         <div className="relative">
           <label className="grid gap-1.5 text-sm font-semibold text-slate-700 dark:text-zinc-200">
@@ -268,6 +271,7 @@ export default function KbList() {
           </select>
         </label>
       </form>
+
       {!debouncedSearch && !familyId && !category && (
         <div className="mt-8 grid gap-6">
           <HighlightShelf
@@ -297,6 +301,7 @@ export default function KbList() {
             )}
         </div>
       )}
+
       <div className="mt-6">
         {query.isLoading && (
           <LoadingState label="Searching knowledge base..." />
@@ -315,7 +320,7 @@ export default function KbList() {
         )}
         {articles.length > 0 && (
           <>
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="kb-articles-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:gap-5">
               {articles.map((article) => (
                 <ArticleCard key={article.id} article={article} />
               ))}
@@ -332,7 +337,7 @@ export default function KbList() {
 
 export function ArticleCard({ article }) {
   return (
-    <article className="flex min-h-72 flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-[#111111]">
+    <article className="kb-article-card flex flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-zinc-800 dark:bg-[#111111] sm:p-5">
       <div className="flex items-start justify-between gap-3">
         <span
           className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase ${categoryStyles[article.category]}`}
@@ -347,7 +352,7 @@ export function ArticleCard({ article }) {
       <p className="mt-4 text-xs font-bold uppercase text-blue-600">
         {article.family?.name || "General support"}
       </p>
-      <h2 className="mt-2 !text-xl !font-semibold text-slate-900 dark:text-white">
+      <h2 className="mt-2 !text-lg !font-semibold text-slate-900 dark:text-white sm:!text-xl">
         <Link
           to={`/knowledge-base/${article.slug}`}
           className="hover:text-blue-600"
@@ -355,7 +360,7 @@ export function ArticleCard({ article }) {
           {article.title}
         </Link>
       </h2>
-      <p className="mt-3 line-clamp-4 text-sm leading-6 text-slate-600 dark:text-zinc-400">
+      <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600 dark:text-zinc-400 sm:line-clamp-4">
         {article.excerpt}
       </p>
       <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 dark:border-zinc-800">
@@ -390,7 +395,7 @@ function HighlightShelf({
         <div>
           <h2
             id={`shelf-${title.replaceAll(" ", "-").toLowerCase()}`}
-            className="flex items-center gap-2 !text-xl !font-semibold text-slate-900 dark:text-white"
+            className="flex items-center gap-2 !text-lg !font-semibold text-slate-900 dark:text-white sm:!text-xl"
           >
             <Icon size={20} className="text-blue-600" />
             {title}
@@ -400,19 +405,19 @@ function HighlightShelf({
           </p>
         </div>
       </div>
-      <div className="mt-3 grid auto-cols-[minmax(245px,1fr)] grid-flow-col gap-3 overflow-x-auto pb-2 xl:grid-flow-row xl:grid-cols-5 xl:overflow-visible">
+      <div className="kb-shelf-grid mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {isLoading &&
           Array.from({ length: 5 }, (_, index) => (
             <div
               key={index}
-              className="h-32 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-zinc-800 dark:bg-[#111111]"
+              className="kb-shelf-item h-32 animate-pulse rounded-xl border border-slate-200 bg-white dark:border-zinc-800 dark:bg-[#111111]"
             />
           ))}
         {articles.map((article, index) => (
           <Link
             key={article.id}
             to={`/knowledge-base/${article.slug}`}
-            className="group flex min-h-32 flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md dark:border-zinc-800 dark:bg-[#111111] dark:hover:border-blue-800"
+            className="kb-shelf-item group flex min-h-32 flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md dark:border-zinc-800 dark:bg-[#111111] dark:hover:border-blue-800"
           >
             <span className="text-xs font-bold text-blue-600">
               {String(index + 1).padStart(2, "0")} ·{" "}
@@ -436,7 +441,7 @@ export function KbBreadcrumb({ category, title }) {
   return (
     <nav
       aria-label="Knowledge base breadcrumb"
-      className="mb-6 flex flex-wrap items-center gap-2 text-sm text-slate-500"
+      className="kb-breadcrumb mb-4 flex flex-wrap items-center gap-1 text-xs text-slate-500 sm:mb-6 sm:gap-2 sm:text-sm"
     >
       <Link to="/" className="font-semibold hover:text-blue-600">
         Home
@@ -475,7 +480,7 @@ const inputClass =
 
 export function SelfServicePage({ children }) {
   return (
-    <section className="min-h-[calc(100vh-64px)] bg-slate-50 py-8 text-slate-900 dark:bg-black dark:text-white sm:py-10">
+    <section className="min-h-[calc(100vh-64px)] bg-slate-50 py-6 text-slate-900 dark:bg-black dark:text-white sm:py-8 lg:py-10">
       <div className="mx-auto w-full max-w-[1180px] px-4 sm:px-6 lg:px-8">
         {children}
       </div>

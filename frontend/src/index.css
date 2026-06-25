@@ -492,3 +492,222 @@ th { font-size: 12px; font-weight: 700; letter-spacing: .02em; }
     display: inline-flex !important;
   }
 }
+
+
+
+/* ===== HEADER RESPONSIVE ===== */
+
+/* Desktop: Show desktop nav, hide hamburger */
+@media (min-width: 1024px) {
+  .mobile-hamburger {
+    display: none !important;
+  }
+  .desktop-nav {
+    display: flex !important;
+  }
+  .user-copy-desktop {
+    display: block !important;
+  }
+}
+
+/* Tablet/Mobile: Hide desktop nav, show hamburger */
+@media (max-width: 1023px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-hamburger {
+    display: inline-flex !important;
+  }
+  .user-copy-desktop {
+    display: none !important;
+  }
+}
+
+/* Touch-friendly buttons on mobile */
+@media (max-width: 1023px) {
+  .mobile-nav-link {
+    min-height: 48px !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+  }
+  .mobile-auth-actions .button {
+    min-height: 48px !important;
+    font-size: 16px !important;
+  }
+}
+
+
+
+
+/* Mobile Menu */
+.mobile-menu-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.mobile-menu-link:hover {
+  color: #2563eb !important;
+  background: #f1f5f9 !important;
+  transform: translateX(4px);
+}
+
+.dark .mobile-menu-link:hover {
+  color: #60a5fa !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mobile-menu-link .menu-icon {
+  transition: color 0.2s ease;
+}
+
+.mobile-menu-link:hover .menu-icon {
+  color: #2563eb !important;
+}
+
+.dark .mobile-menu-link:hover .menu-icon {
+  color: #60a5fa !important;
+}
+
+/* Mobile Menu Animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-open {
+  animation: slideDown 0.3s ease-out;
+}
+
+
+
+
+
+
+
+
+
+
+/* ===== KNOWLEDGE BASE RESPONSIVE ===== */
+
+/* Mobile: Stack everything */
+@media (max-width: 767px) {
+  /* Search form */
+  .kb-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px !important;
+  }
+  
+  .kb-search-form .relative {
+    width: 100%;
+  }
+  
+  .kb-search-form label {
+    width: 100%;
+  }
+  
+  .kb-search-form select {
+    width: 100%;
+  }
+  
+  /* Article cards */
+  .kb-articles-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .kb-article-card {
+    min-height: auto !important;
+    padding: 16px !important;
+  }
+  
+  .kb-article-card h2 {
+    font-size: 18px !important;
+  }
+  
+  /* Highlight shelves */
+  .kb-shelf-grid {
+    grid-auto-columns: 1fr !important;
+    grid-template-columns: 1fr !important;
+    grid-flow: row !important;
+    overflow-x: visible !important;
+  }
+  
+  .kb-shelf-item {
+    min-height: 120px !important;
+  }
+  
+  /* Breadcrumb */
+  .kb-breadcrumb {
+    font-size: 13px !important;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+  
+  /* Page header */
+  .kb-page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+  
+  .kb-page-header .button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .kb-articles-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .kb-search-form {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  .kb-shelf-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1024px) {
+  .kb-articles-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 20px !important;
+  }
+  
+  .kb-shelf-grid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
+
+/* Article card hover */
+.kb-article-card {
+  transition: all 0.2s ease-in-out;
+}
+
+.kb-article-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.dark .kb-article-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
