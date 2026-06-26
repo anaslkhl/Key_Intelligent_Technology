@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -46,7 +47,7 @@ class AIChatControllerTest extends TestCase
     public function test_ai_agent_connection_failure_returns_service_unavailable(): void
     {
         config(['services.ai_agent.base_url' => 'http://ai-agent.test']);
-        Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('Connection refused'));
+        Http::fake(fn () => throw new ConnectionException('Connection refused'));
         Sanctum::actingAs(User::factory()->create());
 
         $this->postJson('/api/ai/chat', [

@@ -23,7 +23,6 @@ import toast from "react-hot-toast";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/auth";
 import { useTheme } from "../../contexts/theme";
-import { ROLE_LABELS } from "../../utils/roles";
 import ConfirmDialog from "./ConfirmDialog";
 
 const publicLinks = [
@@ -707,6 +706,5 @@ export default function Header() {
     </>
   );
 }
-
 
 
