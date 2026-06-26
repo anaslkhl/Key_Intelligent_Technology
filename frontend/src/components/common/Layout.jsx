@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Menu } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
+import AIChatWidget from '../ai/AIChatWidget'
 import Header from './Header'
 import RouteEnhancements from './RouteEnhancements'
 import Sidebar from './Sidebar'
@@ -40,6 +41,7 @@ export default function Layout() {
           </div>
         </footer>
       )}
+      {isAuthenticated && !isAuthPage && <AIChatWidget />}
     </div>
   )
 }
