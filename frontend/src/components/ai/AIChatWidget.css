@@ -21,6 +21,9 @@
   animation: ai-widget-pulse 2.8s ease-in-out infinite;
 }
 
+
+
+
 .ai-widget-launcher:hover {
   background: #1d4ed8;
   box-shadow: 0 24px 58px rgba(37, 99, 235, .42), 0 10px 26px rgba(15, 23, 42, .2);
@@ -68,6 +71,7 @@
 .ai-widget-mobile-handle {
   display: none;
 }
+
 
 .ai-widget-title-group {
   min-width: 0;
