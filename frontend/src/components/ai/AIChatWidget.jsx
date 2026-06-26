@@ -12,6 +12,8 @@ const initialMessages = [
   },
 ]
 
+
+
 export default function AIChatWidget() {
   const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
