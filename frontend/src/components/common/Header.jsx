@@ -37,6 +37,7 @@ const publicLinks = [
 const clientLinks = [
   { to: "/", label: "Home" },
   { to: "/dashboard", label: "Dashboard" },
+  { to: "/ai-chat", label: "AI Assistant" },
   { to: "/tickets", label: "Tickets" },
   { to: "/knowledge-base", label: "Knowledge Base" },
   { to: "/error-codes", label: "Error Codes" },
@@ -565,6 +566,7 @@ export default function Header() {
               else if (label === "reviews") icon = <Star size={18} />;
               else if (label === "features") icon = <Lightbulb size={18} />;
               else if (label === "robots") icon = <Bot size={18} />;
+              else if (label === "ai assistant") icon = <Bot size={18} />;
 
               return (
                 <NavLink
@@ -705,7 +707,6 @@ export default function Header() {
     </>
   );
 }
-
 
 
 

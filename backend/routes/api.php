@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DocumentCategoryController;
 use App\Http\Controllers\DocumentController;
@@ -57,6 +58,7 @@ Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function (
     Route::patch('/notification-preferences', [AuthController::class, 'updateNotificationPreferences']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+    Route::post('/ai/chat', [AIChatController::class, 'chat'])->middleware('throttle:10,1');
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed', 'throttle:6,1'])
         ->name('verification.verify');

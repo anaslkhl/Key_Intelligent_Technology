@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import Layout from './components/common/Layout'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import NotFound from './components/common/NotFound'
+import AIChat from './pages/AIChat'
 import Dashboard from './pages/Dashboard'
 import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
@@ -43,6 +44,7 @@ const router = createBrowserRouter([
         children: [
           { path: '/profile', element: <Profile /> },
           { path: '/notifications', element: <Notifications /> },
+          { path: '/ai-chat', element: <AIChat /> },
         ],
       },
       {

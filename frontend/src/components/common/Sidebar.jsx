@@ -1,6 +1,7 @@
 import {
   BarChart3,
   BookOpen,
+  Bot,
   CircleHelp,
   Download,
   Files,
@@ -22,6 +23,7 @@ import ConfirmDialog from './ConfirmDialog'
 const navigation = {
   agent: [
     { to: '/agent/dashboard', label: 'Dashboard', icon: Gauge },
+    { to: '/ai-chat', label: 'AI Assistant', icon: Bot },
     { to: '/agent/tickets', label: 'Ticket queue', icon: TicketCheck },
     { to: '/agent/kb/manage', label: 'Knowledge base', icon: BookOpen },
     { to: '/agent/documents', label: 'Documents', icon: Files },
@@ -29,6 +31,7 @@ const navigation = {
   ],
   admin: [
     { to: '/admin/dashboard', label: 'Overview', icon: Gauge },
+    { to: '/ai-chat', label: 'AI Assistant', icon: Bot },
     { to: '/admin/users', label: 'Users', icon: Users },
     { to: '/admin/reviews', label: 'Review moderation', icon: ShieldCheck },
     { to: '/admin/features', label: 'Feature roadmap', icon: Lightbulb },

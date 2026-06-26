@@ -4,10 +4,10 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
 import { getRoleHome } from '../../utils/roles'
 
-const labels = { agent: 'Agent', admin: 'Admin', tickets: 'Tickets', kb: 'Knowledge base', manage: 'Manage', create: 'Create', edit: 'Edit', forum: 'Forum', 'knowledge-base': 'Knowledge base', 'error-codes': 'Error codes', reviews: 'Reviews', features: 'Features', documents: 'Documents', permissions: 'Permissions', 'my-products': 'My products', analytics: 'Analytics', export: 'Export', users: 'Users', profile: 'Profile', notifications: 'Notifications', robots: 'Robots', register: 'Register', ask: 'Ask question', write: 'Write review', submit: 'Submit feature', dashboard: 'Dashboard', login: 'Log in' }
+const labels = { agent: 'Agent', admin: 'Admin', tickets: 'Tickets', kb: 'Knowledge base', manage: 'Manage', create: 'Create', edit: 'Edit', forum: 'Forum', 'knowledge-base': 'Knowledge base', 'error-codes': 'Error codes', reviews: 'Reviews', features: 'Features', documents: 'Documents', permissions: 'Permissions', 'my-products': 'My products', analytics: 'Analytics', export: 'Export', users: 'Users', profile: 'Profile', notifications: 'Notifications', robots: 'Robots', register: 'Register', ask: 'Ask question', write: 'Write review', submit: 'Submit feature', dashboard: 'Dashboard', login: 'Log in', 'ai-chat': 'AI Assistant' }
 
 const titles = [
-  [/^\/$/, 'KIT Support Hub'], [/^\/login$/, 'Log in'], [/^\/register$/, 'Create account'], [/^\/dashboard$/, 'Dashboard'],
+  [/^\/$/, 'KIT Support Hub'], [/^\/login$/, 'Log in'], [/^\/register$/, 'Create account'], [/^\/dashboard$/, 'Dashboard'], [/^\/ai-chat$/, 'AI Assistant'],
   [/^\/tickets\/create$/, 'Create ticket'], [/^\/tickets\/[^/]+$/, 'Ticket details'], [/^\/tickets$/, 'Support tickets'],
   [/^\/robots\/register$/, 'Register robot'], [/^\/robots$/, 'Robots'], [/^\/knowledge-base\/[^/]+$/, 'Knowledge article'], [/^\/knowledge-base$/, 'Knowledge base'],
   [/^\/error-codes$/, 'Error code library'],
@@ -21,7 +21,7 @@ const titles = [
   [/^\/profile$/, 'Profile'], [/^\/notifications$/, 'Notifications'],
 ]
 
-const knownPaths = new Set(['/dashboard', '/tickets', '/robots', '/knowledge-base', '/error-codes', '/forum', '/reviews', '/features', '/documents', '/agent/dashboard', '/agent/tickets', '/agent/kb/manage', '/agent/forum/manage', '/agent/documents', '/admin/dashboard', '/admin/users', '/admin/reviews', '/admin/features', '/admin/documents', '/admin/analytics', '/admin/export', '/profile', '/notifications'])
+const knownPaths = new Set(['/dashboard', '/ai-chat', '/tickets', '/robots', '/knowledge-base', '/error-codes', '/forum', '/reviews', '/features', '/documents', '/agent/dashboard', '/agent/tickets', '/agent/kb/manage', '/agent/forum/manage', '/agent/documents', '/admin/dashboard', '/admin/users', '/admin/reviews', '/admin/features', '/admin/documents', '/admin/analytics', '/admin/export', '/profile', '/notifications'])
 
 export default function RouteEnhancements() {
   const location = useLocation(); const { isAuthenticated, user } = useAuth(); const pathname = location.pathname

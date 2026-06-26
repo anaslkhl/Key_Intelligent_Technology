@@ -28,6 +28,11 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'ai_agent' => [
+        'base_url' => env('AI_AGENT_BASE_URL', 'http://localhost:5000'),
+        'timeout' => env('AI_AGENT_TIMEOUT', 30),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
