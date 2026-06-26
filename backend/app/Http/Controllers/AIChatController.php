@@ -29,6 +29,9 @@ class AIChatController extends Controller
                 ->asJson()
                 ->post("{$baseUrl}/ask", [
                     'prompt' => $validated['prompt'],
+                    'kit_mode' => true,  // ← Enable KIT mode
+                    // Optional: Pass custom system prompt if needed
+                    // 'system_prompt' => config('ai.kit_system_prompt'),
                 ])
                 ->throw();
 
