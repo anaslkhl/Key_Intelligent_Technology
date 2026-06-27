@@ -1,10 +1,12 @@
 import { Bot, Send, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { sendMessage } from "../../api/ai";
 import { useAuth } from "../../contexts/auth";
 
 export default function AIChatWidget() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -14,19 +16,16 @@ export default function AIChatWidget() {
   const inputRef = useRef(null);
   const widgetRef = useRef(null);
 
-  // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Focus input when chat opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
 
-  // Close on Escape key
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape" && isOpen) {
@@ -37,7 +36,6 @@ export default function AIChatWidget() {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen]);
 
-  // Close on click outside (desktop only)
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -53,7 +51,6 @@ export default function AIChatWidget() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // Prevent body scroll when mobile chat is open
   useEffect(() => {
     if (isOpen && window.innerWidth < 768) {
       document.body.style.overflow = "hidden";
@@ -76,7 +73,6 @@ export default function AIChatWidget() {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
 
-    // Add user message
     const userMessage = { role: "user", content: trimmed };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -85,11 +81,28 @@ export default function AIChatWidget() {
 
     try {
       const response = await sendMessage(trimmed);
-      const aiMessage = {
-        role: "assistant",
-        content: response.response || "I couldn't process that request.",
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+
+      if (response.type === "navigation") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: response.response,
+          },
+        ]);
+        setTimeout(() => {
+          navigate(`/${response.page}`);
+          setIsOpen(false);
+        }, 1000);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: response.response || "I couldn't process that request.",
+          },
+        ]);
+      }
     } catch (err) {
       setError("Unable to get response. Please try again.");
       console.error("Chat error:", err);
@@ -105,10 +118,9 @@ export default function AIChatWidget() {
     }
   };
 
-  // Welcome message when chat opens
   const getWelcomeMessage = () => {
     if (messages.length === 0) {
-      return "👋 Hello! I'm your AI assistant. How can I help you today?";
+      return "👋 Hello! I'm your AI assistant. I can answer questions about KIT Robotics, search for products, or navigate you to different pages. How can I help you today?";
     }
     return null;
   };
@@ -118,7 +130,7 @@ export default function AIChatWidget() {
       {/* Chat Button */}
       <button
         onClick={toggleChat}
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:bottom-14 sm:right-14 sm:h-16 sm:w-16"
+        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
         aria-label={isOpen ? "Close chat" : "Open AI Assistant"}
       >
         {isOpen ? <X size={20} className="sm:size-6" /> : <Bot size={20} className="sm:size-6" />}
@@ -148,7 +160,7 @@ export default function AIChatWidget() {
                   AI Assistant
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-zinc-400">
-                  Powered by Groq
+                  Powered by KIT Robotics
                 </p>
               </div>
             </div>
@@ -229,7 +241,7 @@ export default function AIChatWidget() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Type a message..."
+                placeholder="Ask me anything..."
                 disabled={isLoading}
                 className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-[#111111] dark:text-white disabled:opacity-50"
                 aria-label="Type a message"
