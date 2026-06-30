@@ -48,12 +48,6 @@ export default function Statistics() {
     queryFn: () => apiClient.get('/admin/statistics/tickets').then((r) => r.data),
   })
 
-  const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || tickets.isLoading
-  const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || tickets.isError
-
-  if (isAnyLoading) return <AdminPage><LoadingState label="Loading statistics..." /></AdminPage>
-  if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch() }} /></AdminPage>
-
   const exportMutation = useMutation({
     mutationFn: async (type) => {
       const response = await apiClient.get(`/admin/statistics/export`, {
@@ -70,6 +64,12 @@ export default function Statistics() {
     onSuccess: () => toast.success('CSV download started'),
     onError: () => toast.error('Unable to export data'),
   })
+
+  const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || tickets.isLoading
+  const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || tickets.isError
+
+  if (isAnyLoading) return <AdminPage><LoadingState label="Loading statistics..." /></AdminPage>
+  if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch() }} /></AdminPage>
 
   return (
     <AdminPage>
