@@ -370,4 +370,4 @@ export default function AIChatWidget() {
       `}</style>
     </>
   );
-}
+} 
