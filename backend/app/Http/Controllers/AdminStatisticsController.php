@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PageView;
 use App\Services\StatisticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,6 +14,35 @@ class AdminStatisticsController extends Controller
     public function __construct(
         private readonly StatisticsService $statisticsService,
     ) {}
+
+    public function trackPageView(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'path' => ['required', 'string', 'max:2048', 'not_regex:/^\/?api(\/|$)/i'],
+            'referer' => ['nullable', 'string', 'max:2048'],
+            'session_id' => ['nullable', 'string', 'max:255'],
+            'response_time' => ['nullable', 'integer', 'min:0', 'max:600000'],
+        ], [
+            'path.not_regex' => 'API routes cannot be recorded as page views.',
+        ]);
+
+        $path = '/' . ltrim($validated['path'], '/');
+
+        PageView::query()->create([
+            'user_id' => $request->user('sanctum')?->id ?? $request->user()?->id,
+            'path' => $path,
+            'method' => 'SPA',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'user_agent' => $request->userAgent(),
+            'session_id' => $validated['session_id'] ?? null,
+            'referer' => $validated['referer'] ?? $request->headers->get('referer'),
+            'response_time' => $validated['response_time'] ?? 0,
+            'status_code' => 200,
+            'created_at' => now(),
+        ]);
+
+        return $this->success(null, 'Page view recorded.', 201);
+    }
 
     public function overview(): JsonResponse
     {

@@ -25,19 +25,20 @@ class StatisticsService
             $now = now();
             $todayStart = $now->copy()->startOfDay();
             $twentyFourHoursAgo = $now->copy()->subDay();
+            $sessionThreshold = $now->copy()->subMinutes(15)->timestamp;
 
-            $activeSessions = PageView::query()
-                ->where('created_at', '>=', $twentyFourHoursAgo)
-                ->distinct('session_id')
-                ->count('session_id');
+            $activeSessions = (int) DB::table('sessions')
+                ->where('last_activity', '>=', $sessionThreshold)
+                ->selectRaw("COUNT(DISTINCT COALESCE(user_id::text, id)) as aggregate")
+                ->value('aggregate');
 
             $pageViewsToday = PageView::query()
                 ->where('created_at', '>=', $todayStart)
                 ->count();
 
-            $totalVisitors = PageView::query()
-                ->distinct('ip_address')
-                ->count('ip_address');
+            $totalVisitors = (int) PageView::query()
+                ->selectRaw("COUNT(DISTINCT {$this->visitorIdentityExpression()}) as aggregate")
+                ->value('aggregate');
 
             $aiMessagesToday = UserActivityLog::query()
                 ->where('action', 'ai_chat_message')
@@ -69,7 +70,7 @@ class StatisticsService
                 ->select([
                     'path',
                     DB::raw('COUNT(*) as views'),
-                    DB::raw("COUNT(DISTINCT COALESCE(user_id::text, ip_address)) as unique_visitors"),
+                    DB::raw("COUNT(DISTINCT {$this->visitorIdentityExpression()}) as unique_visitors"),
                     DB::raw('AVG(response_time) as avg_time_on_page'),
                     DB::raw('MAX(created_at) as last_viewed'),
                 ])
@@ -161,45 +162,44 @@ class StatisticsService
     public function getSessions(): array
     {
         return Cache::remember('admin:stats:sessions', self::CACHE_TTL, function () {
-            $threshold = now()->subMinutes(15);
-            $idleThreshold = now()->subMinutes(5);
+            $threshold = now()->subMinutes(15)->timestamp;
+            $idleThreshold = now()->subMinutes(5)->timestamp;
 
-            $recentViews = PageView::query()
-                ->select('session_id', 'user_id', 'ip_address', 'user_agent', DB::raw('MAX(created_at) as last_activity'), DB::raw('MIN(created_at) as first_activity'))
-                ->where('created_at', '>=', $threshold)
-                ->whereNotNull('session_id')
-                ->groupBy('session_id', 'user_id', 'ip_address', 'user_agent')
-                ->get();
+            return DB::table('sessions')
+                ->leftJoin('users', 'sessions.user_id', '=', 'users.id')
+                ->select([
+                    'sessions.id as session_id',
+                    'sessions.user_id',
+                    'sessions.ip_address',
+                    'sessions.user_agent',
+                    'sessions.last_activity',
+                    'users.name as user_name',
+                    'users.email as user_email',
+                ])
+                ->where('sessions.last_activity', '>=', $threshold)
+                ->orderByDesc('sessions.last_activity')
+                ->limit(100)
+                ->get()
+                ->map(function ($session) use ($idleThreshold) {
+                    $lastActivity = Carbon::createFromTimestamp((int) $session->last_activity);
+                    $idleMinutes = $lastActivity->diffInMinutes(now());
 
-            $users = User::query()
-                ->whereIn('id', $recentViews->pluck('user_id')->filter()->unique()->values())
-                ->get(['id', 'name', 'email'])
-                ->keyBy('id');
-
-            $sessions = [];
-            foreach ($recentViews as $view) {
-                $user = $view->user_id ? $users->get($view->user_id) : null;
-                $firstActivity = $view->first_activity ? Carbon::parse($view->first_activity) : null;
-                $lastActivity = $view->last_activity ? Carbon::parse($view->last_activity) : null;
-
-                $duration = $firstActivity && $lastActivity ? $firstActivity->diffInMinutes($lastActivity) : 0;
-                $isActive = $lastActivity?->greaterThanOrEqualTo($idleThreshold) ?? false;
-
-                $sessions[] = [
-                    'session_id' => $view->session_id,
-                    'user' => $user ? ['id' => $user->id, 'name' => $user->name, 'email' => $user->email] : null,
-                    'ip_address' => $view->ip_address,
-                    'user_agent' => $view->user_agent,
-                    'device' => $this->parseUserAgent($view->user_agent),
-                    'duration' => $duration,
-                    'last_activity' => $lastActivity?->toIso8601String(),
-                    'status' => $isActive ? 'active' : 'idle',
-                ];
-            }
-
-            usort($sessions, fn ($a, $b) => strtotime($b['last_activity']) - strtotime($a['last_activity']));
-
-            return $sessions;
+                    return [
+                        'session_id' => $session->session_id,
+                        'user' => $session->user_id ? [
+                            'id' => $session->user_id,
+                            'name' => $session->user_name,
+                            'email' => $session->user_email,
+                        ] : null,
+                        'ip_address' => $session->ip_address,
+                        'user_agent' => $session->user_agent,
+                        'device' => $this->parseUserAgent($session->user_agent),
+                        'duration' => $idleMinutes,
+                        'last_activity' => $lastActivity->toIso8601String(),
+                        'status' => ((int) $session->last_activity) >= $idleThreshold ? 'active' : 'idle',
+                    ];
+                })
+                ->toArray();
         });
     }
 
@@ -293,7 +293,7 @@ class StatisticsService
 
         return Cache::remember("admin:stats:visitors_chart:{$days}", self::CACHE_TTL, function () use ($since) {
             return PageView::query()
-                ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(DISTINCT ip_address) as unique_visitors'))
+                ->select(DB::raw('DATE(created_at) as date'), DB::raw("COUNT(DISTINCT {$this->visitorIdentityExpression()}) as unique_visitors"))
                 ->where('created_at', '>=', $since)
                 ->groupBy(DB::raw('DATE(created_at)'))
                 ->orderBy('date')
@@ -395,6 +395,11 @@ class StatisticsService
         ];
 
         return $map[$path] ?? ucwords(str_replace(['-', '_', '/'], ' ', $path));
+    }
+
+    private function visitorIdentityExpression(): string
+    {
+        return "CASE WHEN user_id IS NOT NULL THEN 'user:' || user_id::text WHEN session_id IS NOT NULL THEN 'session:' || session_id ELSE 'ip:' || ip_address END";
     }
 
     private function parseUserAgent(?string $ua): string

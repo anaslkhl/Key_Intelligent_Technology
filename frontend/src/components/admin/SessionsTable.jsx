@@ -4,7 +4,7 @@ export default function SessionsTable({ data }) {
     <section className="rounded-lg border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-5 py-4">
         <h2 className="text-lg font-semibold text-slate-900">Active Sessions</h2>
-        <p className="mt-1 text-sm text-slate-500">Currently active and idle sessions</p>
+        <p className="mt-1 text-sm text-slate-500">Live Laravel sessions from the last 15 minutes</p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
@@ -14,7 +14,7 @@ export default function SessionsTable({ data }) {
               <th className="px-5 py-3">User</th>
               <th className="px-5 py-3">IP Address</th>
               <th className="px-5 py-3">Device</th>
-              <th className="px-5 py-3">Duration</th>
+              <th className="px-5 py-3">Idle Time</th>
               <th className="px-5 py-3">Last Activity</th>
               <th className="px-5 py-3">Status</th>
             </tr>
@@ -35,7 +35,7 @@ export default function SessionsTable({ data }) {
                 </td>
                 <td className="px-5 py-3 font-mono text-xs text-slate-600">{row.ip_address}</td>
                 <td className="px-5 py-3 text-slate-700">{row.device}</td>
-                <td className="px-5 py-3 text-slate-700">{row.duration > 0 ? `${row.duration}m` : '&lt;1m'}</td>
+                <td className="px-5 py-3 text-slate-700">{row.duration > 0 ? `${row.duration}m` : '<1m'}</td>
                 <td className="px-5 py-3 text-slate-500">{row.last_activity ? new Date(row.last_activity).toLocaleString() : '-'}</td>
                 <td className="px-5 py-3">
                   <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${

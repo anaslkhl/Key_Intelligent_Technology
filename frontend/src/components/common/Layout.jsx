@@ -2,12 +2,15 @@ import { useState } from 'react'
 import { Menu } from 'lucide-react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/auth'
+import usePageViewTracker from '../../hooks/usePageViewTracker'
 import AIChatWidget from '../ai/AIChatWidget'
 import Header from './Header'
 import RouteEnhancements from './RouteEnhancements'
 import Sidebar from './Sidebar'
 
 export default function Layout() {
+  usePageViewTracker()
+
   const { isAuthenticated, user } = useAuth()
   const { pathname } = useLocation()
   const [isNavigationOpen, setIsNavigationOpen] = useState(false)

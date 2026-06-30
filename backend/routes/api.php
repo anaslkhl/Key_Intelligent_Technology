@@ -51,6 +51,7 @@ Route::get('/documents', [DocumentController::class, 'index']);
 Route::get('/documents/{slug}', [DocumentController::class, 'show']);
 Route::get('/document-categories', [DocumentCategoryController::class, 'index']);
 Route::get('/solution-types', [SolutionTypeController::class, 'index']);
+Route::post('/page-view', [AdminStatisticsController::class, 'trackPageView'])->middleware('throttle:120,1');
 
 Route::middleware(['auth:sanctum', 'active', 'throttle:60,1'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
