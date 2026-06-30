@@ -18,8 +18,8 @@ export default function PageViewsChartBar({ data }) {
             <BarChart data={rows} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
               <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11 }} />
-              <YAxis type="category" dataKey="path" tick={{ fontSize: 10 }} width={140} />
-              <Tooltip contentStyle={chartTooltipStyle} />
+              <YAxis type="category" dataKey="page_name" tick={{ fontSize: 10 }} width={140} />
+              <Tooltip contentStyle={chartTooltipStyle} labelFormatter={(label) => label} />
               <Bar dataKey="views" fill="#f59e0b" radius={[0, 4, 4, 0]} name="Views" />
             </BarChart>
           </ResponsiveContainer>

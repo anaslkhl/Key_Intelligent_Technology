@@ -8,9 +8,9 @@ export default function PageViewsChart({ data }) {
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-          <thead>
+            <thead>
             <tr className="border-b border-slate-100 text-xs font-semibold uppercase text-slate-500">
-              <th className="px-5 py-3">Path</th>
+              <th className="px-5 py-3">Page</th>
               <th className="px-5 py-3">Views</th>
               <th className="px-5 py-3">Unique</th>
               <th className="px-5 py-3">Avg Time (ms)</th>
@@ -23,7 +23,7 @@ export default function PageViewsChart({ data }) {
             )}
             {rows.map((row, i) => (
               <tr key={row.path} className={i < rows.length - 1 ? 'border-b border-slate-100' : ''}>
-                <td className="max-w-xs truncate px-5 py-3 font-medium text-slate-700">{row.path}</td>
+                <td className="max-w-xs truncate px-5 py-3 font-medium text-slate-700">{row.page_name ?? row.path}</td>
                 <td className="px-5 py-3 text-slate-700">{row.views}</td>
                 <td className="px-5 py-3 text-slate-700">{row.unique_visitors}</td>
                 <td className="px-5 py-3 text-slate-700">{row.avg_time_on_page}</td>

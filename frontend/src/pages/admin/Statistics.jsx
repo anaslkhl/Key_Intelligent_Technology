@@ -44,11 +44,6 @@ export default function Statistics() {
     queryFn: () => apiClient.get('/admin/statistics/ai-usage', { params: { days } }).then((r) => r.data.data),
   })
 
-  const tickets = useQuery({
-    queryKey: ['admin-statistics', 'tickets'],
-    queryFn: () => apiClient.get('/admin/statistics/tickets').then((r) => r.data.data),
-  })
-
   const visitorsChart = useQuery({
     queryKey: ['admin-statistics', 'visitors-chart', days],
     queryFn: () => apiClient.get('/admin/statistics/visitors-chart', { params: { days } }).then((r) => r.data.data),
@@ -76,17 +71,16 @@ export default function Statistics() {
     onError: () => toast.error('Unable to export data'),
   })
 
-  const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || tickets.isLoading || visitorsChart.isLoading || pageViewsChart.isLoading
-  const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || tickets.isError || visitorsChart.isError || pageViewsChart.isError
+  const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || visitorsChart.isLoading || pageViewsChart.isLoading
+  const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || visitorsChart.isError || pageViewsChart.isError
 
   if (isAnyLoading) return <AdminPage><LoadingState label="Loading statistics..." /></AdminPage>
-  if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch() }} /></AdminPage>
+  if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); visitorsChart.refetch(); pageViewsChart.refetch() }} /></AdminPage>
 
   const hasNoData = overview.data && (
-    overview.data.total_users === 0 &&
     overview.data.page_views_today === 0 &&
-    overview.data.ai_messages_today === 0 &&
-    overview.data.active_sessions === 0
+    overview.data.active_sessions === 0 &&
+    overview.data.total_visitors === 0
   )
 
   return (
@@ -135,11 +129,10 @@ export default function Statistics() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         <AIUsageChart data={aiUsage.data} />
-        <TicketStatsCard data={tickets.data} />
+        <VisitorsChart data={visitorsChart.data} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <VisitorsChart data={visitorsChart.data} />
+      <div className="mt-6">
         <PageViewsChartBar data={pageViewsChart.data} />
       </div>
 
