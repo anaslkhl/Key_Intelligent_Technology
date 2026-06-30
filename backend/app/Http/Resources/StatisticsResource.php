@@ -12,9 +12,9 @@ class StatisticsResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
-            'data' => $this->resource,
-            'generated_at' => now()->toIso8601String(),
-        ];
+        return array_merge(
+            is_array($this->resource) ? $this->resource : [],
+            ['generated_at' => now()->toIso8601String()],
+        );
     }
 }

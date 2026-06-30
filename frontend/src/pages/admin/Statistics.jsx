@@ -18,34 +18,34 @@ export default function Statistics() {
 
   const overview = useQuery({
     queryKey: ['admin-statistics', 'overview'],
-    queryFn: () => apiClient.get('/admin/statistics/overview').then((r) => r.data.data.data),
+    queryFn: () => apiClient.get('/admin/statistics/overview').then((r) => r.data.data),
     refetchInterval: 60_000,
   })
 
   const pageViews = useQuery({
     queryKey: ['admin-statistics', 'page-views', days],
-    queryFn: () => apiClient.get('/admin/statistics/page-views', { params: { days } }).then((r) => r.data.data.data),
+    queryFn: () => apiClient.get('/admin/statistics/page-views', { params: { days } }).then((r) => r.data.data),
   })
 
   const userActivity = useQuery({
     queryKey: ['admin-statistics', 'users-activity', days],
-    queryFn: () => apiClient.get('/admin/statistics/users-activity', { params: { days } }).then((r) => r.data.data.data),
+    queryFn: () => apiClient.get('/admin/statistics/users-activity', { params: { days } }).then((r) => r.data.data),
   })
 
   const sessions = useQuery({
     queryKey: ['admin-statistics', 'sessions'],
-    queryFn: () => apiClient.get('/admin/statistics/sessions').then((r) => r.data.data.data),
+    queryFn: () => apiClient.get('/admin/statistics/sessions').then((r) => r.data.data),
     refetchInterval: 30_000,
   })
 
   const aiUsage = useQuery({
     queryKey: ['admin-statistics', 'ai-usage', days],
-    queryFn: () => apiClient.get('/admin/statistics/ai-usage', { params: { days } }).then((r) => r.data.data.data),
+    queryFn: () => apiClient.get('/admin/statistics/ai-usage', { params: { days } }).then((r) => r.data.data),
   })
 
   const tickets = useQuery({
     queryKey: ['admin-statistics', 'tickets'],
-    queryFn: () => apiClient.get('/admin/statistics/tickets').then((r) => r.data.data.data),
+    queryFn: () => apiClient.get('/admin/statistics/tickets').then((r) => r.data.data),
   })
 
   const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || tickets.isLoading
