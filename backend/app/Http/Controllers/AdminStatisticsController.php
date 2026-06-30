@@ -71,15 +71,6 @@ class AdminStatisticsController extends Controller
         return $this->success($data, 'AI usage statistics retrieved successfully.');
     }
 
-    public function tickets(): JsonResponse
-    {
-        Gate::authorize('viewAdminDashboard');
-
-        $data = $this->statisticsService->getTicketStats();
-
-        return $this->success($data, 'Ticket statistics retrieved successfully.');
-    }
-
     public function visitorsChart(Request $request): JsonResponse
     {
         Gate::authorize('viewAdminDashboard');

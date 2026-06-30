@@ -22,8 +22,6 @@ class StatisticsService
             $todayStart = $now->copy()->startOfDay();
             $twentyFourHoursAgo = $now->copy()->subDay();
 
-            $totalUsers = User::query()->count();
-
             $activeSessions = PageView::query()
                 ->where('created_at', '>=', $twentyFourHoursAgo)
                 ->distinct('session_id')
@@ -33,13 +31,14 @@ class StatisticsService
                 ->where('created_at', '>=', $todayStart)
                 ->count();
 
+            $totalVisitors = PageView::query()
+                ->where('created_at', '>=', $twentyFourHoursAgo)
+                ->distinct('ip_address')
+                ->count('ip_address');
+
             $aiMessagesToday = UserActivityLog::query()
                 ->where('action', 'ai_chat_message')
                 ->where('created_at', '>=', $todayStart)
-                ->count();
-
-            $openTickets = Ticket::query()
-                ->whereIn('status', ['new', 'open', 'in_progress', 'waiting_client'])
                 ->count();
 
             $avgResponseTime = (int) PageView::query()
@@ -47,11 +46,10 @@ class StatisticsService
                 ->avg('response_time') ?? 0;
 
             return [
-                'total_users' => $totalUsers,
                 'active_sessions' => $activeSessions,
                 'page_views_today' => $pageViewsToday,
+                'total_visitors' => $totalVisitors,
                 'ai_messages_today' => $aiMessagesToday,
-                'open_tickets' => $openTickets,
                 'avg_response_time' => $avgResponseTime,
             ];
         });
@@ -77,6 +75,7 @@ class StatisticsService
                 ->get()
                 ->map(fn ($row) => [
                     'path' => $row->path,
+                    'page_name' => $this->pageNameFromPath($row->path),
                     'views' => (int) $row->views,
                     'unique_visitors' => (int) $row->unique_visitors,
                     'avg_time_on_page' => (int) round((float) $row->avg_time_on_page),
@@ -273,6 +272,7 @@ class StatisticsService
                 ->get()
                 ->map(fn ($row) => [
                     'path' => $row->path,
+                    'page_name' => $this->pageNameFromPath($row->path),
                     'views' => (int) $row->views,
                 ])
                 ->toArray();
@@ -309,6 +309,44 @@ class StatisticsService
                 ]),
             default => collect([]),
         };
+    }
+
+    private function pageNameFromPath(string $path): string
+    {
+        $path = trim($path, '/');
+
+        if (str_starts_with($path, 'api/')) {
+            $path = substr($path, 4);
+        }
+
+        $path = preg_replace('/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/?.*/', '', $path);
+        $path = preg_replace('/\/\d+.*/', '', $path);
+
+        $map = [
+            '' => 'Home',
+            'login' => 'Login',
+            'register' => 'Register',
+            'tickets' => 'Tickets',
+            'tickets/create' => 'Create Ticket',
+            'knowledge-base' => 'Knowledge Base',
+            'knowledge-base/search' => 'Knowledge Base',
+            'forum' => 'Forum',
+            'forum/questions' => 'Forum',
+            'documents' => 'Documents',
+            'robots' => 'Robots',
+            'error-codes' => 'Error Codes',
+            'reviews' => 'Reviews',
+            'feature-requests' => 'Features',
+            'ai/chat' => 'AI Chat',
+            'me' => 'Profile',
+            'dashboard' => 'Dashboard',
+            'notifications' => 'Notifications',
+            'admin/stats' => 'Dashboard',
+            'admin/users' => 'Users',
+            'admin/tickets' => 'Tickets',
+        ];
+
+        return $map[$path] ?? ucwords(str_replace(['-', '_', '/'], ' ', $path));
     }
 
     private function parseUserAgent(?string $ua): string

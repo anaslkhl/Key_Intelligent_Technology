@@ -1,11 +1,10 @@
-import { Bot, Clock, Eye, TicketCheck, TimerReset, Users } from 'lucide-react'
+import { Bot, Clock, Eye, Globe, TimerReset } from 'lucide-react'
 
 const cards = [
-  { label: 'Total Users', key: 'total_users', icon: Users, color: 'text-blue-600' },
   { label: 'Active Sessions (24h)', key: 'active_sessions', icon: Clock, color: 'text-emerald-600' },
   { label: 'Page Views (Today)', key: 'page_views_today', icon: Eye, color: 'text-cyan-600' },
+  { label: 'Total Visitors (24h)', key: 'total_visitors', icon: Globe, color: 'text-blue-600' },
   { label: 'AI Messages (Today)', key: 'ai_messages_today', icon: Bot, color: 'text-violet-600' },
-  { label: 'Open Tickets', key: 'open_tickets', icon: TicketCheck, color: 'text-amber-600' },
   { label: 'Avg Response Time', key: 'avg_response_time', icon: TimerReset, color: 'text-rose-600', suffix: 'ms' },
 ]
 
