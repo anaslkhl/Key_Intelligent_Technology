@@ -9,7 +9,7 @@ import LandingPage from './pages/LandingPage'
 import Login from './pages/Login'
 import { AskQuestion, DocumentDetail, DocumentLibrary, ErrorCodeList, FeatureList, KbDetail, KbList, MyProductDocuments, MyReviews, QuestionDetail, QuestionList, ReviewList, SubmitFeature, WriteReview } from './pages/phase3'
 import { AgentDashboard, AgentDocuments, AgentTicketDetail, AllTickets, DocumentForm, KbForm, ManageForum, ManageKb } from './pages/phase4'
-import { AdminDashboard, AdminDocuments, Analytics, DocumentPermissions, ExportData, KbAnalytics, ManageFeatures, ManageReviews, ManageUsers } from './pages/phase5'
+import { AdminDashboard, AdminDocuments, Analytics, DocumentPermissions, ExportData, KbAnalytics, ManageFeatures, ManageReviews, ManageUsers, Statistics } from './pages/phase5'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import Notifications from './pages/Notifications'
@@ -88,6 +88,7 @@ const router = createBrowserRouter([
           { path: '/admin/reviews', element: deferred(<ManageReviews />) },
           { path: '/admin/features', element: deferred(<ManageFeatures />) },
           { path: '/admin/analytics', element: deferred(<Analytics />) },
+          { path: '/admin/statistics', element: deferred(<Statistics />) },
           { path: '/admin/analytics/knowledge-base', element: deferred(<KbAnalytics />) },
           { path: '/admin/export', element: deferred(<ExportData />) },
           { path: '/admin/documents', element: deferred(<AdminDocuments />) },

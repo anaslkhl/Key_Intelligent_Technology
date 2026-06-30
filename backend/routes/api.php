@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminStatisticsController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\AIChatController;
 use App\Http\Controllers\AuthController;
@@ -140,6 +141,16 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
         Route::patch('/feature-requests/{id}', [AdminController::class, 'updateFeatureStatus'])->whereUuid('id');
         Route::get('/export/users', [AdminController::class, 'exportUsers']);
         Route::get('/export/tickets', [AdminController::class, 'exportTickets']);
+
+        Route::prefix('statistics')->group(function () {
+            Route::get('/overview', [AdminStatisticsController::class, 'overview']);
+            Route::get('/page-views', [AdminStatisticsController::class, 'pageViews']);
+            Route::get('/users-activity', [AdminStatisticsController::class, 'userActivity']);
+            Route::get('/sessions', [AdminStatisticsController::class, 'sessions']);
+            Route::get('/ai-usage', [AdminStatisticsController::class, 'aiUsage']);
+            Route::get('/tickets', [AdminStatisticsController::class, 'tickets']);
+            Route::get('/export', [AdminStatisticsController::class, 'export']);
+        });
     });
 
 Route::middleware(['auth:sanctum', 'active', 'role:agent,admin', 'throttle:60,1'])
