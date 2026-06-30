@@ -47,8 +47,12 @@ class StatisticsSeeder extends Seeder
         $batch = [];
         $count = 0;
 
-        for ($day = 29; $day >= 0; $day--) {
-            $viewsToday = random_int(2, 8);
+        for ($day = 30; $day >= 0; $day--) {
+            $viewsToday = random_int(1, 3);
+            $sessionIds = [];
+            for ($s = 0; $s < random_int(1, 2); $s++) {
+                $sessionIds[] = (string) Str::uuid();
+            }
             for ($i = 0; $i < $viewsToday; $i++) {
                 $batch[] = [
                     'id' => (string) Str::uuid(),
@@ -57,7 +61,7 @@ class StatisticsSeeder extends Seeder
                     'method' => 'GET',
                     'ip_address' => long2ip(random_int(0, 1 << 24) + random_int(0, (1 << 24) - 1)),
                     'user_agent' => self::USER_AGENTS[array_rand(self::USER_AGENTS)],
-                    'session_id' => (string) Str::uuid(),
+                    'session_id' => $sessionIds[array_rand($sessionIds)],
                     'referer' => random_int(0, 1) === 0 ? null : 'https://kitrobotics.com/knowledge-base',
                     'response_time' => random_int(50, 2000),
                     'status_code' => random_int(0, 10) === 0 ? 500 : (random_int(0, 5) === 0 ? 404 : 200),
@@ -83,8 +87,8 @@ class StatisticsSeeder extends Seeder
         $batch = [];
         $count = 0;
 
-        for ($day = 29; $day >= 0; $day--) {
-            $logsToday = random_int(1, 5);
+        for ($day = 30; $day >= 0; $day--) {
+            $logsToday = random_int(1, 3);
             for ($i = 0; $i < $logsToday; $i++) {
                 $action = self::ACTIVITY_ACTIONS[array_rand(self::ACTIVITY_ACTIONS)];
                 $userId = $userIds ? $userIds[array_rand($userIds)] : null;

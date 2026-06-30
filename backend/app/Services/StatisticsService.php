@@ -6,15 +6,19 @@ use App\Models\PageView;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Models\UserActivityLog;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsService
 {
     private const CACHE_TTL = 300;
+    private const RETENTION_DAYS = 90;
 
     public function getOverview(): array
     {
+        $this->pruneOldData();
+
         $ttl = self::CACHE_TTL;
 
         return Cache::remember('admin:stats:overview', $ttl, function () {
@@ -32,7 +36,6 @@ class StatisticsService
                 ->count();
 
             $totalVisitors = PageView::query()
-                ->where('created_at', '>=', $twentyFourHoursAgo)
                 ->distinct('ip_address')
                 ->count('ip_address');
 
@@ -55,12 +58,14 @@ class StatisticsService
         });
     }
 
-    public function getPageViews(int $days = 30): array
+    public function getPageViews(int $days = 30, int $page = 1, int $perPage = 15): array
     {
         $since = now()->subDays($days)->startOfDay();
+        $page = max(1, $page);
+        $perPage = min(max(1, $perPage), 100);
 
-        return Cache::remember("admin:stats:page_views:{$days}", self::CACHE_TTL, function () use ($since) {
-            return PageView::query()
+        return Cache::remember("admin:stats:page_views:{$days}:{$page}:{$perPage}", self::CACHE_TTL, function () use ($since, $page, $perPage) {
+            $paginator = PageView::query()
                 ->select([
                     'path',
                     DB::raw('COUNT(*) as views'),
@@ -71,8 +76,9 @@ class StatisticsService
                 ->where('created_at', '>=', $since)
                 ->groupBy('path')
                 ->orderByDesc('views')
-                ->limit(100)
-                ->get()
+                ->paginate($perPage, ['*'], 'page', $page);
+
+            $items = $paginator->getCollection()
                 ->map(fn ($row) => [
                     'path' => $row->path,
                     'page_name' => $this->pageNameFromPath($row->path),
@@ -81,7 +87,26 @@ class StatisticsService
                     'avg_time_on_page' => (int) round((float) $row->avg_time_on_page),
                     'last_viewed' => $row->last_viewed,
                 ])
-                ->toArray();
+                ->values();
+
+            return [
+                'data' => $items->all(),
+                'links' => [
+                    'first' => $paginator->url(1),
+                    'last' => $paginator->url($paginator->lastPage()),
+                    'prev' => $paginator->previousPageUrl(),
+                    'next' => $paginator->nextPageUrl(),
+                ],
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'from' => $paginator->firstItem(),
+                    'last_page' => $paginator->lastPage(),
+                    'path' => $paginator->path(),
+                    'per_page' => $paginator->perPage(),
+                    'to' => $paginator->lastItem(),
+                    'total' => $paginator->total(),
+                ],
+            ];
         });
     }
 
@@ -146,15 +171,19 @@ class StatisticsService
                 ->groupBy('session_id', 'user_id', 'ip_address', 'user_agent')
                 ->get();
 
+            $users = User::query()
+                ->whereIn('id', $recentViews->pluck('user_id')->filter()->unique()->values())
+                ->get(['id', 'name', 'email'])
+                ->keyBy('id');
+
             $sessions = [];
             foreach ($recentViews as $view) {
-                $user = null;
-                if ($view->user_id) {
-                    $user = User::query()->find($view->user_id, ['id', 'name', 'email']);
-                }
+                $user = $view->user_id ? $users->get($view->user_id) : null;
+                $firstActivity = $view->first_activity ? Carbon::parse($view->first_activity) : null;
+                $lastActivity = $view->last_activity ? Carbon::parse($view->last_activity) : null;
 
-                $duration = $view->first_activity?->diffInMinutes($view->last_activity) ?? 0;
-                $isActive = $view->last_activity >= now()->subMinutes(5);
+                $duration = $firstActivity && $lastActivity ? $firstActivity->diffInMinutes($lastActivity) : 0;
+                $isActive = $lastActivity?->greaterThanOrEqualTo($idleThreshold) ?? false;
 
                 $sessions[] = [
                     'session_id' => $view->session_id,
@@ -163,7 +192,7 @@ class StatisticsService
                     'user_agent' => $view->user_agent,
                     'device' => $this->parseUserAgent($view->user_agent),
                     'duration' => $duration,
-                    'last_activity' => $view->last_activity?->toIso8601String(),
+                    'last_activity' => $lastActivity?->toIso8601String(),
                     'status' => $isActive ? 'active' : 'idle',
                 ];
             }
@@ -237,6 +266,25 @@ class StatisticsService
                 'avg_resolution_time_hours' => round((float) $avgResolutionTime, 2),
             ];
         });
+    }
+
+    public function pruneOldData(int $days = self::RETENTION_DAYS): void
+    {
+        $cacheKey = "admin:stats:retention:pruned:{$days}";
+
+        if (! Cache::add($cacheKey, true, now()->addDay())) {
+            return;
+        }
+
+        $cutoff = now()->subDays($days);
+
+        PageView::query()
+            ->where('created_at', '<', $cutoff)
+            ->delete();
+
+        UserActivityLog::query()
+            ->where('created_at', '<', $cutoff)
+            ->delete();
     }
 
     public function getVisitorsChart(int $days = 30): array

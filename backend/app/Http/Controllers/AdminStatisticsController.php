@@ -29,9 +29,15 @@ class AdminStatisticsController extends Controller
 
         $validated = $request->validate([
             'days' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'page' => ['nullable', 'integer', 'min:1'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
-        $data = $this->statisticsService->getPageViews($validated['days'] ?? 30);
+        $data = $this->statisticsService->getPageViews(
+            $validated['days'] ?? 30,
+            $validated['page'] ?? 1,
+            $validated['per_page'] ?? 15,
+        );
 
         return $this->success($data, 'Page view statistics retrieved successfully.');
     }

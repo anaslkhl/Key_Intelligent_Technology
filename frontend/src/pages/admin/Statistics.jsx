@@ -1,11 +1,11 @@
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { BarChart3, Download, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import apiClient from '../../api/client'
 import AIUsageChart from '../../components/admin/AIUsageChart'
-import PageViewsChart from '../../components/admin/PageViewsChart'
 import PageViewsChartBar from '../../components/admin/PageViewsChartBar'
+import PageViewsTable from '../../components/admin/PageViewsTable'
 import SessionsTable from '../../components/admin/SessionsTable'
 import StatisticsOverview from '../../components/admin/StatisticsOverview'
 import UsersActivityTable from '../../components/admin/UsersActivityTable'
@@ -15,7 +15,10 @@ import { ErrorState, LoadingState } from '../../components/common/QueryState'
 import AdminPage from './AdminPage'
 
 export default function Statistics() {
+  const queryClient = useQueryClient()
   const [days, setDays] = useState(30)
+  const [pageViewsPage, setPageViewsPage] = useState(1)
+  const pageViewsPerPage = 15
 
   const overview = useQuery({
     queryKey: ['admin-statistics', 'overview'],
@@ -24,8 +27,9 @@ export default function Statistics() {
   })
 
   const pageViews = useQuery({
-    queryKey: ['admin-statistics', 'page-views', days],
-    queryFn: () => apiClient.get('/admin/statistics/page-views', { params: { days } }).then((r) => r.data.data),
+    queryKey: ['admin-statistics', 'page-views', days, pageViewsPage, pageViewsPerPage],
+    queryFn: () => apiClient.get('/admin/statistics/page-views', { params: { days, page: pageViewsPage, per_page: pageViewsPerPage } }).then((r) => r.data.data),
+    keepPreviousData: true,
   })
 
   const userActivity = useQuery({
@@ -75,7 +79,12 @@ export default function Statistics() {
   const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || visitorsChart.isError || pageViewsChart.isError
 
   if (isAnyLoading) return <AdminPage><LoadingState label="Loading statistics..." /></AdminPage>
-  if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); visitorsChart.refetch(); pageViewsChart.refetch() }} /></AdminPage>
+  const refreshStatistics = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-statistics'] })
+    toast.success('Statistics refreshed')
+  }
+
+  if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={refreshStatistics} /></AdminPage>
 
   const hasNoData = overview.data && (
     overview.data.page_views_today === 0 &&
@@ -93,7 +102,10 @@ export default function Statistics() {
           <div className="flex flex-wrap gap-2">
             <select
               value={days}
-              onChange={(e) => setDays(Number(e.target.value))}
+              onChange={(e) => {
+                setDays(Number(e.target.value))
+                setPageViewsPage(1)
+              }}
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700"
             >
               <option value={7}>Last 7 days</option>
@@ -106,7 +118,7 @@ export default function Statistics() {
             <button type="button" onClick={() => exportMutation.mutate('user-activity')} disabled={exportMutation.isPending} className="button button-secondary">
               <Download size={16} /> Activity
             </button>
-            <button type="button" onClick={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch(); visitorsChart.refetch(); pageViewsChart.refetch() }} className="button button-primary">
+            <button type="button" onClick={refreshStatistics} className="button button-primary">
               <RefreshCw size={16} /> Refresh
             </button>
           </div>
@@ -137,7 +149,7 @@ export default function Statistics() {
       </div>
 
       <div className="mt-6">
-        <PageViewsChart data={pageViews.data} />
+        <PageViewsTable data={pageViews.data} onPageChange={setPageViewsPage} />
       </div>
 
       <div className="mt-6">

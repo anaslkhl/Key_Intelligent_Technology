@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class TrackPageViews
 {
     private const EXCLUDED_PATHS = [
+        'api/*',
         '_debugbar/*',
         'telescope/*',
         'horizon/*',
@@ -51,13 +52,15 @@ class TrackPageViews
 
     private function shouldSkip(Request $request): bool
     {
-        $path = $request->path();
+        $path = ltrim($request->path(), '/');
 
         foreach (self::EXCLUDED_PATHS as $pattern) {
+            $pattern = ltrim($pattern, '/');
+
             if ($pattern === $path) {
                 return true;
             }
-            if (str_ends_with($pattern, '/*') && str_starts_with($path, rtrim($pattern, '/*'))) {
+            if (str_ends_with($pattern, '/*') && str_starts_with($path, rtrim($pattern, '/*').'/')) {
                 return true;
             }
         }
