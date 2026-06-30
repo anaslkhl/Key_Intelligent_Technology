@@ -2,7 +2,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { chartTooltipStyle } from './chartConfig'
 
 export default function AIUsageChart({ data }) {
-  const messages = data?.messages_per_day ?? []
+  const messages = Array.isArray(data?.messages_per_day) ? data.messages_per_day : []
   const total = data?.total_messages ?? 0
   const avgResponse = data?.avg_response_time ?? 0
 
@@ -23,15 +23,19 @@ export default function AIUsageChart({ data }) {
         </div>
       </div>
       <div className="h-64 w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={messages}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-            <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-            <Tooltip contentStyle={chartTooltipStyle} />
-            <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Messages" />
-          </BarChart>
-        </ResponsiveContainer>
+        {messages.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-sm text-slate-400">No AI chat data available yet. Messages will appear once users interact with the AI assistant.</div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={messages}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={chartTooltipStyle} />
+              <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Messages" />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </section>
   )

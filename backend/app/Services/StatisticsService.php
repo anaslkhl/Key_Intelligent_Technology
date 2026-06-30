@@ -127,7 +127,7 @@ class StatisticsService
                     'last_login' => $user->last_login_at?->toIso8601String(),
                     'total_logins' => (int) $user->total_logins,
                     'total_actions' => (int) $user->total_actions,
-                    'last_action' => $user->last_action_time?->toIso8601String(),
+                    'last_action' => $user->last_action_time ? \Carbon\Carbon::parse($user->last_action_time)->toIso8601String() : null,
                     'status' => $user->is_active ? 'active' : 'inactive',
                 ])
                 ->toArray();

@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { Download, RefreshCw } from 'lucide-react'
+import { BarChart3, Download, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import apiClient from '../../api/client'
@@ -71,6 +71,13 @@ export default function Statistics() {
   if (isAnyLoading) return <AdminPage><LoadingState label="Loading statistics..." /></AdminPage>
   if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch() }} /></AdminPage>
 
+  const hasNoData = overview.data && (
+    overview.data.total_users === 0 &&
+    overview.data.page_views_today === 0 &&
+    overview.data.ai_messages_today === 0 &&
+    overview.data.active_sessions === 0
+  )
+
   return (
     <AdminPage>
       <PageHeader
@@ -100,6 +107,16 @@ export default function Statistics() {
           </div>
         }
       />
+
+      {hasNoData && (
+        <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <div className="flex items-center gap-2 font-semibold">
+            <BarChart3 size={18} />
+            <span>No statistics data collected yet</span>
+          </div>
+          <p className="mt-1 ml-7">Data will appear once users interact with the platform. Try running <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-mono">php artisan db:seed --class=StatisticsSeeder</code> to generate sample data for testing.</p>
+        </div>
+      )}
 
       <div className="mt-6">
         <StatisticsOverview data={overview.data} />

@@ -1,4 +1,5 @@
-export default function SessionsTable({ data = [] }) {
+export default function SessionsTable({ data }) {
+  const rows = Array.isArray(data) ? data : []
   return (
     <section className="rounded-lg border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-5 py-4">
@@ -19,11 +20,11 @@ export default function SessionsTable({ data = [] }) {
             </tr>
           </thead>
           <tbody>
-            {data.length === 0 && (
-              <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No session data available.</td></tr>
+            {rows.length === 0 && (
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No active sessions right now. Sessions appear when users are browsing the platform.</td></tr>
             )}
-            {data.map((row, i) => (
-              <tr key={row.session_id} className={i < data.length - 1 ? 'border-b border-slate-100' : ''}>
+            {rows.map((row, i) => (
+              <tr key={row.session_id} className={i < rows.length - 1 ? 'border-b border-slate-100' : ''}>
                 <td className="max-w-[120px] truncate px-5 py-3 font-mono text-xs text-slate-500">{row.session_id}</td>
                 <td className="px-5 py-3">
                   {row.user ? (

@@ -1,4 +1,5 @@
-export default function UsersActivityTable({ data = [] }) {
+export default function UsersActivityTable({ data }) {
+  const rows = Array.isArray(data) ? data : []
   return (
     <section className="rounded-lg border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-5 py-4">
@@ -19,11 +20,11 @@ export default function UsersActivityTable({ data = [] }) {
             </tr>
           </thead>
           <tbody>
-            {data.length === 0 && (
-              <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No activity data available.</td></tr>
+            {rows.length === 0 && (
+              <tr><td colSpan={7} className="px-5 py-8 text-center text-slate-400">No user activity recorded yet. Activity logs will appear as users interact with the platform.</td></tr>
             )}
-            {data.map((row, i) => (
-              <tr key={row.id} className={i < data.length - 1 ? 'border-b border-slate-100' : ''}>
+            {rows.map((row, i) => (
+              <tr key={row.id} className={i < rows.length - 1 ? 'border-b border-slate-100' : ''}>
                 <td className="px-5 py-3">
                   <span className="font-medium text-slate-700">{row.name}</span>
                   <span className="ml-2 text-slate-400">{row.email}</span>

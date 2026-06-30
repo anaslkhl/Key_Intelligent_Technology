@@ -1,4 +1,5 @@
-export default function PageViewsChart({ data = [] }) {
+export default function PageViewsChart({ data }) {
+  const rows = Array.isArray(data) ? data : []
   return (
     <section className="rounded-lg border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-5 py-4">
@@ -17,11 +18,11 @@ export default function PageViewsChart({ data = [] }) {
             </tr>
           </thead>
           <tbody>
-            {data.length === 0 && (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No page view data available.</td></tr>
+            {rows.length === 0 && (
+              <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-400">No page view data available yet. Data will appear once users start visiting pages.</td></tr>
             )}
-            {data.map((row, i) => (
-              <tr key={row.path} className={i < data.length - 1 ? 'border-b border-slate-100' : ''}>
+            {rows.map((row, i) => (
+              <tr key={row.path} className={i < rows.length - 1 ? 'border-b border-slate-100' : ''}>
                 <td className="max-w-xs truncate px-5 py-3 font-medium text-slate-700">{row.path}</td>
                 <td className="px-5 py-3 text-slate-700">{row.views}</td>
                 <td className="px-5 py-3 text-slate-700">{row.unique_visitors}</td>

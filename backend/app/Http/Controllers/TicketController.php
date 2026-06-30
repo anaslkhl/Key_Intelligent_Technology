@@ -9,6 +9,7 @@ use App\Models\Ticket;
 use App\Models\TicketCategory;
 use App\Models\TicketMessage;
 use App\Models\Upload;
+use App\Models\UserActivityLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -115,6 +116,15 @@ class TicketController extends Controller
             'robot.product.family',
             'category',
             'messages.user:id,name,email,role',
+        ]);
+
+        UserActivityLog::query()->create([
+            'user_id' => $request->user()->id,
+            'action' => 'ticket_created',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'user_agent' => $request->userAgent(),
+            'details' => ['priority' => $validated['priority'], 'ticket_id' => $ticket->id],
+            'created_at' => now(),
         ]);
 
         TicketCreated::dispatch($ticket);

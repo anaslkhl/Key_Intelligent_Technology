@@ -17,9 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ]);
-
-        $middleware->appendToGroup('web', [
             \App\Http\Middleware\TrackPageViews::class,
         ]);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserActivityLog;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\JsonResponse;
@@ -37,6 +38,14 @@ class AuthController extends Controller
         ]);
 
         $user->sendEmailVerificationNotification();
+
+        UserActivityLog::query()->create([
+            'user_id' => $user->id,
+            'action' => 'register',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'user_agent' => $request->userAgent(),
+            'created_at' => now(),
+        ]);
 
         $token = $user->createToken('auth_token', ['*'], now()->addHours(24))->plainTextToken;
 
@@ -100,6 +109,14 @@ class AuthController extends Controller
 
         RateLimiter::clear($key);
 
+        UserActivityLog::query()->create([
+            'user_id' => $user->id,
+            'action' => 'login',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'user_agent' => $request->userAgent(),
+            'created_at' => now(),
+        ]);
+
         // Update last login
         $user->update([
             'last_login_at' => now(),
@@ -128,11 +145,16 @@ class AuthController extends Controller
      */
     public function logout(Request $request): JsonResponse
     {
+        UserActivityLog::query()->create([
+            'user_id' => $request->user()->id,
+            'action' => 'logout',
+            'ip_address' => $request->ip() ?? '127.0.0.1',
+            'user_agent' => $request->userAgent(),
+            'created_at' => now(),
+        ]);
+
         // Delete current token only
         $request->user()->currentAccessToken()->delete();
-
-        // Or delete all tokens (logout from all devices)
-        // $request->user()->tokens()->delete();
 
         return response()->json([
             'message' => 'Logged out successfully',
