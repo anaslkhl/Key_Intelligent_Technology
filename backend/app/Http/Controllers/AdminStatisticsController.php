@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\StatisticsResource;
 use App\Services\StatisticsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +20,7 @@ class AdminStatisticsController extends Controller
 
         $data = $this->statisticsService->getOverview();
 
-        return $this->success(new StatisticsResource($data), 'Overview statistics retrieved successfully.');
+        return $this->success($data, 'Overview statistics retrieved successfully.');
     }
 
     public function pageViews(Request $request): JsonResponse
@@ -34,7 +33,7 @@ class AdminStatisticsController extends Controller
 
         $data = $this->statisticsService->getPageViews($validated['days'] ?? 30);
 
-        return $this->success(new StatisticsResource($data), 'Page view statistics retrieved successfully.');
+        return $this->success($data, 'Page view statistics retrieved successfully.');
     }
 
     public function userActivity(Request $request): JsonResponse
@@ -47,7 +46,7 @@ class AdminStatisticsController extends Controller
 
         $data = $this->statisticsService->getUserActivity($validated['days'] ?? 30);
 
-        return $this->success(new StatisticsResource($data), 'User activity statistics retrieved successfully.');
+        return $this->success($data, 'User activity statistics retrieved successfully.');
     }
 
     public function sessions(): JsonResponse
@@ -56,7 +55,7 @@ class AdminStatisticsController extends Controller
 
         $data = $this->statisticsService->getSessions();
 
-        return $this->success(new StatisticsResource($data), 'Session statistics retrieved successfully.');
+        return $this->success($data, 'Session statistics retrieved successfully.');
     }
 
     public function aiUsage(Request $request): JsonResponse
@@ -69,7 +68,7 @@ class AdminStatisticsController extends Controller
 
         $data = $this->statisticsService->getAIUsage($validated['days'] ?? 30);
 
-        return $this->success(new StatisticsResource($data), 'AI usage statistics retrieved successfully.');
+        return $this->success($data, 'AI usage statistics retrieved successfully.');
     }
 
     public function tickets(): JsonResponse
@@ -78,7 +77,7 @@ class AdminStatisticsController extends Controller
 
         $data = $this->statisticsService->getTicketStats();
 
-        return $this->success(new StatisticsResource($data), 'Ticket statistics retrieved successfully.');
+        return $this->success($data, 'Ticket statistics retrieved successfully.');
     }
 
     public function export(Request $request): StreamedResponse

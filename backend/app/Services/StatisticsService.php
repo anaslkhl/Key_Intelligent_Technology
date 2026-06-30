@@ -66,7 +66,7 @@ class StatisticsService
                 ->select([
                     'path',
                     DB::raw('COUNT(*) as views'),
-                    DB::raw('COUNT(DISTINCT COALESCE(user_id, ip_address)) as unique_visitors'),
+                    DB::raw("COUNT(DISTINCT COALESCE(user_id::text, ip_address)) as unique_visitors"),
                     DB::raw('AVG(response_time) as avg_time_on_page'),
                     DB::raw('MAX(created_at) as last_viewed'),
                 ])
