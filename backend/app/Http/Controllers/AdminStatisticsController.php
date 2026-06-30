@@ -80,6 +80,32 @@ class AdminStatisticsController extends Controller
         return $this->success($data, 'Ticket statistics retrieved successfully.');
     }
 
+    public function visitorsChart(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAdminDashboard');
+
+        $validated = $request->validate([
+            'days' => ['nullable', 'integer', 'min:1', 'max:365'],
+        ]);
+
+        $data = $this->statisticsService->getVisitorsChart($validated['days'] ?? 30);
+
+        return $this->success($data, 'Visitors chart data retrieved successfully.');
+    }
+
+    public function pageViewsChart(Request $request): JsonResponse
+    {
+        Gate::authorize('viewAdminDashboard');
+
+        $validated = $request->validate([
+            'days' => ['nullable', 'integer', 'min:1', 'max:365'],
+        ]);
+
+        $data = $this->statisticsService->getPageViewsChart($validated['days'] ?? 30);
+
+        return $this->success($data, 'Page views chart data retrieved successfully.');
+    }
+
     public function export(Request $request): StreamedResponse
     {
         Gate::authorize('viewAdminDashboard');

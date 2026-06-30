@@ -5,10 +5,12 @@ import toast from 'react-hot-toast'
 import apiClient from '../../api/client'
 import AIUsageChart from '../../components/admin/AIUsageChart'
 import PageViewsChart from '../../components/admin/PageViewsChart'
+import PageViewsChartBar from '../../components/admin/PageViewsChartBar'
 import SessionsTable from '../../components/admin/SessionsTable'
 import StatisticsOverview from '../../components/admin/StatisticsOverview'
 import TicketStatsCard from '../../components/admin/TicketStatsCard'
 import UsersActivityTable from '../../components/admin/UsersActivityTable'
+import VisitorsChart from '../../components/admin/VisitorsChart'
 import PageHeader from '../../components/common/PageHeader'
 import { ErrorState, LoadingState } from '../../components/common/QueryState'
 import AdminPage from './AdminPage'
@@ -48,6 +50,16 @@ export default function Statistics() {
     queryFn: () => apiClient.get('/admin/statistics/tickets').then((r) => r.data.data),
   })
 
+  const visitorsChart = useQuery({
+    queryKey: ['admin-statistics', 'visitors-chart', days],
+    queryFn: () => apiClient.get('/admin/statistics/visitors-chart', { params: { days } }).then((r) => r.data.data),
+  })
+
+  const pageViewsChart = useQuery({
+    queryKey: ['admin-statistics', 'page-views-chart', days],
+    queryFn: () => apiClient.get('/admin/statistics/page-views-chart', { params: { days } }).then((r) => r.data.data),
+  })
+
   const exportMutation = useMutation({
     mutationFn: async (type) => {
       const response = await apiClient.get(`/admin/statistics/export`, {
@@ -65,8 +77,8 @@ export default function Statistics() {
     onError: () => toast.error('Unable to export data'),
   })
 
-  const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || tickets.isLoading
-  const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || tickets.isError
+  const isAnyLoading = overview.isLoading || pageViews.isLoading || userActivity.isLoading || sessions.isLoading || aiUsage.isLoading || tickets.isLoading || visitorsChart.isLoading || pageViewsChart.isLoading
+  const isAnyError = overview.isError || pageViews.isError || userActivity.isError || sessions.isError || aiUsage.isError || tickets.isError || visitorsChart.isError || pageViewsChart.isError
 
   if (isAnyLoading) return <AdminPage><LoadingState label="Loading statistics..." /></AdminPage>
   if (isAnyError) return <AdminPage><ErrorState message="Unable to load statistics data." onRetry={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch() }} /></AdminPage>
@@ -101,7 +113,7 @@ export default function Statistics() {
             <button type="button" onClick={() => exportMutation.mutate('user-activity')} disabled={exportMutation.isPending} className="button button-secondary">
               <Download size={16} /> Activity
             </button>
-            <button type="button" onClick={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch() }} className="button button-primary">
+            <button type="button" onClick={() => { overview.refetch(); pageViews.refetch(); userActivity.refetch(); sessions.refetch(); aiUsage.refetch(); tickets.refetch(); visitorsChart.refetch(); pageViewsChart.refetch() }} className="button button-primary">
               <RefreshCw size={16} /> Refresh
             </button>
           </div>
@@ -125,6 +137,11 @@ export default function Statistics() {
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         <AIUsageChart data={aiUsage.data} />
         <TicketStatsCard data={tickets.data} />
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <VisitorsChart data={visitorsChart.data} />
+        <PageViewsChartBar data={pageViewsChart.data} />
       </div>
 
       <div className="mt-6">

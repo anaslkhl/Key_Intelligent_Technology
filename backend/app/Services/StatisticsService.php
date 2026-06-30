@@ -240,6 +240,45 @@ class StatisticsService
         });
     }
 
+    public function getVisitorsChart(int $days = 30): array
+    {
+        $since = now()->subDays($days)->startOfDay();
+
+        return Cache::remember("admin:stats:visitors_chart:{$days}", self::CACHE_TTL, function () use ($since) {
+            return PageView::query()
+                ->select(DB::raw('DATE(created_at) as date'), DB::raw('COUNT(DISTINCT ip_address) as unique_visitors'))
+                ->where('created_at', '>=', $since)
+                ->groupBy(DB::raw('DATE(created_at)'))
+                ->orderBy('date')
+                ->get()
+                ->map(fn ($row) => [
+                    'date' => $row->date,
+                    'unique_visitors' => (int) $row->unique_visitors,
+                ])
+                ->toArray();
+        });
+    }
+
+    public function getPageViewsChart(int $days = 30): array
+    {
+        $since = now()->subDays($days)->startOfDay();
+
+        return Cache::remember("admin:stats:page_views_chart:{$days}", self::CACHE_TTL, function () use ($since) {
+            return PageView::query()
+                ->select('path', DB::raw('COUNT(*) as views'))
+                ->where('created_at', '>=', $since)
+                ->groupBy('path')
+                ->orderByDesc('views')
+                ->limit(10)
+                ->get()
+                ->map(fn ($row) => [
+                    'path' => $row->path,
+                    'views' => (int) $row->views,
+                ])
+                ->toArray();
+        });
+    }
+
     public function exportData(string $type): \Illuminate\Support\LazyCollection
     {
         return match ($type) {

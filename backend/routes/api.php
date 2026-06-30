@@ -149,6 +149,8 @@ Route::middleware(['auth:sanctum', 'active', 'admin', 'throttle:60,1'])
             Route::get('/sessions', [AdminStatisticsController::class, 'sessions']);
             Route::get('/ai-usage', [AdminStatisticsController::class, 'aiUsage']);
             Route::get('/tickets', [AdminStatisticsController::class, 'tickets']);
+            Route::get('/visitors-chart', [AdminStatisticsController::class, 'visitorsChart']);
+            Route::get('/page-views-chart', [AdminStatisticsController::class, 'pageViewsChart']);
             Route::get('/export', [AdminStatisticsController::class, 'export']);
         });
     });
