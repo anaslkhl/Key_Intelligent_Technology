@@ -1,15 +1,18 @@
+import { Eye, EyeOff, UserPlus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
 import { applyFieldErrors, parseApiError } from '../api/errors'
+import backgroundImage from '../assets/images/image1.png'
 import { useAuth } from '../contexts/auth'
-import backgroundImage from "../assets/images/image1.png";
 
 export default function Register() {
   const { register: createAccount } = useAuth()
   const navigate = useNavigate()
   const [isVisible, setIsVisible] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const { register, handleSubmit, getValues, setError, clearErrors, formState: { errors, isSubmitting } } = useForm()
 
   useEffect(() => {
@@ -31,109 +34,103 @@ export default function Register() {
 
   return (
     <section
-      className="relative min-h-screen bg-cover bg-center bg-no-repeat px-6 py-12 lg:px-0"
+      className="relative min-h-screen bg-cover bg-center bg-no-repeat px-4 py-10 text-white sm:px-6 lg:px-8"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div className="absolute inset-0 bg-black/40" />
-      
-      <div className="relative z-10 flex min-h-[calc(100vh-96px)] items-center justify-center lg:justify-start lg:ml-20">
+      <div className="absolute inset-0 bg-black/55" />
+
+      <div className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center py-10">
         <div
-          className={`w-full max-w-lg transform rounded-2xl bg-white p-8 shadow-xl transition-all duration-700 ${
-            isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'
+          className={`w-full max-w-[420px] transform rounded-2xl border border-white/10 bg-white/[0.08] p-8 shadow-2xl backdrop-blur-[12px] transition-all duration-700 ${
+            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`}
         >
-          <div className="mb-8">
-            <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">
-              Get Started
-            </p>
-            <h1 className="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">
-              Create your account
-            </h1>
-            <p className="mt-2 text-slate-600">
-              Join KIT Support Hub and start managing your robots today.
-            </p>
+          <div className="mb-8 text-center">
+            <span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-950/30">
+              <UserPlus size={22} />
+            </span>
+            <h1 className="mt-5 text-[28px] font-bold leading-tight text-white">Create Account</h1>
+            <p className="mt-2 text-sm text-white/70">Join KIT Support Hub and manage your robots</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {errors.root?.server && <div className="form-alert" role="alert">{errors.root.server.message}</div>}
+            {errors.root?.server && (
+              <div className="mb-4 rounded-xl border border-red-400/30 bg-red-500/15 px-4 py-3 text-sm text-red-100" role="alert">
+                {errors.root.server.message}
+              </div>
+            )}
 
-            <label className="field">
-              <span className="text-sm font-semibold text-slate-700">Full name</span>
+            <Field label="Full name" error={errors.name?.message}>
               <input
                 placeholder="Your full name"
                 autoComplete="name"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className={inputClass}
                 aria-invalid={Boolean(errors.name)}
                 {...register('name', { required: 'Name is required', maxLength: { value: 255, message: 'Name must not exceed 255 characters' } })}
               />
-              {errors.name && <small className="field-error">{errors.name.message}</small>}
-            </label>
+            </Field>
 
-            <label className="field mt-4">
-              <span className="text-sm font-semibold text-slate-700">Work email</span>
+            <Field label="Work email" error={errors.email?.message}>
               <input
                 type="email"
                 placeholder="you@company.com"
                 autoComplete="email"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className={inputClass}
                 aria-invalid={Boolean(errors.email)}
                 {...register('email', {
                   required: 'Email is required',
                   pattern: { value: /^\S+@\S+\.\S+$/, message: 'Enter a valid email address' },
                 })}
               />
-              {errors.email && <small className="field-error">{errors.email.message}</small>}
-            </label>
+            </Field>
 
-            {/* Company Name - Added */}
-            <label className="field mt-4">
-              <span className="text-sm font-semibold text-slate-700">Company name</span>
+            <Field label="Company name">
               <input
                 placeholder="Your company name"
                 autoComplete="organization"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className={inputClass}
                 {...register('company_name')}
               />
-            </label>
+            </Field>
 
-            <label className="field mt-4">
-              <span className="text-sm font-semibold text-slate-700">Password</span>
-              <input
-                type="password"
-                placeholder="At least 8 characters"
-                autoComplete="new-password"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                aria-invalid={Boolean(errors.password)}
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: { value: 8, message: 'Use at least 8 characters' },
-                  pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
-                    message: 'Use uppercase, lowercase, number, and symbol characters',
-                  },
-                })}
+            <Field label="Password" error={errors.password?.message}>
+              <PasswordInput
+                visible={showPassword}
+                onToggle={() => setShowPassword((visible) => !visible)}
+                inputProps={{
+                  placeholder: 'At least 8 characters',
+                  autoComplete: 'new-password',
+                  'aria-invalid': Boolean(errors.password),
+                  ...register('password', {
+                    required: 'Password is required',
+                    minLength: { value: 8, message: 'Use at least 8 characters' },
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/,
+                      message: 'Use uppercase, lowercase, number, and symbol characters',
+                    },
+                  }),
+                }}
               />
-              {errors.password && <small className="field-error">{errors.password.message}</small>}
-            </label>
+            </Field>
 
-            <label className="field mt-4">
-              <span className="text-sm font-semibold text-slate-700">Confirm password</span>
-              <input
-                type="password"
-                placeholder="Repeat your password"
-                autoComplete="new-password"
-                className="mt-1 h-12 w-full rounded-lg border border-slate-200 bg-white px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                aria-invalid={Boolean(errors.password_confirmation)}
-                {...register('password_confirmation', {
-                  required: 'Please confirm your password',
-                  validate: (value) => value === getValues('password') || 'Passwords do not match',
-                })}
+            <Field label="Confirm password" error={errors.password_confirmation?.message}>
+              <PasswordInput
+                visible={showConfirmPassword}
+                onToggle={() => setShowConfirmPassword((visible) => !visible)}
+                inputProps={{
+                  placeholder: 'Repeat your password',
+                  autoComplete: 'new-password',
+                  'aria-invalid': Boolean(errors.password_confirmation),
+                  ...register('password_confirmation', {
+                    required: 'Please confirm your password',
+                    validate: (value) => value === getValues('password') || 'Passwords do not match',
+                  }),
+                }}
               />
-              {errors.password_confirmation && <small className="field-error">{errors.password_confirmation.message}</small>}
-            </label>
+            </Field>
 
             <button
-              className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-semibold text-white transition hover:bg-blue-700 hover:scale-[1.02] disabled:opacity-50"
+              className="mt-6 h-12 w-full rounded-lg bg-blue-600 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
               type="submit"
               disabled={isSubmitting}
             >
@@ -141,9 +138,9 @@ export default function Register() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-white/70">
             Already registered?{' '}
-            <Link to="/login" className="font-semibold text-blue-600 hover:underline">
+            <Link to="/login" className="font-semibold text-white hover:text-blue-200">
               Sign in
             </Link>
           </p>
@@ -152,3 +149,35 @@ export default function Register() {
     </section>
   )
 }
+
+function Field({ label, error, children }) {
+  return (
+    <label className="mt-4 block first:mt-0">
+      <span className="text-sm font-semibold text-white">{label}</span>
+      <div className="mt-2">{children}</div>
+      {error && <small className="mt-1 block text-sm text-red-200">{error}</small>}
+    </label>
+  )
+}
+
+function PasswordInput({ visible, onToggle, inputProps }) {
+  return (
+    <div className="relative">
+      <input
+        type={visible ? 'text' : 'password'}
+        className={`${inputClass} pr-12`}
+        {...inputProps}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-white/70 transition hover:bg-white/10 hover:text-white"
+        aria-label={visible ? 'Hide password' : 'Show password'}
+      >
+        {visible ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
+  )
+}
+
+const inputClass = 'h-12 w-full rounded-lg border border-white/15 bg-white/10 px-4 text-sm text-white outline-none transition placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30'

@@ -60,9 +60,9 @@ export default function Header() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const isAuthPage = ["/login", "/register"].includes(location.pathname);
-  const isTransparent = location.pathname === "/" && !isAuthPage && !scrolled;
+  const isTransparent = (location.pathname === "/" || isAuthPage) && !scrolled;
   const links = isAuthenticated ? clientLinks : publicLinks;
-  const showNav = !isAuthPage;
+  const showNav = true;
 
   useEffect(() => {
     const updateScrolled = () => setScrolled(window.scrollY > 10);
@@ -296,7 +296,7 @@ export default function Header() {
               marginLeft: "auto",
             }}
           >
-            {!isAuthPage && (
+            {(
               <button
                 type="button"
                 onClick={toggleTheme}
@@ -451,56 +451,58 @@ export default function Header() {
                 )}
               </div>
             ) : (
-              !isAuthPage && (
-                <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                  <NavLink
-                    to="/login"
-                    style={{
-                      minHeight: "36px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      border: isTransparent
-                        ? "1px solid rgba(255,255,255,0.3)"
-                        : "1px solid #cbd5e1",
-                      borderRadius: "8px",
-                      padding: "0 12px",
-                      background: isTransparent
-                        ? "rgba(255,255,255,0.1)"
-                        : "#ffffff",
-                      color: getTextColor(),
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Log in
-                  </NavLink>
-                  <NavLink
-                    to="/register"
-                    style={{
-                      minHeight: "36px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      border: "1px solid transparent",
-                      borderRadius: "8px",
-                      padding: "0 12px",
-                      background: "#2563eb",
-                      color: "#ffffff",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Get started
-                  </NavLink>
-                </div>
-              )
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                {location.pathname !== "/login" && (
+                <NavLink
+                  to="/login"
+                  style={{
+                    minHeight: "36px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    border: isTransparent
+                      ? "1px solid rgba(255,255,255,0.3)"
+                      : "1px solid #cbd5e1",
+                    borderRadius: "8px",
+                    padding: "0 12px",
+                    background: isTransparent
+                      ? "rgba(255,255,255,0.1)"
+                      : "#ffffff",
+                    color: getTextColor(),
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Log in
+                </NavLink>
+                )}
+                {location.pathname !== "/register" && (
+                <NavLink
+                  to="/register"
+                  style={{
+                    minHeight: "36px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    border: "1px solid transparent",
+                    borderRadius: "8px",
+                    padding: "0 12px",
+                    background: "#2563eb",
+                    color: "#ffffff",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  Get started
+                </NavLink>
+                )}
+              </div>
             )}
 
             {/* Mobile Hamburger */}
@@ -706,7 +708,6 @@ export default function Header() {
     </>
   );
 }
-
 
 
 
