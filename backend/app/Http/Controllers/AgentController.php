@@ -52,14 +52,27 @@ class AgentController extends Controller
         $validated = $request->validate([
             'status' => ['nullable', Rule::in(['new', 'open', 'in_progress', 'waiting_client', 'resolved', 'closed'])],
             'priority' => ['nullable', Rule::in(['low', 'medium', 'high', 'urgent', 'critical'])],
+            'category_id' => ['nullable', 'uuid', 'exists:ticket_categories,id'],
             'assigned_to' => ['nullable', 'uuid', 'exists:users,id'],
+            'search' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $priority = $validated['priority'] ?? null;
+
         $tickets = Ticket::query()
-            ->with(['user:id,name,email', 'robot.product.family', 'assignee:id,name,email'])
+            ->with(['user:id,name,email', 'robot.product.family', 'category:id,name', 'assignee:id,name,email'])
             ->when($validated['status'] ?? null, fn (Builder $query, string $status) => $query->where('status', $status))
-            ->when($validated['priority'] ?? null, fn (Builder $query, string $priority) => $query->where('priority', $priority))
+            ->when($priority, fn (Builder $query) => $priority === 'critical'
+                ? $query->whereIn('priority', ['critical', 'urgent'])
+                : $query->where('priority', $priority)
+            )
+            ->when($validated['category_id'] ?? null, fn (Builder $query, string $categoryId) => $query->where('category_id', $categoryId))
             ->when($validated['assigned_to'] ?? null, fn (Builder $query, string $agentId) => $query->where('assigned_to', $agentId))
+            ->when($validated['search'] ?? null, fn (Builder $query, string $search) => $query->where(function (Builder $searchQuery) use ($search) {
+                $searchQuery
+                    ->where('title', 'ILIKE', "%{$search}%")
+                    ->orWhere('description', 'ILIKE', "%{$search}%");
+            }))
             ->latest()
             ->paginate($this->perPage());
 

@@ -17,6 +17,10 @@ class AdminTicketResource extends JsonResource
             'title' => $this->title,
             'status' => $this->status,
             'priority' => $this->priority,
+            'category' => $this->whenLoaded('category', fn () => $this->category ? [
+                'id' => $this->category->id,
+                'name' => $this->category->name,
+            ] : null),
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
@@ -30,6 +34,10 @@ class AdminTicketResource extends JsonResource
                     'id' => $this->robot->product->id,
                     'model' => $this->robot->product->model,
                     'name' => $this->robot->product->name,
+                    'family' => $this->robot->product->relationLoaded('family') && $this->robot->product->family ? [
+                        'id' => $this->robot->product->family->id,
+                        'name' => $this->robot->product->family->name,
+                    ] : null,
                 ] : null,
             ]),
             'assigned_to' => $this->whenLoaded('assignee', fn () => $this->assignee ? [
