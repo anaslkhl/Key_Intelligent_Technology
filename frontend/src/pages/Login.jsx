@@ -40,23 +40,23 @@ export default function Login() {
 
   return (
     <section
-      className="relative min-h-screen bg-cover bg-center bg-no-repeat text-white"
+      className="relative min-h-screen bg-cover bg-center bg-no-repeat text-white pt-[64px]"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div className="absolute inset-0 bg-black/55" />
 
       <div className="relative z-10 flex min-h-screen items-center justify-start pl-[200px] max-xl:pl-24 max-lg:justify-center max-lg:px-4 max-lg:pl-4">
         <div
-          className={`flex h-[700px] w-[600px] max-w-[calc(100vw-32px)] transform flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.08] p-8 shadow-2xl backdrop-blur-[12px] transition-all duration-700 max-sm:h-auto max-sm:min-h-[620px] ${
-            isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          className={`flex h-[700px] w-[600px] max-w-[calc(100vw-32px)] transform flex-col justify-center rounded-2xl border border-white/30 bg-white p-8 shadow-[0_8px_32px_rgba(0,0,0,0.08)] backdrop-blur-[20px] transition-all duration-700 dark:border-white/10 dark:bg-transparent dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] max-sm:h-auto max-sm:min-h-[620px] ${
+            isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'
           }`}
         >
           <div className="mb-8 text-center">
             <span className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-950/30">
               <ShieldCheck size={22} />
             </span>
-            <h1 className="mt-5 text-[28px] font-bold leading-tight text-white">Welcome Back</h1>
-            <p className="mt-2 text-sm text-white/70">Sign in to continue to KIT Support Hub</p>
+            <h1 className="mt-5 text-[28px] font-bold leading-tight text-[#0F172A] dark:text-white">Welcome Back</h1>
+            <p className="mt-2 text-sm text-[#475569] dark:text-[#94A3B8]">Sign in to continue to KIT Support Hub</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -67,12 +67,12 @@ export default function Login() {
             )}
 
             <label className="block">
-              <span className="text-sm font-semibold text-white">Email address</span>
+              <span className="text-sm font-semibold text-[#1E293B] dark:text-[#E2E8F0]">Email address</span>
               <input
                 type="email"
                 autoComplete="email"
                 placeholder="you@company.com"
-                className="mt-2 h-12 w-full rounded-lg border border-white/15 bg-white/10 px-4 text-sm text-white outline-none transition placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30"
+                className="mt-2 h-12 w-full rounded-lg border border-[#E2E8F0] bg-white/90 px-4 text-sm text-[#0F172A] outline-none transition placeholder:text-[#94A3B8] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/[0.15] dark:border-white/[0.12] dark:bg-white/[0.05] dark:text-white dark:placeholder:text-[#64748B] dark:focus:border-[#2563EB] dark:focus:ring-[#2563EB]/[0.25]"
                 aria-invalid={Boolean(errors.email)}
                 {...register('email', {
                   required: 'Email is required',
@@ -83,20 +83,20 @@ export default function Login() {
             </label>
 
             <label className="mt-4 block">
-              <span className="text-sm font-semibold text-white">Password</span>
+              <span className="text-sm font-semibold text-[#1E293B] dark:text-[#E2E8F0]">Password</span>
               <div className="relative mt-2">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Enter your password"
-                  className="h-12 w-full rounded-lg border border-white/15 bg-white/10 px-4 pr-12 text-sm text-white outline-none transition placeholder:text-white/40 focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30"
+                  className="h-12 w-full rounded-lg border border-[#E2E8F0] bg-white/90 px-4 pr-12 text-sm text-[#0F172A] outline-none transition placeholder:text-[#94A3B8] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/[0.15] dark:border-white/[0.12] dark:bg-white/[0.05] dark:text-white dark:placeholder:text-[#64748B] dark:focus:border-[#2563EB] dark:focus:ring-[#2563EB]/[0.25]"
                   aria-invalid={Boolean(errors.password)}
                   {...register('password', { required: 'Password is required' })}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((visible) => !visible)}
-                  className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-white/70 transition hover:bg-white/10 hover:text-white"
+                  className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-[#64748B] transition hover:bg-white/10 hover:text-[#0F172A] dark:text-[#64748B] dark:hover:text-[#0F172A]"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -114,9 +114,9 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-white/70">
+          <p className="mt-6 text-center text-sm text-[#475569] dark:text-[#94A3B8]">
             New to KIT Support Hub?{' '}
-            <Link to="/register" className="font-semibold text-white hover:text-blue-200">
+            <Link to="/register" className="font-semibold text-[#2563EB] hover:text-[#1D4ED8] dark:text-[#2563EB] dark:hover:text-[#1D4ED8]">
               Create an account
             </Link>
           </p>

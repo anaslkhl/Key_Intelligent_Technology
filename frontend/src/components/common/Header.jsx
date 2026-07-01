@@ -65,7 +65,7 @@ export default function Header() {
   const showNav = true;
 
   useEffect(() => {
-    const updateScrolled = () => setScrolled(window.scrollY > 10);
+    const updateScrolled = () => setScrolled(window.scrollY > 20);
     updateScrolled();
     window.addEventListener("scroll", updateScrolled, { passive: true });
     return () => window.removeEventListener("scroll", updateScrolled);
@@ -109,23 +109,21 @@ export default function Header() {
 
   const getTextColor = () => {
     if (isTransparent) return "#ffffff";
+    if (isAuthPage) return isDark ? "#ffffff" : "#0f172a";
     if (isDark) return "#ffffff";
     return "#0f172a";
   };
 
   const getBackground = () => {
     if (isTransparent) return "transparent";
+    if (isAuthPage) return isDark ? "#15172b" : "#ffffff";
     if (isDark) return "#0a1628";
     return "#ffffff";
   };
 
   const getLinkColor = (isActive) => {
-    if (isTransparent) {
-      return isActive ? "#ffffff" : "#ffffff";
-    }
-    if (isDark) {
-      return isActive ? "#60a5fa" : "#94a3b8";
-    }
+    if (isTransparent) return "#ffffff";
+    if (isDark) return isActive ? "#60a5fa" : "#94a3b8";
     return isActive ? "#2563eb" : "#64748b";
   };
 
@@ -148,7 +146,7 @@ export default function Header() {
     <>
       <header
         style={{
-          position: "sticky",
+          position: isAuthPage ? "fixed" : "sticky",
           top: 0,
           zIndex: 50,
           width: "100%",
@@ -461,15 +459,11 @@ export default function Header() {
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "6px",
-                    border: isTransparent
-                      ? "1px solid rgba(255,255,255,0.3)"
-                      : "1px solid #cbd5e1",
+                    border: "1px solid transparent",
                     borderRadius: "8px",
                     padding: "0 12px",
-                    background: isTransparent
-                      ? "rgba(255,255,255,0.1)"
-                      : "#ffffff",
-                    color: getTextColor(),
+                    background: "#2563eb",
+                    color: "#ffffff",
                     fontSize: "13px",
                     fontWeight: 600,
                     textDecoration: "none",
