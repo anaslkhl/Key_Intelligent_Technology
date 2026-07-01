@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { applyFieldErrors, parseApiError } from '../api/errors'
 import { useAuth } from '../contexts/auth'
 import { getRoleHome } from '../utils/roles'
@@ -9,7 +9,6 @@ import backgroundImage from "../assets/images/login.png";
 
 export default function Login() {
   const { isAuthenticated, login, user } = useAuth()
-  const location = useLocation()
   const navigate = useNavigate()
   const [isVisible, setIsVisible] = useState(false)
   const { register, handleSubmit, setError, clearErrors, formState: { errors, isSubmitting } } = useForm()
@@ -19,7 +18,9 @@ export default function Login() {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) navigate('/', { replace: true })  // ← Changed
+    if (isAuthenticated && user?.role) {
+      navigate(getRoleHome(user.role), { replace: true })
+    }
   }, [isAuthenticated, navigate, user])
 
   const onSubmit = async (values) => {
@@ -27,8 +28,7 @@ export default function Login() {
     try {
       const loggedInUser = await login(values.email, values.password)
       toast.success('Welcome back')
-      const requestedLocation = location.state?.from
-      navigate(requestedLocation ? `${requestedLocation.pathname}${requestedLocation.search || ''}` : '/', { replace: true })
+      navigate(getRoleHome(loggedInUser.role), { replace: true })
     } catch (error) {
       const apiError = parseApiError(error, 'Unable to log in')
       applyFieldErrors(setError, apiError.fieldErrors)

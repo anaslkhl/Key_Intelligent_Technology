@@ -1,11 +1,11 @@
 export const ROLE_HOME = {
-  client: '/dashboard',
+  client: '/',
   agent: '/agent/dashboard',
   admin: '/admin/dashboard',
 }
 
 export function getRoleHome(role) {
-  return ROLE_HOME[role] || '/dashboard'
+  return ROLE_HOME[role] || '/'
 }
 
 export const ROLE_LABELS = {
