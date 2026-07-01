@@ -26,6 +26,10 @@ class TicketResource extends JsonResource
                 'id' => $this->category->id,
                 'name' => $this->category->name,
             ]),
+            'family' => $this->whenLoaded('robot', fn () => $this->robot?->product?->family ? [
+                'id' => $this->robot->product->family->id,
+                'name' => $this->robot->product->family->name,
+            ] : null),
             'assignee' => $this->whenLoaded('assignee', fn () => $this->assignee ? [
                 'id' => $this->assignee->id,
                 'name' => $this->assignee->name,

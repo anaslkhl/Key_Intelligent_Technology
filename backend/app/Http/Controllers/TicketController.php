@@ -23,11 +23,22 @@ class TicketController extends Controller
 
         $validated = $request->validate([
             'status' => ['nullable', Rule::in(['new', 'open', 'in_progress', 'waiting_client', 'resolved', 'closed'])],
+            'category_id' => ['nullable', 'uuid', 'exists:ticket_categories,id'],
+            'family_id' => ['nullable', 'uuid', 'exists:product_families,id'],
         ]);
 
-        $tickets = Ticket::query()
-            ->where('user_id', $request->user()->id)
+        $baseQuery = Ticket::query()
+            ->where('user_id', $request->user()->id);
+
+        $filters = $this->ticketFilters($request->user()->id);
+
+        $tickets = (clone $baseQuery)
             ->when($validated['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
+            ->when($validated['category_id'] ?? null, fn ($query, string $categoryId) => $query->where('category_id', $categoryId))
+            ->when($validated['family_id'] ?? null, fn ($query, string $familyId) => $query->whereHas(
+                'robot.product',
+                fn ($productQuery) => $productQuery->where('family_id', $familyId)
+            ))
             ->with([
                 'robot.product.family',
                 'category',
@@ -37,7 +48,27 @@ class TicketController extends Controller
             ->latest()
             ->paginate($this->perPage());
 
-        return $this->paginated($tickets, TicketResource::class, 'Tickets retrieved successfully.');
+        return response()->json([
+            'data' => TicketResource::collection($tickets->items()),
+            'filters' => $filters,
+            'links' => [
+                'first' => $tickets->url(1),
+                'last' => $tickets->url($tickets->lastPage()),
+                'prev' => $tickets->previousPageUrl(),
+                'next' => $tickets->nextPageUrl(),
+            ],
+            'meta' => [
+                'current_page' => $tickets->currentPage(),
+                'from' => $tickets->firstItem(),
+                'last_page' => $tickets->lastPage(),
+                'path' => $tickets->path(),
+                'per_page' => $tickets->perPage(),
+                'to' => $tickets->lastItem(),
+                'total' => $tickets->total(),
+            ],
+            'message' => 'Tickets retrieved successfully.',
+            'status' => 200,
+        ]);
     }
 
     public function store(Request $request): JsonResponse
@@ -184,6 +215,57 @@ class TicketController extends Controller
     {
         abort_unless($request->user()?->is_active, 403, 'Your account is inactive.');
         abort_unless($request->user()?->role === 'client', 403, 'Only authenticated clients can access tickets.');
+    }
+
+    /**
+     * @return array{categories: array<int, array<string, mixed>>, families: array<int, array<string, mixed>>}
+     */
+    private function ticketFilters(string $userId): array
+    {
+        $categories = TicketCategory::query()
+            ->with('family:id,name')
+            ->withCount([
+                'tickets as tickets_count' => fn ($query) => $query->where('user_id', $userId),
+            ])
+            ->orderBy('name')
+            ->get()
+            ->filter(fn (TicketCategory $category) => (int) $category->tickets_count > 0)
+            ->map(fn (TicketCategory $category) => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'family_id' => $category->family_id,
+                'family_name' => $category->family?->name,
+                'count' => (int) $category->tickets_count,
+            ])
+            ->values()
+            ->all();
+
+        $families = DB::table('tickets')
+            ->join('robots', 'tickets.robot_id', '=', 'robots.id')
+            ->join('products', 'robots.product_id', '=', 'products.id')
+            ->join('product_families', 'products.family_id', '=', 'product_families.id')
+            ->where('tickets.user_id', $userId)
+            ->select([
+                'product_families.id',
+                'product_families.name',
+                DB::raw('COUNT(tickets.id) as tickets_count'),
+            ])
+            ->groupBy('product_families.id', 'product_families.name', 'product_families.sort_order')
+            ->orderBy('product_families.sort_order')
+            ->orderBy('product_families.name')
+            ->get()
+            ->map(fn ($family) => [
+                'id' => $family->id,
+                'name' => $family->name,
+                'count' => (int) $family->tickets_count,
+            ])
+            ->values()
+            ->all();
+
+        return [
+            'categories' => $categories,
+            'families' => $families,
+        ];
     }
 
     /**
