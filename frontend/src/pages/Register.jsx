@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
 import { applyFieldErrors, parseApiError } from '../api/errors'
-import backgroundImage from '../assets/images/image1.png'
+import backgroundImage from '../assets/images/login.png'
 import { useAuth } from '../contexts/auth'
 
 export default function Register() {
@@ -34,14 +34,14 @@ export default function Register() {
 
   return (
     <section
-      className="relative min-h-screen bg-cover bg-center bg-no-repeat px-4 py-10 text-white sm:px-6 lg:px-8"
+      className="relative min-h-screen bg-cover bg-center bg-no-repeat text-white"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div className="absolute inset-0 bg-black/55" />
 
-      <div className="relative z-10 flex min-h-[calc(100vh-80px)] items-center justify-center py-10">
+      <div className="relative z-10 flex min-h-screen items-center justify-start pl-[200px] max-xl:pl-24 max-lg:justify-center max-lg:px-4 max-lg:pl-4">
         <div
-          className={`w-full max-w-[420px] transform rounded-2xl border border-white/10 bg-white/[0.08] p-8 shadow-2xl backdrop-blur-[12px] transition-all duration-700 ${
+          className={`flex h-[700px] w-[600px] max-w-[calc(100vw-32px)] transform flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.08] p-8 shadow-2xl backdrop-blur-[12px] transition-all duration-700 max-sm:h-auto max-sm:min-h-[700px] ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
           }`}
         >
